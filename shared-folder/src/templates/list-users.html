@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block container %}
+	{% for user in users %}
+		ID: {{ user.id }}</br>
+		NAME: {{ user.first_name }}</br>
+		LAST NAME: {{ user.last_name }}</br>
+		USERNAME: {{ user.username }}</br>
+		EMAIL: {{ user.email }}</br>
+		PASS: {{ user.password }}</br>
+	{% endfor %}
+{% endblock container %}            
