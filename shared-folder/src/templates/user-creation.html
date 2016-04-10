@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block container %}
+    <ol class="breadcrumb"> 
+        <li><a href="{% url "home" %}">Home</a></li>
+        <li><a href="{% url "list" %}">Users list</a></li>                 
+        <li class="active">{{ role }} creation</li>                 
+    </ol>            
+    <div class="row"> 
+        <article class="col-xs-12 maincontent"> 
+            <header class="page-header"> 
+                <h1 class="page-title">{{ role }} creation</h1> 
+            </header>                     
+            <div class="col-md-6"> 
+                <div class="panel panel-default"> 
+                    <div class="panel-body"> 
+                        <h3 class="thin text-center">Register a new {{ role }}</h3> 
+                        <hr> 
+                        <form method="POST" action=""> {% csrf_token %} 
+                            <div class="top-margin"> 
+                                <label>First Name
+                                    {% if userCreationForm.first_name.field.required %}
+                                    <span class="text-danger">*</span>
+                                    {% endif %}
+                                </label>   
+                                {{ userCreationForm.first_name }}                                      
+                            </div>                                     
+                            <div class="top-margin"> 
+                                <label>Last Name
+                                    {% if userCreationForm.last_name.field.required %}
+                                    <span class="text-danger">*</span>
+                                    {% endif %}
+                                </label>
+                                {{ userCreationForm.last_name }} 
+                            </div>             
+                            <hr> 
+                            <div class="top-margin"> 
+                                <label>Challenge
+                                    {% if userCreationForm.last_name.field.required %}
+                                    <span class="text-danger">*</span>
+                                    {% endif %}
+                                </label>
+                                {{ userCreationForm.challenge_select }} 
+                            </div>
+                            <div class="top-margin"> 
+                                <label>Biography
+                                    {% if profileForm.bio.field.required %}
+                                    <span class="text-danger">*</span>
+                                    {% endif %}
+                                </label>   
+                                {{ profileForm.bio }}                                      
+                            </div>
+                            <div class="top-margin"> 
+                                <label>Affiliation name
+                                    {% if affiliationForm.name.field.required %}
+                                    <span class="text-danger">*</span>
+                                    {% endif %}
+                                </label>   
+                                {{ affiliationForm.name }}                                      
+                            </div>
+                            <div class="top-margin"> 
+                                <label>Affiliation country
+                                    {% if affiliationForm.country.field.required %}
+                                    <span class="text-danger">*</span>
+                                    {% endif %}
+                                </label>   
+                                {{ affiliationForm.country }}                                      
+                            </div>
+                            <div class="top-margin"> 
+                                <label>Affiliation city
+                                    {% if affiliationForm.city.field.required %}
+                                    <span class="text-danger">*</span>
+                                    {% endif %}
+                                </label>   
+                                {{ affiliationForm.city }}                                      
+                            </div>
+                            <hr> 
+                            <div class="row">
+                                <div class="col-lg-4 col-lg-offset-8 text-right"> 
+                                    <button class="btn btn-action" type="submit">Save</button>
+                                </div>
+                            </div>                                     
+                        </form>                                 
+                    </div>                             
+                </div>                         
+            </div>                   
+        </article>                 
+    </div> 
+{% endblock container %}            

@@ -1,9 +1,22 @@
 {% extends "base.html" %}
 {% block container %}
-	ID: {{ instance.id }}</br>
-	NAME: {{ instance.first_name }}</br>
-	LAST NAME: {{ instance.last_name }}</br>
-	USERNAME: {{ instance.username }}</br>
-	EMAIL: {{ instance.email }}</br>
-	PASS: {{ instance.password }}</br>
+	<ol class="breadcrumb"> 
+        <li><a href="{% url "home" %}">Home</a></li>
+        <li><a href="{% url "list" %}">Users list</a></li>                 
+        <li class="active">User Detail</li>                
+    </ol> 
+    <h2 class="text-center top-space">User Detail</h2> 
+    <br> 
+    <div class="row"> 
+        <div class="col-sm-3 col-separator"> 
+            <h3>{{ profile.user.username }}</h3> 
+	        <p>	<b>First name:</b> {{ profile.user.first_name }}</br>
+				<b>Last name:</b> {{ profile.user.last_name }}</br>
+				<b>Email:</b> {{ profile.user.email }}</br>
+				<b>Role:</b> {{ profile.events.role }}</br>
+				<b>Affiliation name:</b> {{ profile.affiliation.name }}</br>
+				<b>Affiliation country:</b> {{ profile.affiliation.country }}</br>
+				<b>Affiliation city:</b> {{ profile.affiliation.city }}</br></p>
+        </div>              
+    </div>
 {% endblock container %}      

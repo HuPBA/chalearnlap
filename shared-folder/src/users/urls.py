@@ -8,4 +8,5 @@ urlpatterns = [
     url(r'^sign/$', views.sign, name="sign"),
     url(r'^list/$', views.list, name="list"),
     url(r'^detail/(?P<id>\d+)/$', views.detail, name="detail"),
+    url(r'^user-creation/(?P<id>\d+)/$', views.user_creation, name="user-creation"),
 ]

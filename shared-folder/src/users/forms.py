@@ -83,3 +83,26 @@ class UserLogForm(forms.Form):
 
 	def clean(self):
 		return self.cleaned_data
+
+class UserCreationForm(forms.ModelForm):
+	def __init__(self, *args, **kwargs):
+		super(UserCreationForm, self).__init__(*args, **kwargs)
+		self.fields['first_name'].required = True
+		self.fields['last_name'].required = True
+		self.fields['challenge_select'].required = True
+
+	challenge_select = forms.ChoiceField(widget=forms.Select(attrs={'class': "form-control"}), required=True)
+
+	class Meta:
+		model = User
+		fields = [
+			"first_name",
+			"last_name",
+		]
+		widgets = {
+			'first_name': forms.TextInput(attrs={'class': "form-control"}),
+			'last_name': forms.TextInput(attrs={'class': "form-control"}),
+		}
+
+	def clean(self):
+		return self.cleaned_data	

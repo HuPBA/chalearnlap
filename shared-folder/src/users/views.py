@@ -1,10 +1,11 @@
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
-from .forms import UserRegForm, UserLogForm, ProfileForm, AffiliationForm
+from .forms import UserRegForm, UserLogForm, ProfileForm, AffiliationForm, UserCreationForm
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_protect
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
+from .models import Profile, Profile_Event, Affiliation
 
 def home(request):
 	return render(request, "home.html", {});
@@ -55,6 +56,7 @@ def sign(request):
 					else:
 						print 'not active'
 				else:
+					
 					print 'None'
 			else:
 				print 'not valid'
@@ -68,15 +70,66 @@ def sign(request):
 	return render(request, "sign.html", context)
 
 def list(request):
-	queryset = User.objects.all()
+	profiles = Profile.objects.all()
+	admins = Profile.objects.all().filter(profile__role="admin")
+	editors = Profile.objects.all().filter(profile__role="editors")
+	organizers = Profile.objects.all().filter(profile__role="organizers")
 	context = {
-		"users": queryset,
+		"profiles": profiles,
+		"admins": admins,
+		"editors": editors,
+		"organizers": organizers
 	}
 	return render(request, "list-users.html", context);
 
 def detail(request, id=None):
-	instance = get_object_or_404(User, id=id)
+	profile = get_object_or_404(Profile, id=id)
 	context = {
-		"instance": instance
+		"profile": profile
 	}
 	return render(request, "detail.html", context)
+
+@csrf_protect
+def user_creation(request, id=None):
+	userCreationForm = UserCreationForm()
+	profileForm = ProfileForm()
+	affiliationForm = AffiliationForm()
+	if request.method == 'POST':
+		userCreationForm = UserCreationForm(request.POST)
+		profileForm = ProfileForm(request.POST)
+		affiliationForm = AffiliationForm(request.POST)
+		if userCreationForm.is_valid():
+			if profileForm.is_valid():
+				if affiliationForm.is_valid():
+					fname = userCreationForm.cleaned_data["first_name"]
+					lname = userCreationForm.cleaned_data["last_name"]
+					bio = profileForm.cleaned_data["bio"]
+					aff_name = affiliationForm.cleaned_data["name"]
+					aff_country = affiliationForm.cleaned_data["country"]
+					aff_city = affiliationForm.cleaned_data["city"]
+					new_aff = Affiliation(name=aff_name, country=aff_country, city=aff_city)
+					# new_aff.save()
+					new_user = User.objects.create_user(username=(fname+lname), email=None, password=None)
+					new_user.first_name = fname
+					new_user.last_name = lname
+					# new_user.save()
+					new_profile = Profile(user=new_user, affiliation=new_aff, bio=bio)
+					# new_profile.save()
+					if id==1: # organizer
+						new_profile_event = Profile_Event(profile=new_profile, role="editor")
+					elif id==2: # editor
+						new_profile_event = Profile_Event(profile=new_profile, role="editor")
+					# new_profile_event.save()
+					messages.success(request, "User registered succesfully")
+				else:
+					messages.error(request, affiliationForm.errors)
+			else:
+				messages.error(request, profileForm.errors)
+		else:
+			messages.error(request, userCreationForm.errors)
+	context = {
+		"userCreationForm": userCreationForm,
+		"profileForm": profileForm,
+		"affiliationForm": affiliationForm
+	}
+	return render(request, "user-creation.html", context)
