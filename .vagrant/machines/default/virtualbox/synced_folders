@@ -1,1 +1,0 @@
-{"virtualbox":{"/var/www":{"guestpath":"/var/www","hostpath":"C:/Users/Oriol/Desktop/GitLocalRepos/chalearn-web/shared-folder","disabled":false,"__vagrantfile":true},"/vagrant":{"guestpath":"/vagrant","hostpath":"C:/Users/Oriol/Desktop/GitLocalRepos/chalearn-web","disabled":false,"__vagrantfile":true}}}
