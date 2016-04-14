@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_protect
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
-from .models import Profile, Profile_Event, Affiliation
+from .models import Profile, Profile_Event, Affiliation, Event
 
 def home(request):
 	return render(request, "home.html", {});
@@ -72,8 +72,13 @@ def sign(request):
 def list(request):
 	profiles = Profile.objects.all()
 	admins = User.objects.all().filter(is_staff=True)
-	editors = Profile.objects.all().filter(profile__role="editors")
-	organizers = Profile.objects.all().filter(profile__role="organizers")
+	editors = []
+	organizers = []
+	for o in Profile_Event.objects.all():
+		if o.role == 'editor':
+			editors.append(o.profile)
+		elif o.role == 'organizer':
+			organizers.append(o.profile)
 	context = {
 		"profiles": profiles,
 		"admins": admins,
@@ -91,7 +96,11 @@ def detail(request, id=None):
 
 @csrf_protect
 def user_creation(request, id=None):
-	userCreationForm = UserCreationForm()
+	choices = []
+	events = Event.objects.all()
+	for e in events:
+	    choices.append((e.id, e.title))
+	userCreationForm = UserCreationForm(choices)
 	profileForm = ProfileForm()
 	affiliationForm = AffiliationForm()
 	if id=='1':
@@ -99,7 +108,7 @@ def user_creation(request, id=None):
 	elif id=='2':
 		role = "editor"
 	if request.method == 'POST':
-		userCreationForm = UserCreationForm(request.POST)
+		userCreationForm = UserCreationForm(choices, request.POST)
 		profileForm = ProfileForm(request.POST)
 		affiliationForm = AffiliationForm(request.POST)
 		if userCreationForm.is_valid():
@@ -111,19 +120,13 @@ def user_creation(request, id=None):
 					aff_name = affiliationForm.cleaned_data["name"]
 					aff_country = affiliationForm.cleaned_data["country"]
 					aff_city = affiliationForm.cleaned_data["city"]
+					event_selected = Event.objects.get(pk=userCreationForm.cleaned_data["event_select"])
 					new_aff = Affiliation(name=aff_name, country=aff_country, city=aff_city)
-					# new_aff.save()
-					new_user = User.objects.create_user(username=(fname+lname), email=None, password=None)
-					new_user.first_name = fname
-					new_user.last_name = lname
-					# new_user.save()
-					new_profile = Profile(user=new_user, affiliation=new_aff, bio=bio)
-					# new_profile.save()
-					if id==1: # organizer
-						new_profile_event = Profile_Event(profile=new_profile, role=role)
-					elif id==2: # editor
-						new_profile_event = Profile_Event(profile=new_profile, role=role)
-					# new_profile_event.save()
+					new_aff.save()
+					new_profile = Profile(first_name=fname, last_name= lname, affiliation=new_aff, bio=bio)
+					new_profile.save()
+					new_profile_event = Profile_Event(profile=new_profile, event=event_selected, role=role)
+					new_profile_event.save()
 					messages.success(request, "User registered succesfully")
 				else:
 					messages.error(request, affiliationForm.errors)

@@ -87,9 +87,12 @@ class UserLogForm(forms.Form):
 		return self.cleaned_data
 
 class UserCreationForm(forms.Form):
-	def __init__(self, *args, **kwargs):
+	def __init__(self, choices, *args, **kwargs):
 		super(UserCreationForm, self).__init__(*args, **kwargs)
 		self.fields['event_select'] = forms.ChoiceField(widget=forms.Select(attrs={'class': "form-control"}), required=True)
+		self.fields['event_select'].choices = choices
+
+	event_select = forms.ChoiceField(choices=(), required=True)
 
 	def clean(self):
 		return self.cleaned_data	
