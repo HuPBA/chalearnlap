@@ -141,3 +141,8 @@ def user_creation(request, id=None):
 		"role": role
 	}
 	return render(request, "user-creation.html", context)
+
+@csrf_protect
+def dataset_list(request):
+	context = {}
+	return render(request, "list-dataset.html", context)

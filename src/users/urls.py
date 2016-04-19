@@ -6,7 +6,8 @@ urlpatterns = [
     url(r'^home/$', views.home, name="home"),
     url(r'^logout/$', views.logout_user, name="logout"),
     url(r'^sign/$', views.sign, name="sign"),
-    url(r'^list/$', views.list, name="list"),
+    url(r'^list/$', views.list, name="users-list"),
     url(r'^detail/(?P<id>\d+)/$', views.detail, name="detail"),
     url(r'^user-creation/(?P<id>\d+)/$', views.user_creation, name="user-creation"),
+    url(r'^data-zone/$', views.dataset_list, name="data-zone"),
 ]

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% block container %}
+	<ol class="breadcrumb"> 
+        <li>
+            <a href="{% url "home" %}">Home</a>
+        </li>                 
+        <li class="active">Dataset list</li>                 
+    </ol> 
+    <h2 class="text-center top-space">Datasets</h2> 
+    <br> 
+    <div class="row"> 
+        <div class="col-sm-6 col-separator"> 
+            <h3>Datasets <a href="{% url "user-creation" id=1 %}"><img class="plus-icon" src="{% static "images/plus-icon.jpg" %}" alt="Add Organizer"></a> </h3> 
+            {% for profile in profiles %}
+	            <p><a href='{{ profile.get_absolute_url }}'>{{ profile.first_name }} {{ profile.last_name }}</a></p>
+            {% endfor %}
+        </div>
+        <div class="col-sm-6 col-separator"> 
+            <h3>Data <a href="{% url "user-creation" id=1 %}"><img class="plus-icon" src="{% static "images/plus-icon.jpg" %}" alt="Add Organizer"></a> </h3> 
+            {% for admin in admins %}
+                <p>{{ admin.username }}</p>
+            {% endfor %}
+        </div>               
+    </div>                         
+{% endblock container %}    
