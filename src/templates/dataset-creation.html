@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load staticfiles %}
 {% block container %}
     <ol class="breadcrumb"> 
         <li>
@@ -9,13 +10,38 @@
     <div class="row"> 
         <article class="col-xs-12 maincontent"> 
             <header class="page-header"> 
-                <h1 class="page-title">Data creation</h1> 
+                <h1 class="page-title">Dataset creation</h1> 
             </header>                     
             <div class="col-md-6"> 
                 <div class="panel panel-default"> 
                     <div class="panel-body"> 
+                        <h3 class="thin text-center">Dataset</h3> 
+                        <hr> 
                         <form method="POST" action=""> 
                         	{% csrf_token %}
+                            <div class="top-margin"> 
+                                <label>Title 
+                                    {% if datasetform.title.field.required %}
+                                    <span class="text-danger">*</span>
+                                    {% endif %}
+                                </label>  
+                                {% if datasetform.errors.title %}
+                                    <div class="alert alert-danger" role="alert">{{ datasetform.errors.title }}</div>
+                                {% endif %}
+                                {{ datasetform.title }} 
+                            </div>                                     
+                            <div class="top-margin"> 
+                                <label>Description 
+                                    {% if datasetform.description.field.required %}
+                                    <span class="text-danger">*</span>
+                                    {% endif %}
+                                </label>   
+                                {% if datasetform.errors.description %}
+                                    <div class="alert alert-danger" role="alert">{{ datasetform.errors.description }}</div>
+                                {% endif %}
+                                {{ datasetform.description }} 
+                            </div>  
+                            <hr>
 	                        <h3 class="thin text-center">Data</h3> 
 						    <div class="item">
 							    <hr> 

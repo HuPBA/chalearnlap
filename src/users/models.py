@@ -54,7 +54,7 @@ class Profile(models.Model):
 		return unicode(self.first_name).encode('utf-8')
 
 	def get_absolute_url(self):
-		return reverse("detail", kwargs={"id": self.id})
+		return reverse("edit-profile", kwargs={"id": self.id})
 
 class Profile_Event(models.Model):
 	profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='fk_profile')
@@ -113,6 +113,12 @@ class Dataset(models.Model):
 	title = models.CharField(max_length=100, null=True)
 	description = models.TextField(max_length=3000, null=True)
 	chalearn = models.ForeignKey(Chalearn, on_delete=models.SET_NULL, null=True)
+
+	def __str__(self):
+		return unicode(self.title).encode('utf-8')
+
+	def get_absolute_url(self):
+		return reverse("edit-dataset", kwargs={"id": self.id})
 
 class Result(models.Model):
 	title = models.CharField(max_length=100)

@@ -1,13 +1,12 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
-from .forms import UserRegForm, UserLogForm, ProfileForm, AffiliationForm, UserCreationForm, UserEditForm, UserRegisterForm, EditProfileForm
+from .forms import UserRegForm, UserLogForm, ProfileForm, AffiliationForm, UserCreationForm, UserEditForm, UserRegisterForm, EditProfileForm, EditExtraForm, DatasetCreationForm, DataCreationForm
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_protect
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
-from .models import Profile, Profile_Event, Affiliation, Event
-from django.contrib.auth.decorators import login_required
-from django.contrib.admin.views.decorators import staff_member_required
+from .models import Profile, Profile_Event, Affiliation, Event, Dataset, Data
+from django.contrib.auth.decorators import login_required, user_passes_test
 
 # from registration.backends.default.views import RegistrationView
 
@@ -22,9 +21,9 @@ def home(request):
 	return render(request, "home.html", {});
 
 @login_required(login_url='/users/login/')
-@staff_member_required
+@user_passes_test(lambda u:u.is_staff, login_url='/')
 def list(request):
-	profiles = Profile.objects.all()
+	users = User.objects.all().filter(is_staff=False)
 	admins = User.objects.all().filter(is_staff=True)
 	editors = []
 	organizers = []
@@ -34,7 +33,7 @@ def list(request):
 		elif o.role == 'organizer':
 			organizers.append(o.profile)
 	context = {
-		"profiles": profiles,
+		"users": users,
 		"admins": admins,
 		"editors": editors,
 		"organizers": organizers
@@ -49,7 +48,7 @@ def detail(request, id=None):
 	return render(request, "detail.html", context)
 
 @login_required(login_url='/users/login/')
-@staff_member_required
+@user_passes_test(lambda u:u.is_staff, login_url='/')
 @csrf_protect
 def user_creation(request, id=None):
 	choices = []
@@ -99,15 +98,8 @@ def user_creation(request, id=None):
 	return render(request, "user-creation.html", context)
 
 @login_required(login_url='/users/login/')
-@staff_member_required
-def dataset_list(request):
-	context = {}
-	return render(request, "list-dataset.html", context)
-
-@login_required(login_url='/users/login/')
-@staff_member_required
 def edit_profile(request, id=None):
-	profile = Profile.objects.filter(id=id)[0]
+	profile = Profile.objects.filter(user__id=id)[0]
 	user = profile.user
 	affiliation = profile.affiliation
 	form = EditProfileForm(profile=profile, user=user, affiliation=affiliation)
@@ -146,5 +138,108 @@ def edit_profile(request, id=None):
 			messages.error(request, form.errors)
 	context = {
 		"form": form,
+		"user_edit": user.id
 	}
 	return render(request, "edit-profile.html", context)
+
+@login_required(login_url='/users/login/')
+@user_passes_test(lambda u:u.is_staff, login_url='/')
+def edit_extra(request, id=None):
+	profile = Profile.objects.filter(id=id)[0]
+	affiliation = profile.affiliation
+	form = EditExtraForm(profile=profile, affiliation=affiliation)
+	if request.method == 'POST':
+		form = EditExtraForm(request.POST, profile=profile, affiliation=affiliation)
+		if form.is_valid():
+			first_name = form.cleaned_data["first_name"]
+			last_name = form.cleaned_data["last_name"]
+			avatar = form.cleaned_data["avatar"]
+			bio = form.cleaned_data["bio"]
+			name = form.cleaned_data["name"]
+			country = form.cleaned_data["country"]
+			city = form.cleaned_data["city"]
+			affiliation.name = name
+			affiliation.country = country
+			affiliation.city = city
+			affiliation.save()
+			profile.affiliation = affiliation
+			profile.first_name = first_name
+			profile.last_name = last_name
+			profile.avatar = avatar
+			profile.bio = bio
+			profile.save()
+			messages.success(request, "User edited succesfully")
+			return render(request, "home.html", {})
+		else:
+			messages.error(request, form.errors)
+	context = {
+		"form": form,
+	}
+	return render(request, "edit-extra.html", context)
+
+@login_required(login_url='/users/login/')
+@user_passes_test(lambda u:u.is_staff, login_url='/')
+def dataset_list(request):
+	datasets = Dataset.objects.all()
+	context = {
+		"datasets": datasets,
+	}
+	return render(request, "list-dataset.html", context)
+
+@login_required(login_url='/users/login/')
+@user_passes_test(lambda u:u.is_staff, login_url='/')
+def dataset_creation(request):
+	datasetform = DatasetCreationForm()
+	dataform = DataCreationForm()
+	if request.method == 'POST':
+		datasetform = DatasetCreationForm(request.POST)
+		dataform = DataCreationForm(request.POST, request.FILES)
+		if datasetform.is_valid():
+			if dataform.is_valid():
+				new_dataset = datasetform.save()
+				title = dataform.cleaned_data['title']
+				file = dataform.cleaned_data['file']
+				new_data = Data(title=title, file=file, dataset=new_dataset)
+				new_data.save()
+				messages.success(request, "Dataset created succesfully")
+			else:
+				messages.error(request, dataform.errors)
+		else:
+			messages.error(request, datasetform.errors)
+	context = {
+		"datasetform": datasetform,
+		"dataform": dataform,
+	}
+	return render(request, "dataset-creation.html", context)
+
+@login_required(login_url='/users/login/')
+@user_passes_test(lambda u:u.is_staff, login_url='/')
+def edit_dataset(request, id=None):
+	dataset = Dataset.objects.filter(id=id)[0]
+	datas = Data.objects.all().filter(dataset=dataset)
+	context = {
+		"dataset": dataset,
+		"datas": datas
+	}
+	return render(request, "edit-dataset.html", context)
+
+@login_required(login_url='/users/login/')
+@user_passes_test(lambda u:u.is_staff, login_url='/')
+def data_creation(request, id=None):
+	dataform = DataCreationForm()
+	if request.method == 'POST':
+		dataform = DataCreationForm(request.POST, request.FILES)
+		if dataform.is_valid():
+			new_dataset = Dataset.objects.filter(id=id)[0]
+			title = dataform.cleaned_data['title']
+			file = dataform.cleaned_data['file']
+			new_data = Data(title=title, file=file, dataset=new_dataset)
+			new_data.save()
+			messages.success(request, "Dataset created succesfully")
+			return redirect('edit-dataset', id=id)
+		else:
+			messages.error(request, dataform.errors)
+	context = {
+		"dataform": dataform,
+	}
+	return render(request, "data-creation.html", context)

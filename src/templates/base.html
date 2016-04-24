@@ -106,7 +106,7 @@
                                             </ul>
                                         </li>
                                     {% endif %} 
-                                    <li><a href="{% url "edit-profile" id=user.id%}">Edit profile</a>
+                                    <li><a href="{% url "edit-profile" id=user.id %}">Edit profile</a>
                                     <a href="{% url "auth_logout" %}">Log out</a></li> 
                                 </ul>  
                             </li>                       
@@ -125,7 +125,7 @@
             </div>             
         </div>                
         <div class="container content"> 
-            {% if messages %}
+           <!--  {% if messages %}
                 {% for msg in messages %} 
                     <div class="row"> 
                         <div class="col-md-3 widget col-md-offset-4"> 
@@ -133,7 +133,7 @@
                         </div>
                     </div>
                 {% endfor %}
-            {% endif %}
+            {% endif %} -->
         {% block title %} {% endblock %}
         {% block container %} {% endblock container %}
         </div>              
