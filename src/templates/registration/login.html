@@ -1,0 +1,66 @@
+{% extends "registration/registration_base.html" %}
+{% load i18n %}
+
+{% block container %}
+    {% if form.errors %}
+        <div class="row"> 
+            <div class="col-md-6 widget col-md-offset-3"> 
+                <div class="alert alert-danger" role="alert">Your username and password didn't match. Please try again.</div>
+            </div>
+        </div>
+    {% endif %}
+    <ol class="breadcrumb"> 
+        <li>
+            <a href="{% url "home" %}">Home</a>
+        </li>                 
+        <li class="active">User access</li>                 
+    </ol>            
+    <div class="row"> 
+        <article class="col-xs-12 maincontent"> 
+            <header class="page-header"> 
+                <h1 class="page-title">Sign in</h1> 
+            </header>                     
+            <div class="col-md-6"> 
+                <div class="panel panel-default"> 
+                    <div class="panel-body"> 
+                        <h3 class="thin text-center">Sign in to your account</h3> 
+                        <hr> 
+                        <form method="POST" action=""> {% csrf_token %}
+                            <div class="top-margin"> 
+                                <label>Username 
+                                    {% if form.username.field.required %}
+                                    <span class="text-danger">*</span>
+                                    {% endif %}
+                                </label>  
+                                {% if form.errors.username %}
+                                    <div class="alert alert-danger" role="alert">{{ form.errors.username }}</div>
+                                {% endif %}
+                                {{ form.username }} 
+                            </div>                                     
+                            <div class="top-margin"> 
+                                <label>Password 
+                                    {% if form.password.field.required %}
+                                    <span class="text-danger">*</span>
+                                    {% endif %}
+                                </label>   
+                                {% if form.errors.username %}
+                                    <div class="alert alert-danger" role="alert">{{ form.errors.password }}</div>
+                                {% endif %}
+                                {{ form.password }} 
+                            </div>                                     
+                            <hr> 
+                            <div class="row"> 
+                                <div class="col-lg-8"> 
+                                    <b><a href="{% url 'auth_password_reset' %}">Forgot password?</a></b> 
+                                </div>                                         
+                                <div class="col-lg-4 text-right"> 
+                                    <button class="btn btn-action" type="submit" name="signin-button">Sign in</button>                                             
+                                </div>                                         
+                            </div>                                     
+                        </form>                                 
+                    </div>                             
+                </div>                         
+            </div>
+        </article>
+    </div>
+{% endblock %}
