@@ -30,4 +30,6 @@ urlpatterns = [
     url(r'^dataset-creation/$', views.dataset_creation, name="dataset-creation"),
     url(r'^edit-dataset/(?P<id>\d+)/$', views.edit_dataset, name="edit-dataset"),
     url(r'^data-creation/(?P<id>\d+)/$', views.data_creation, name="data-creation"),
+
+    url(r'^partners/$', views.partners_list, name="partners-list"),
 ]

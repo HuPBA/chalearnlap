@@ -212,7 +212,7 @@ class DataCreationForm(forms.Form):
 	def __init__(self, *args, **kwargs):
 		super(DataCreationForm, self).__init__(*args, **kwargs)
 		self.fields['title'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}))
-		self.fields['file'] = forms.FileField(required=False, widget=forms.FileInput(attrs={'class': "form-control"}))
+		self.fields['file'] = forms.FileField(required=True, widget=forms.FileInput(attrs={'class': "form-control"}))
 
 	def clean(self):
 		return self.cleaned_data

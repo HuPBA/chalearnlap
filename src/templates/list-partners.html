@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block container %}
+	<ol class="breadcrumb"> 
+        <li>
+            <a href="{% url "home" %}">Home</a>
+        </li>                 
+        <li class="active">Partners list</li>                 
+    </ol> 
+    <div class="row"> 
+        <article class="col-xs-12 maincontent"> 
+            <header class="page-header"> 
+                <h1 class="page-title">Partners</h1> 
+            </header>                                      
+            {% for p in partners %}
+                <div class="col-sm-3"> 
+                    <div class="panel panel-default"> 
+                        <div class="panel-body">
+                            <h3>{{ p.name }}</h3>
+                            <a href="{{ p.url }}"><img class="img-responsive" src="{{ p.banner.url }}"></a>
+                            <hr>
+                            <p><b>Contact:</b> </p>
+                            <img class="img-responsive" src="{{ p.member.avatar.url }}">
+                            <br>
+                            <p>{{ p.member.first_name }} {{ p.member.last_name }}</p>
+                            <p>{{ p.member.email }}</p>
+                            <p>{{ p.member.bio }}</p>
+                        </div>
+                    </div>                             
+                </div>  
+            {% endfor %}                       
+        </article>
+    </div>                      
+{% endblock container %}    

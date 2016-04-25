@@ -18,7 +18,7 @@
                     <div class="panel-body"> 
                         <h3 class="thin text-center">Register a new account</h3> 
                         <hr> 
-                        <form method="POST" action=""> {% csrf_token %}
+                        <form method="POST" action="" enctype="multipart/form-data"> {% csrf_token %}
                             <div class="top-margin"> 
                                 <label>Username
                                     {% if form.username.field.required %}

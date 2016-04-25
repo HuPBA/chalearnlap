@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_protect
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
-from .models import Profile, Profile_Event, Affiliation, Event, Dataset, Data
+from .models import Profile, Profile_Event, Affiliation, Event, Dataset, Data, Partner
 from django.contrib.auth.decorators import login_required, user_passes_test
 
 # from registration.backends.default.views import RegistrationView
@@ -243,3 +243,10 @@ def data_creation(request, id=None):
 		"dataform": dataform,
 	}
 	return render(request, "data-creation.html", context)
+
+def partners_list(request):
+	partners = Partner.objects.all()
+	context = {
+		"partners": partners,
+	}
+	return render(request, "list-partners.html", context)

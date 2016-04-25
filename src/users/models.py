@@ -61,11 +61,22 @@ class Profile_Event(models.Model):
 	event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='fk_event')
 	role = models.CharField(max_length=50)
 
+class Member_Partner(models.Model):
+	first_name = models.CharField(max_length=30, null=True)
+	last_name = models.CharField(max_length=30, null=True)
+	bio = models.TextField(max_length=3000)
+	avatar = models.ImageField(upload_to='userpics/', null=True)
+	email = models.CharField(max_length=100, null=True)
+
+	def __str__(self):
+		return unicode(self.first_name).encode('utf-8')
+
 class Partner(models.Model):
 	name = models.CharField(max_length=100)
-	url = models.CharField(max_length=200)
+	url = models.CharField(max_length=300)
 	banner = models.ImageField(upload_to='partnerpics/', null=True)
-	events = models.ManyToManyField(Event, through='Challenge_Partner')
+	events = models.ManyToManyField(Event, through='Challenge_Partner', null=True)
+	member = models.ForeignKey(Member_Partner, on_delete=models.CASCADE, null=True)
 
 	def __str__(self):
 		return unicode(self.name).encode('utf-8')
