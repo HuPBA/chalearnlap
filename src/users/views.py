@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import render, get_object_or_404, redirect, render_to_response
 from django.http import HttpResponse
 from .forms import UserRegForm, UserLogForm, ProfileForm, AffiliationForm, UserCreationForm, UserEditForm, UserRegisterForm, EditProfileForm, EditExtraForm, DatasetCreationForm, DataCreationForm
 from django.contrib.auth.models import User
@@ -7,6 +7,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from .models import Profile, Profile_Event, Affiliation, Event, Dataset, Data, Partner
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.template import RequestContext
 
 # from registration.backends.default.views import RegistrationView
 
@@ -250,3 +251,8 @@ def partners_list(request):
 		"partners": partners,
 	}
 	return render(request, "list-partners.html", context)
+
+def handler404(request):
+    response = render_to_response('404.html', {}, context_instance=RequestContext(request))
+    response.status_code = 404
+    return response
