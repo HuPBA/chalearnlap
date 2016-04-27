@@ -51,14 +51,14 @@
                     <div class="panel-body"> 
                         <h3 class="thin text-center">Register a new account</h3> 
                         <hr> 
-                        <form method="POST" action=""> {% csrf_token %}
+                        <form method="POST" action="" enctype="multipart/form-data"> {% csrf_token %}
                             <div class="top-margin"> 
                                 <label>Username
                                     {% if signupForm.username.field.required %}
                                     <span class="text-danger">*</span>
                                     {% endif %}
                                 </label>   
-                                {{ signupForm.username }}                                      
+                                {{ form.username }}                                      
                             </div> 
                             <div class="top-margin"> 
                                 <label>First Name
@@ -66,7 +66,7 @@
                                     <span class="text-danger">*</span>
                                     {% endif %}
                                 </label>   
-                                {{ profileForm.first_name }}                                      
+                                {{ form.first_name }}                                      
                             </div>                                     
                             <div class="top-margin"> 
                                 <label>Last Name
@@ -74,7 +74,7 @@
                                     <span class="text-danger">*</span>
                                     {% endif %}
                                 </label>
-                                {{ profileForm.last_name }} 
+                                {{ form.last_name }} 
                             </div>                                     
                             <div class="top-margin"> 
                                 <label>Email Address 
@@ -82,7 +82,7 @@
                                     <span class="text-danger">*</span>
                                     {% endif %}
                                 </label>
-                                {{ signupForm.email }} 
+                                {{ form.email }} 
                             </div>                                     
                             <div class="row top-margin"> 
                                 <div class="col-sm-6"> 
@@ -91,7 +91,7 @@
                                     <span class="text-danger">*</span>
                                     {% endif %}
                                     </label>
-                                    {{ signupForm.password }} 
+                                    {{ form.password }} 
                                 </div>                                         
                                 <div class="col-sm-6"> 
                                     <label>Confirm Password 
@@ -99,7 +99,7 @@
                                     <span class="text-danger">*</span>
                                     {% endif %}
                                     </label>
-                                    {{ signupForm.confirm_password }}  
+                                    {{ form.confirm_password }}  
                                 </div>                                         
                             </div>                                     
                             <hr> 
@@ -109,7 +109,7 @@
                                     <span class="text-danger">*</span>
                                     {% endif %}
                                 </label>   
-                                {{ profileForm.bio }}                                      
+                                {{ form.bio }}                                      
                             </div>
                             <div class="top-margin"> 
                                 <label>Affiliation name
@@ -117,7 +117,7 @@
                                     <span class="text-danger">*</span>
                                     {% endif %}
                                 </label>   
-                                {{ affiliationForm.name }}                                      
+                                {{ form.name }}                                      
                             </div>
                             <div class="top-margin"> 
                                 <label>Affiliation country
@@ -125,7 +125,7 @@
                                     <span class="text-danger">*</span>
                                     {% endif %}
                                 </label>   
-                                {{ affiliationForm.country }}                                      
+                                {{ form.country }}                                      
                             </div>
                             <div class="top-margin"> 
                                 <label>Affiliation city
@@ -133,7 +133,7 @@
                                     <span class="text-danger">*</span>
                                     {% endif %}
                                 </label>   
-                                {{ affiliationForm.city }}                                      
+                                {{ form.city }}                                      
                             </div>
                             <hr> 
                             <div class="row">

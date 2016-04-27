@@ -1,76 +1,30 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect, render_to_response
 from django.http import HttpResponse
-from .forms import UserRegForm, UserLogForm, ProfileForm, AffiliationForm, UserCreationForm
+from .forms import UserRegForm, UserLogForm, ProfileForm, AffiliationForm, UserCreationForm, UserEditForm, UserRegisterForm, EditProfileForm, EditExtraForm, DatasetCreationForm, DataCreationForm
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_protect
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
-from .models import Profile, Profile_Event, Affiliation, Event
+from .models import Profile, Profile_Event, Affiliation, Event, Dataset, Data, Partner
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.template import RequestContext
+
+# from registration.backends.default.views import RegistrationView
+
+# class MyRegistrationView(RegistrationView):
+#     def register(self, form):
+#         """
+#         Implement user-registration logic here.
+#         """
+#         raise NotImplementedError
 
 def home(request):
 	return render(request, "home.html", {});
 
-def logout_user(request):
-	logout(request)
-	return render(request, "home.html", {});
-
-@csrf_protect
-def sign(request):
-	signupForm = UserRegForm()
-	signinForm = UserLogForm()
-	profileForm = ProfileForm()
-	affiliationForm = AffiliationForm()
-	if request.method == 'POST':
-		if 'signup-button' in request.POST:
-			signupForm = UserRegForm(request.POST)
-			profileForm = ProfileForm(request.POST)
-			affiliationForm = AffiliationForm(request.POST)
-			if signupForm.is_valid():
-				if profileForm.is_valid():
-					if affiliationForm.is_valid():
-						new_user = signupForm.save(commit=False)
-						new_user.set_password(signupForm.cleaned_data["password"])
-						new_user.save()
-						new_affiliation = affiliationForm.save()
-						new_profile = profileForm.save(commit=False)
-						new_profile.user = new_user
-						new_profile.affiliation = new_affiliation
-						new_profile.save()
-						messages.success(request, "User registered succesfully")
-					else:
-						messages.error(request, affiliationForm.errors)
-				else:
-					messages.error(request, profileForm.errors)
-			else:
-				messages.error(request, signupForm.errors)
-		if 'signin-button' in request.POST:
-			signinForm = UserLogForm(request.POST)
-			if signinForm.is_valid():
-				username = signinForm.cleaned_data['username']
-				password = signinForm.cleaned_data['password']
-				user = authenticate(username=username, password=password)
-				if user is not None:
-					if user.is_active:
-						login(request, user)
-						return render(request, "home.html", {})
-					else:
-						print 'not active'
-				else:
-					
-					print 'None'
-			else:
-				print 'not valid'
-				messages.error(request, signinForm.errors)
-	context = {
-		"signupForm": signupForm,
-		"signinForm": signinForm,
-		"profileForm": profileForm,
-		"affiliationForm": affiliationForm
-	}
-	return render(request, "sign.html", context)
-
+@login_required(login_url='/users/login/')
+@user_passes_test(lambda u:u.is_staff, login_url='/')
 def list(request):
-	profiles = Profile.objects.all()
+	users = User.objects.all().filter(is_staff=False)
 	admins = User.objects.all().filter(is_staff=True)
 	editors = []
 	organizers = []
@@ -80,7 +34,7 @@ def list(request):
 		elif o.role == 'organizer':
 			organizers.append(o.profile)
 	context = {
-		"profiles": profiles,
+		"users": users,
 		"admins": admins,
 		"editors": editors,
 		"organizers": organizers
@@ -94,6 +48,8 @@ def detail(request, id=None):
 	}
 	return render(request, "detail.html", context)
 
+@login_required(login_url='/users/login/')
+@user_passes_test(lambda u:u.is_staff, login_url='/')
 @csrf_protect
 def user_creation(request, id=None):
 	choices = []
@@ -141,3 +97,162 @@ def user_creation(request, id=None):
 		"role": role
 	}
 	return render(request, "user-creation.html", context)
+
+@login_required(login_url='/users/login/')
+def edit_profile(request, id=None):
+	profile = Profile.objects.filter(user__id=id)[0]
+	user = profile.user
+	affiliation = profile.affiliation
+	form = EditProfileForm(profile=profile, user=user, affiliation=affiliation)
+	if request.method == 'POST':
+		form = EditProfileForm(request.POST, profile=profile, user=user, affiliation=affiliation)
+		if form.is_valid():
+			username = form.cleaned_data["username"]
+			print username
+			first_name = form.cleaned_data["first_name"]
+			email = form.cleaned_data["email"]
+			last_name = form.cleaned_data["last_name"]
+			staff = form.cleaned_data["staff"]
+			avatar = form.cleaned_data["avatar"]
+			bio = form.cleaned_data["bio"]
+			name = form.cleaned_data["name"]
+			country = form.cleaned_data["country"]
+			city = form.cleaned_data["city"]
+			user.username = username
+			user.email = email
+			user.is_staff = staff
+			user.save()
+			affiliation.name = name
+			affiliation.country = country
+			affiliation.city = city
+			affiliation.save()
+			profile.user = user
+			profile.affiliation = affiliation
+			profile.first_name = first_name
+			profile.last_name = last_name
+			profile.avatar = avatar
+			profile.bio = bio
+			profile.save()
+			messages.success(request, "User edited succesfully")
+			return render(request, "home.html", {})
+		else:
+			messages.error(request, form.errors)
+	context = {
+		"form": form,
+		"user_edit": user.id
+	}
+	return render(request, "edit-profile.html", context)
+
+@login_required(login_url='/users/login/')
+@user_passes_test(lambda u:u.is_staff, login_url='/')
+def edit_extra(request, id=None):
+	profile = Profile.objects.filter(id=id)[0]
+	affiliation = profile.affiliation
+	form = EditExtraForm(profile=profile, affiliation=affiliation)
+	if request.method == 'POST':
+		form = EditExtraForm(request.POST, profile=profile, affiliation=affiliation)
+		if form.is_valid():
+			first_name = form.cleaned_data["first_name"]
+			last_name = form.cleaned_data["last_name"]
+			avatar = form.cleaned_data["avatar"]
+			bio = form.cleaned_data["bio"]
+			name = form.cleaned_data["name"]
+			country = form.cleaned_data["country"]
+			city = form.cleaned_data["city"]
+			affiliation.name = name
+			affiliation.country = country
+			affiliation.city = city
+			affiliation.save()
+			profile.affiliation = affiliation
+			profile.first_name = first_name
+			profile.last_name = last_name
+			profile.avatar = avatar
+			profile.bio = bio
+			profile.save()
+			messages.success(request, "User edited succesfully")
+			return render(request, "home.html", {})
+		else:
+			messages.error(request, form.errors)
+	context = {
+		"form": form,
+	}
+	return render(request, "edit-extra.html", context)
+
+@login_required(login_url='/users/login/')
+@user_passes_test(lambda u:u.is_staff, login_url='/')
+def dataset_list(request):
+	datasets = Dataset.objects.all()
+	context = {
+		"datasets": datasets,
+	}
+	return render(request, "list-dataset.html", context)
+
+@login_required(login_url='/users/login/')
+@user_passes_test(lambda u:u.is_staff, login_url='/')
+def dataset_creation(request):
+	datasetform = DatasetCreationForm()
+	dataform = DataCreationForm()
+	if request.method == 'POST':
+		datasetform = DatasetCreationForm(request.POST)
+		dataform = DataCreationForm(request.POST, request.FILES)
+		if datasetform.is_valid():
+			if dataform.is_valid():
+				new_dataset = datasetform.save()
+				title = dataform.cleaned_data['title']
+				file = dataform.cleaned_data['file']
+				new_data = Data(title=title, file=file, dataset=new_dataset)
+				new_data.save()
+				messages.success(request, "Dataset created succesfully")
+			else:
+				messages.error(request, dataform.errors)
+		else:
+			messages.error(request, datasetform.errors)
+	context = {
+		"datasetform": datasetform,
+		"dataform": dataform,
+	}
+	return render(request, "dataset-creation.html", context)
+
+@login_required(login_url='/users/login/')
+@user_passes_test(lambda u:u.is_staff, login_url='/')
+def edit_dataset(request, id=None):
+	dataset = Dataset.objects.filter(id=id)[0]
+	datas = Data.objects.all().filter(dataset=dataset)
+	context = {
+		"dataset": dataset,
+		"datas": datas
+	}
+	return render(request, "edit-dataset.html", context)
+
+@login_required(login_url='/users/login/')
+@user_passes_test(lambda u:u.is_staff, login_url='/')
+def data_creation(request, id=None):
+	dataform = DataCreationForm()
+	if request.method == 'POST':
+		dataform = DataCreationForm(request.POST, request.FILES)
+		if dataform.is_valid():
+			new_dataset = Dataset.objects.filter(id=id)[0]
+			title = dataform.cleaned_data['title']
+			file = dataform.cleaned_data['file']
+			new_data = Data(title=title, file=file, dataset=new_dataset)
+			new_data.save()
+			messages.success(request, "Dataset created succesfully")
+			return redirect('edit-dataset', id=id)
+		else:
+			messages.error(request, dataform.errors)
+	context = {
+		"dataform": dataform,
+	}
+	return render(request, "data-creation.html", context)
+
+def partners_list(request):
+	partners = Partner.objects.all()
+	context = {
+		"partners": partners,
+	}
+	return render(request, "list-partners.html", context)
+
+def handler404(request):
+    response = render_to_response('404.html', {}, context_instance=RequestContext(request))
+    response.status_code = 404
+    return response

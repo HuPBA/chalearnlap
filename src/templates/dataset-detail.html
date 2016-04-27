@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block container %}
+	<ol class="breadcrumb"> 
+        <li><a href="{% url "home" %}">Home</a></li>
+        <li><a href="{% url "data-zone" %}">Dataset list</a></li>                 
+        <li class="active">Dataset Detail</li>                
+    </ol> 
+    <h2 class="text-center top-space">Dataset Detail</h2> 
+    <br> 
+    <div class="row"> 
+        <div class="col-sm-3 col-separator"> 
+	        <p>	<b>Title:</b> {{ dataset.title }}</br>
+				<b>Description:</b> {{ dataset.description }}</br>
+        </div>              
+    </div>
+{% endblock container %}      

@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 """
 
 import os
+from django.contrib.messages import constants as message_constants
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -27,7 +28,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -36,8 +36,10 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'django.contrib.sites',
     'django.contrib.staticfiles',
     'users',
+    'registration',
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -130,4 +132,34 @@ STATICFILES_DIRS = [
 ]
 
 STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), "static_cdn")
+
+MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), "media_cdn")
+
+# Override messages to feedback information
+
+MESSAGE_TAGS = {
+    message_constants.DEBUG: 'debug',
+    message_constants.INFO: 'info',
+    message_constants.SUCCESS: 'success',
+    message_constants.WARNING: 'warning',
+    message_constants.ERROR: 'danger',
+}
+
+# Registration settings
+
+ACCOUNT_ACTIVATION_DAYS = 7 # One-week activation window; you may, of course, use a different value.
+REGISTRATION_EMAIL_HTML = False
+SITE_ID = 1
+
+# GMAIL SMTP settings
+
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'chalearnweb'
+EMAIL_HOST_PASSWORD = 'oriolsuils'
+DEFAULT_FROM_EMAIL = 'chalearnweb@gmail.com'
+DEFAULT_TO_EMAIL = ''
+
+LOGIN_REDIRECT_URL = '/'
