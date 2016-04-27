@@ -12,14 +12,24 @@
                 <h1 class="page-title">Partners</h1> 
             </header>                                      
             {% for p in partners %}
-                <div class="col-sm-3"> 
+                <div class="col-sm-4"> 
                     <div class="panel panel-default"> 
                         <div class="panel-body">
-                            <h3>{{ p.name }}</h3>
-                            <a href="{{ p.url }}"><img class="img-responsive" src="{{ p.banner.url }}"></a>
+                            <div class="row"> 
+                                <!-- <div class="col-sm-9 col-sm-offset-3"> 
+                                    <h3>{{ p.name }}</h3>
+                                </div> -->
+                                <div class="col-sm-10 col-sm-offset-2"> 
+                                    <a href="{{ p.url }}"><img id="partner-logo" class="img-responsive" src="{{ p.banner.url }}"></a>
+                                </div>
+                            </div>
                             <hr>
                             <p><b>Contact:</b> </p>
-                            <img class="img-responsive" src="{{ p.member.avatar.url }}">
+                            <div class="row"> 
+                                <div class="col-sm-4 col-sm-offset-4"> 
+                                    <img class="img-responsive" src="{{ p.member.avatar.url }}">
+                                </div>
+                            </div>
                             <br>
                             <p>{{ p.member.first_name }} {{ p.member.last_name }}</p>
                             <p>{{ p.member.email }}</p>
