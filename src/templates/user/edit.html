@@ -1,12 +1,10 @@
 {% extends "base.html" %}
-{% load i18n %}
-
 {% block container %}
     {% if form.non_field_errors  %}
         {% for e in form.non_field_errors %} 
             <div class="row"> 
                 <div class="col-md-6 widget col-md-offset-3"> 
-                    <div class="alert alert-danger" role="alert">{{ e|escape }}</div>
+                    <div class="alert alert-danger" role="alert">{{ e }}</div>
                 </div>
             </div>
         {% endfor %} 
@@ -15,19 +13,20 @@
         <li>
             <a href="{% url "home" %}">Home</a>
         </li>                 
-        <li class="active">User access</li>                 
-    </ol>            
+        <li class="active">Edit profile</li>                 
+    </ol>   
     <div class="row"> 
         <article class="col-xs-12 maincontent"> 
             <header class="page-header"> 
-                <h1 class="page-title">Sign up</h1> 
+                <h1 class="page-title">Edit profile</h1> 
             </header>                     
             <div class="col-md-6"> 
                 <div class="panel panel-default"> 
                     <div class="panel-body"> 
-                        <h3 class="thin text-center">Register a new account</h3> 
+                        <h3 class="thin text-center">Edit profile</h3> 
                         <hr> 
-                        <form method="POST" action="" enctype="multipart/form-data"> {% csrf_token %}
+                        <form method="POST" action="" enctype="multipart/form-data"> 
+                            {% csrf_token %}
                             <div class="top-margin"> 
                                 <label>Username
                                     {% if form.username.field.required %}
@@ -71,29 +70,28 @@
                                     <div class="alert alert-danger" role="alert">{{ form.errors.email }}</div>
                                 {% endif %}
                                 {{ form.email }} 
-                            </div>                                     
-                            <div class="row top-margin"> 
-                                {% if form.errors.password2 %}
-                                    <div class="alert alert-danger" role="alert">{{ form.errors.password2 }}</div>
-                                {% endif %} 
-                                <div class="col-sm-6"> 
-                                    <label>Password 
-                                        {% if form.password1.field.required %}
-                                    <span class="text-danger">*</span>
+                            </div>   
+                            {% if user.is_staff %}        
+                                <div class="top-margin"> 
+                                    <label>Admin
+                                        {% if form.staff.field.required %}
+                                        <span class="text-danger">*</span>
+                                        {% endif %}
+                                    </label>   
+                                    {% if form.errors.staff %}
+                                        <div class="alert alert-danger" role="alert">{{ form.errors.staff }}</div>
                                     {% endif %}
-                                    </label>
-                                    {{ form.password1 }} 
+                                    {{ form.staff }}                                      
+                                </div>
+                            {% endif %}
+                            {% ifequal user.id user_edit %}
+                                <hr> 
+                                <div class="row">
+                                    <div class="col-sm-3"> 
+                                        <a class="btn btn-action" href="{% url "auth_password_change" %}">Change password</a>
+                                    </div>  
                                 </div>  
-
-                                <div class="col-sm-6"> 
-                                    <label>Confirm Password 
-                                        {% if form.password2.field.required %}
-                                    <span class="text-danger">*</span>
-                                    {% endif %}
-                                    </label>
-                                    {{ form.password2 }}  
-                                </div>                                         
-                            </div>                                     
+                            {% endifequal %}                        
                             <hr> 
                             <div class="top-margin"> 
                                 <label>Profile picture
@@ -155,7 +153,7 @@
                             <hr> 
                             <div class="row">
                                 <div class="col-lg-4 col-lg-offset-8 text-right"> 
-                                    <button class="btn btn-action" type="submit" name="signup-button">Register</button>
+                                    <button class="btn btn-action" type="submit" name="signup-button">Save</button>
                                 </div>
                             </div>                                     
                         </form>                                 
@@ -163,5 +161,5 @@
                 </div>                         
             </div>                   
         </article>                 
-    </div> 
-{% endblock container %} 
+    </div>           
+{% endblock container %}            

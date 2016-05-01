@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% block container %}
+    {% if datasetform.non_field_errors  %}
+        {% for e in datasetform.non_field_errors %} 
+            <div class="row"> 
+                <div class="col-md-6 widget col-md-offset-3"> 
+                    <div class="alert alert-danger" role="alert">{{ e }}</div>
+                </div>
+            </div>
+        {% endfor %} 
+    {% endif %}
+    {% if dataform.non_field_errors  %}
+        {% for e in dataform.non_field_errors %} 
+            <div class="row"> 
+                <div class="col-md-6 widget col-md-offset-3"> 
+                    <div class="alert alert-danger" role="alert">{{ e }}</div>
+                </div>
+            </div>
+        {% endfor %} 
+    {% endif %}
+    {% if fileform.non_field_errors  %}
+        {% for e in fileform.non_field_errors %} 
+            <div class="row"> 
+                <div class="col-md-6 widget col-md-offset-3"> 
+                    <div class="alert alert-danger" role="alert">{{ e }}</div>
+                </div>
+            </div>
+        {% endfor %} 
+    {% endif %}
+    <ol class="breadcrumb"> 
+        <li> <a href="{% url "home" %}">Home</a> </li>
+        <li> <a href="{% url "dataset_list" %}">Dataset list</a> </li>                 
+        <li class="active"> Dataset creation </li>                 
+    </ol>            
+    <div class="row"> 
+        <article class="col-xs-12 maincontent"> 
+            <header class="page-header"> 
+                <h1 class="page-title">Dataset creation</h1> 
+            </header>                     
+            <div class="col-md-6"> 
+                <div class="panel panel-default"> 
+                    <div class="panel-body"> 
+                        <h3 class="thin text-center">Dataset</h3> 
+                        <hr> 
+                        <form method="POST" action="" enctype="multipart/form-data"> 
+                        	{% csrf_token %}
+                            <div class="top-margin"> 
+                                <label>Title 
+                                    {% if datasetform.dataset_title.field.required %}
+                                    <span class="text-danger">*</span>
+                                    {% endif %}
+                                </label>  
+                                {% if datasetform.errors.dataset_title %}
+                                    <div class="alert alert-danger" role="alert">{{ datasetform.errors.dataset_title }}</div>
+                                {% endif %}
+                                {{ datasetform.dataset_title }} 
+                            </div>                                     
+                            <div class="top-margin"> 
+                                <label>Description 
+                                    {% if datasetform.description.field.required %}
+                                    <span class="text-danger">*</span>
+                                    {% endif %}
+                                </label>   
+                                {% if datasetform.errors.description %}
+                                    <div class="alert alert-danger" role="alert">{{ datasetform.errors.description }}</div>
+                                {% endif %}
+                                {{ datasetform.description }} 
+                            </div>  
+                            <hr>
+	                        <h3 class="thin text-center">Data</h3> 
+						    <div class="item">
+							    <hr> 
+							    <div class="top-margin"> 
+	                                <label>Title 
+	                                    {% if dataform.data_title.field.required %}
+	                                    <span class="text-danger">*</span>
+	                                    {% endif %}
+	                                </label>  
+	                                {% if dataform.errors.data_title %}
+	                                    <div class="alert alert-danger" role="alert">{{ dataform.errors.data_title }}</div>
+	                                {% endif %}
+	                                {{ dataform.data_title }} 
+	                            </div>
+	                            <div class="top-margin"> 
+	                                <label>File 
+	                                    {% if fileform.file.field.required %}
+	                                    <span class="text-danger">*</span>
+	                                    {% endif %}
+	                                </label>  
+	                                {% if fileform.errors.file %}
+	                                    <div class="alert alert-danger" role="alert">{{ fileform.errors.file }}</div>
+	                                {% endif %}
+	                                {{ fileform.file }} 
+	                            </div>
+						    </div>
+                            <hr> 
+                            <div class="row">
+                                <div class="col-lg-4 col-lg-offset-8 text-right"> 
+                                    <button class="btn btn-action" type="submit" name="signup-button">Save</button>
+                                </div>
+                            </div>                                     
+                        </form>                                 
+                    </div>                             
+                </div>                         
+            </div>
+        </article>
+    </div>
+{% endblock container %}  

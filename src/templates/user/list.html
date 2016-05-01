@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% block container %}
+	<ol class="breadcrumb"> 
+        <li>
+            <a href="{% url "home" %}">Home</a>
+        </li>                 
+        <li class="active">Users list</li>                 
+    </ol> 
+    <h2 class="text-center top-space">Users</h2> 
+    <br> 
+    <div class="row"> 
+        <div class="col-sm-4 col-separator"> 
+            <h3>All users (Without admins)</h3> 
+            {% for u in users %}
+	            <p><a href='{% url 'user_edit' id=u.id %}'>{{ u.username }}</a></p>
+            {% endfor %}
+        </div>
+        <div class="col-sm-4 col-separator"> 
+            <h3>Admin users<br></h3> 
+            {% for admin in admins %}
+                <p>{{ admin.username }}</p>
+            {% endfor %}
+        </div>             
+    </div>                         
+{% endblock container %}            

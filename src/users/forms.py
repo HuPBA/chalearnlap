@@ -98,7 +98,6 @@ class AffiliationForm(forms.ModelForm):
 			'city': forms.TextInput(attrs={'class': "form-control"}),
 		}
 
-
 class UserLogForm(forms.Form):
 	def __init__(self, *args, **kwargs):
 		super(UserLogForm, self).__init__(*args, **kwargs)
@@ -108,16 +107,24 @@ class UserLogForm(forms.Form):
 	def clean(self):
 		return self.cleaned_data
 
-class UserCreationForm(forms.Form):
+class SelectRoleForm(forms.Form):
 	def __init__(self, choices, *args, **kwargs):
-		super(UserCreationForm, self).__init__(*args, **kwargs)
-		self.fields['event_select'] = forms.ChoiceField(widget=forms.Select(attrs={'class': "form-control"}), required=True)
-		self.fields['event_select'].choices = choices
+		super(SelectRoleForm, self).__init__(*args, **kwargs)
+		self.fields['role_select'] = forms.ChoiceField(widget=forms.Select(attrs={'class': "form-control"}), required=True)
+		self.fields['role_select'].choices = choices
 
-	event_select = forms.ChoiceField(choices=(), required=True)
+	role_select = forms.ChoiceField(choices=(), required=True)
 
 	def clean(self):
 		return self.cleaned_data	
+
+class RoleCreationForm(forms.Form):
+	def __init__(self, *args, **kwargs):
+		super(RoleCreationForm, self).__init__(*args, **kwargs)
+		self.fields['name'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}))
+
+	def clean(self):
+		return self.cleaned_data
 
 class UserRegisterForm(RegistrationForm):
 	def __init__(self, *args, **kwargs):
@@ -135,6 +142,10 @@ class UserRegisterForm(RegistrationForm):
 		self.fields['city'] = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}))
 
 	def clean(self):
+		username = self.cleaned_data.get('username')
+		if username:
+			if User.objects.filter(username=username).exists():
+				raise forms.ValidationError('Your username is not unique.')
 		return self.cleaned_data
 
 class EditProfileForm(forms.Form):
@@ -189,30 +200,76 @@ class SetPassForm(SetPasswordForm):
 	new_password1 = forms.CharField(required=True, widget=forms.PasswordInput(attrs={'class': "form-control"}))
 	new_password2 = forms.CharField(required=True, widget=forms.PasswordInput(attrs={'class': "form-control"}))
 
-class DatasetCreationForm(forms.ModelForm):
+class DatasetCreationForm(forms.Form):
 	def __init__(self, *args, **kwargs):
 		super(DatasetCreationForm, self).__init__(*args, **kwargs)
-		self.fields['title'].required = True
-		self.fields['description'].required = True
+		self.fields['dataset_title'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}))
+		self.fields['description'] = forms.CharField(required=True, widget=forms.Textarea(attrs={'class': "form-control"}))
 
-	class Meta:
-		model = Dataset
-		fields = [
-			"title",
-			"description",
-		]
-		widgets = {
-			'title': forms.TextInput(attrs={'class': "form-control"}),
-			'description': forms.Textarea(attrs={'class': "form-control"}),
-		}
 	def clean(self):
 		return self.cleaned_data
 
 class DataCreationForm(forms.Form):
 	def __init__(self, *args, **kwargs):
 		super(DataCreationForm, self).__init__(*args, **kwargs)
-		self.fields['title'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}))
+		self.fields['data_title'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}))
+		# self.fields['file'] = forms.FileField(required=True, widget=forms.FileInput(attrs={'class': "form-control"}))
+
+	def clean(self):
+		return self.cleaned_data
+
+class FileCreationForm(forms.Form):
+	def __init__(self, *args, **kwargs):
+		super(FileCreationForm, self).__init__(*args, **kwargs)
+		# self.fields['title'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}))
 		self.fields['file'] = forms.FileField(required=True, widget=forms.FileInput(attrs={'class': "form-control"}))
+
+	def clean(self):
+		return self.cleaned_data
+
+class EventCreationForm(forms.Form):
+	def __init__(self, *args, **kwargs):
+		super(EventCreationForm, self).__init__(*args, **kwargs)
+		self.fields['title'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}))
+		self.fields['description'] = forms.CharField(required=True, widget=forms.Textarea(attrs={'class': "form-control"}))
+		self.fields['event_type'] = forms.ChoiceField(widget=forms.Select(attrs={'class': "form-control"}), required=True, choices=[('1','Challenge'),('2','Special Issue'),('3', 'Workshop')])
+
+	def clean(self):
+		return self.cleaned_data
+
+class EditEventForm(forms.Form):
+	def __init__(self, *args, **kwargs):
+		event = kwargs.pop('event', None)
+		super(EditEventForm, self).__init__(*args, **kwargs)
+		self.fields['title'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}), initial=event.title)
+		self.fields['description'] = forms.CharField(required=True, widget=forms.Textarea(attrs={'class': "form-control"}), initial=event.description)
+
+	def clean(self):
+		return self.cleaned_data
+
+class NewsCreationForm(forms.Form):
+	def __init__(self, *args, **kwargs):
+		super(NewsCreationForm, self).__init__(*args, **kwargs)
+		self.fields['title'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}))
+		self.fields['description'] = forms.CharField(required=True, widget=forms.Textarea(attrs={'class': "form-control"}))
+
+	def clean(self):
+		return self.cleaned_data
+
+class NewsEditForm(forms.Form):
+	def __init__(self, *args, **kwargs):
+		news = kwargs.pop('news', None)
+		super(NewsEditForm, self).__init__(*args, **kwargs)
+		self.fields['title'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}), initial=news.title)
+		self.fields['description'] = forms.CharField(required=True, widget=forms.Textarea(attrs={'class': "form-control"}), initial=news.description)
+
+	def clean(self):
+		return self.cleaned_data
+
+class SelectDatasetForm(forms.Form):
+	def __init__(self, choices, *args, **kwargs):
+		super(SelectDatasetForm, self).__init__(*args, **kwargs)
+		self.fields['select_dataset'] = forms.MultipleChoiceField(required=True, widget=forms.CheckboxSelectMultiple(), choices=choices)
 
 	def clean(self):
 		return self.cleaned_data

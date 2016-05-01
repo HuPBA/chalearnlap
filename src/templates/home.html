@@ -7,33 +7,29 @@
             <hr>
             <br>
             <div class="row"> 
-                <div class="col-sm-3 col-sm-offset-5"> 
-                    <img src="{% static "images/info-icon.png" %}">
+                <div class="col-sm-6 col-sm-offset-4"> 
+                    <img src="{% static "images/info-icon3.png" %}">
                 </div>
             </div>
             <br><br>
-            <p><b>Machine Learning</b> is the science of building hardware or software that can achieve tasks by learning from examples. The examples often come as {input, output} pairs. Given new inputs a trained machine can make predictions of the unknown output.</p>
+            <p>Machine Learning is the science of building hardware or software that can achieve tasks by learning from examples. The examples often come as {input, output} pairs. Given new inputs a trained machine can make predictions of the unknown output.</p>
             Examples of machine learning tasks include:
-            <ul><li>automatic reading of handwriting </li>
-            <li>assisted medical diagnosis </li>
-            <li>automatic text classification (classification of web pages; spam filtering) </li>
-            <li>financial predictions </li> </ul>
+            <ul>
+                <li> automatic reading of handwriting </li>
+                <li> assisted medical diagnosis </li>
+                <li> automatic text classification (classification of web pages; spam filtering) </li>
+                <li> financial predictions </li>
+            </ul>
             <p>We organize challenges to stimulate research in this field. The web sites of past challenges remain open for post-challenge submission as ever-going benchmarks.</p>
         </div>                 
         <div class="col-sm-3"> 
             <div class="thumbnail">
                 <h2 class="text-center top-space">News</h2> 
                 <div class="caption">
-                    <h3>See4.C kickoff in Paris</h3> 
-                    <p>The past 12th and 13th of January took place the presentation of See4.C project funded within the H2020 programme of the EU. The meeting took place at the University of Paris-Saclay and RTE facilities.</p> 
-                </div>
-                <div class="caption">
-                    <h3>Another new</h3> 
-                    <p>The past 12th and 13th of January took place the presentation of See4.C project funded within the H2020 programme of the EU. The meeting took place at the University of Paris-Saclay and RTE facilities.</p> 
-                </div>
-                <div class="caption">
-                    <h3>Another new</h3> 
-                    <p>The past 12th and 13th of January took place the presentation of See4.C project funded within the H2020 programme of the EU. The meeting took place at the University of Paris-Saclay and RTE facilities.</p> 
+                    {% for n in news %}
+                        <h3>{{ n.title }}</h3> 
+                        <p>{{ n.description }}</p>
+                    {% endfor %}
                 </div>
             </div> 
         </div>  
