@@ -1,7 +1,7 @@
 from django.conf.urls import url
 from . import views
 from django.contrib.auth import views as auth_views
-from .forms import UserRegisterForm, UserLoginForm, ChangePassForm, ResetPassForm, SetPassForm
+from .forms import UserRegisterForm, UserLoginForm, ChangePassForm, ResetPassForm, SetPassForm, MemberCreationForm
 from registration.backends.default.views import RegistrationView, ActivationView
 from django.views.generic.base import TemplateView
 
@@ -26,7 +26,8 @@ urlpatterns = [
     url(r'^user/edit/(?P<id>\d+)/$', views.user_edit, name="user_edit"),
     # Profile urls (Editors, Organizers...)
     url(r'^profile/edit/(?P<id>\d+)/$', views.profile_edit, name="profile_edit"),
-    url(r'^profile/creation/(?P<id>\d+)/$', views.profile_creation, name="profile_creation"),
+    url(r'^profile/creation/$', views.Backend.as_view(form_class = MemberCreationForm,template_name='registration/registration_form_email.html'), name="profile_creation"),
+    url(r'^profile/select/(?P<id>\d+)/$', views.profile_select, name="profile_select"),
     # Dataset urls
     url(r'^dataset/list/$', views.dataset_list, name="dataset_list"),
     url(r'^dataset/creation/$', views.dataset_creation, name="dataset_creation"),

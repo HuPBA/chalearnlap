@@ -350,9 +350,10 @@ img.pull-left
 
 .content
 {
-    margin-top: 130px;
+    margin-top: 140px;
     margin-bottom: 30px;
 }
+
 
 .input-search
 {
@@ -442,3 +443,10 @@ img.pull-left
     max-width: 160px;
     height: auto;
 }
+
+#input-addmembers
+{
+    width: 100%;
+    min-width: 50px;
+}
+

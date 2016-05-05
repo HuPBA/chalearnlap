@@ -8,17 +8,18 @@ from registration.signals import user_registered
 import os
 
 def user_registered_callback(sender, user, request, **kwargs):
-	aff_name = request.POST["name"]
-	aff_city = request.POST["city"]
-	aff_country = request.POST["country"]
-	bio = request.POST["bio"]
-	first_name = request.POST["first_name"]
-	last_name = request.POST["last_name"]
-	avatar = request.FILES["avatar"]
-	new_affiliation = Affiliation(name=aff_name, country=aff_country, city=aff_city)
-	new_affiliation.save()
-	profile = Profile(user=user, affiliation=new_affiliation, bio=bio, first_name=first_name, last_name=last_name, avatar=avatar)
-	profile.save()
+	aff_name = request.POST.get('name','')
+	aff_city = request.POST.get('city','')
+	aff_country = request.POST.get('country','')
+	bio = request.POST.get('bio','')
+	first_name = request.POST.get('first_name','')
+	last_name = request.POST.get('last_name','')
+	avatar = request.FILES.get('avatar',None)
+	if first_name == 'zyx':
+		first_name = user.username
+		last_name = ''
+	new_affiliation = Affiliation.objects.create(name=aff_name, country=aff_country, city=aff_city)
+	profile = Profile.objects.create(user=user, affiliation=new_affiliation, bio=bio, first_name=first_name, last_name=last_name, avatar=avatar)
 
 user_registered.connect(user_registered_callback)
 

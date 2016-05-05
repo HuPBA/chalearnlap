@@ -20,138 +20,182 @@
     <div class="row"> 
         <article class="col-xs-12 maincontent"> 
             <header class="page-header"> 
+            {% if form.city and form.city in form.visible_fields %}
                 <h1 class="page-title">Sign up</h1> 
+            {% else %}
+                <h1 class="page-title">Register new member</h1> 
+            {% endif %}
             </header>                     
             <div class="col-md-6"> 
                 <div class="panel panel-default"> 
                     <div class="panel-body"> 
-                        <h3 class="thin text-center">Register a new account</h3> 
+                        <h3 class="thin text-center">User</h3> 
                         <hr> 
                         <form method="POST" action="" enctype="multipart/form-data"> {% csrf_token %}
-                            <div class="top-margin"> 
-                                <label>Username
-                                    {% if form.username.field.required %}
-                                    <span class="text-danger">*</span>
-                                    {% endif %}
-                                </label>   
-                                {% if form.errors.username %}
-                                    <div class="alert alert-danger" role="alert">{{ form.errors.username }}</div>
+                            {% if form.username %}
+                                {% if form.username in form.visible_fields %}
+                                    <div class="top-margin"> 
+                                        <label>Username
+                                            {% if form.username.field.required %}
+                                            <span class="text-danger">*</span>
+                                            {% endif %}
+                                        </label>   
+                                        {% if form.errors.username %}
+                                            <div class="alert alert-danger" role="alert">{{ form.errors.username }}</div>
+                                        {% endif %}
+                                        {{ form.username }}                                      
+                                    </div> 
                                 {% endif %}
-                                {{ form.username }}                                      
-                            </div> 
-                            <div class="top-margin"> 
-                                <label>First Name
-                                    {% if form.first_name.field.required %}
-                                    <span class="text-danger">*</span>
-                                    {% endif %}
-                                </label>   
-                                {% if form.errors.first_name %}
-                                    <div class="alert alert-danger" role="alert">{{ form.errors.first_name }}</div>
+                            {% endif %}
+                            {% if form.first_name %}
+                                {% if form.first_name in form.visible_fields %}
+                                    <div class="top-margin"> 
+                                        <label>First Name
+                                            {% if form.first_name.field.required %}
+                                            <span class="text-danger">*</span>
+                                            {% endif %}
+                                        </label>   
+                                        {% if form.errors.first_name %}
+                                            <div class="alert alert-danger" role="alert">{{ form.errors.first_name }}</div>
+                                        {% endif %}
+                                        {{ form.first_name }}                                      
+                                    </div>   
                                 {% endif %}
-                                {{ form.first_name }}                                      
-                            </div>                                     
-                            <div class="top-margin"> 
-                                <label>Last Name
-                                    {% if form.last_name.field.required %}
-                                    <span class="text-danger">*</span>
-                                    {% endif %}
-                                </label>
-                                {% if form.errors.last_name %}
-                                    <div class="alert alert-danger" role="alert">{{ form.errors.last_name }}</div>
-                                {% endif %}
-                                {{ form.last_name }} 
-                            </div>                                     
-                            <div class="top-margin"> 
-                                <label>Email Address 
-                                    {% if form.email.field.required %}
-                                    <span class="text-danger">*</span>
-                                    {% endif %}
-                                </label>
-                                {% if form.errors.email %}
-                                    <div class="alert alert-danger" role="alert">{{ form.errors.email }}</div>
-                                {% endif %}
-                                {{ form.email }} 
-                            </div>                                     
-                            <div class="row top-margin"> 
-                                {% if form.errors.password2 %}
-                                    <div class="alert alert-danger" role="alert">{{ form.errors.password2 }}</div>
+                            {% endif %}
+                            {% if form.last_name %}   
+                                {% if form.last_name in form.visible_fields %}                               
+                                    <div class="top-margin"> 
+                                        <label>Last Name
+                                            {% if form.last_name.field.required %}
+                                            <span class="text-danger">*</span>
+                                            {% endif %}
+                                        </label>
+                                        {% if form.errors.last_name %}
+                                            <div class="alert alert-danger" role="alert">{{ form.errors.last_name }}</div>
+                                        {% endif %}
+                                        {{ form.last_name }} 
+                                    </div>   
                                 {% endif %} 
-                                <div class="col-sm-6"> 
-                                    <label>Password 
-                                        {% if form.password1.field.required %}
-                                    <span class="text-danger">*</span>
-                                    {% endif %}
-                                    </label>
-                                    {{ form.password1 }} 
-                                </div>  
+                            {% endif %}
+                            {% if form.email %}   
+                                {% if form.email in form.visible_fields %}                              
+                                    <div class="top-margin"> 
+                                        <label>Email Address 
+                                            {% if form.email.field.required %}
+                                            <span class="text-danger">*</span>
+                                            {% endif %}
+                                        </label>
+                                        {% if form.errors.email %}
+                                            <div class="alert alert-danger" role="alert">{{ form.errors.email }}</div>
+                                        {% endif %}
+                                        {{ form.email }} 
+                                    </div>  
+                                {% endif %} 
+                            {% endif %}
+                            {% if form.password2 %} 
+                                {% if form.password2 in form.visible_fields %}                                 
+                                    <div class="row top-margin"> 
+                                        {% if form.errors.password2 %}
+                                            <div class="alert alert-danger" role="alert">{{ form.errors.password2 }}</div>
+                                        {% endif %} 
+                                        <div class="col-sm-6"> 
+                                            <label>Password 
+                                                {% if form.password1.field.required %}
+                                            <span class="text-danger">*</span>
+                                            {% endif %}
+                                            </label>
+                                            {{ form.password1 }} 
+                                        </div>  
 
-                                <div class="col-sm-6"> 
-                                    <label>Confirm Password 
-                                        {% if form.password2.field.required %}
-                                    <span class="text-danger">*</span>
-                                    {% endif %}
-                                    </label>
-                                    {{ form.password2 }}  
-                                </div>                                         
-                            </div>                                     
-                            <hr> 
-                            <div class="top-margin"> 
-                                <label>Profile picture
-                                    {% if form.avatar.field.required %}
-                                    <span class="text-danger">*</span>
-                                    {% endif %}
-                                </label>   
-                                {% if form.errors.avatar %}
-                                    <div class="alert alert-danger" role="alert">{{ form.errors.avatar }}</div>
+                                        <div class="col-sm-6"> 
+                                            <label>Confirm Password 
+                                                {% if form.password2.field.required %}
+                                            <span class="text-danger">*</span>
+                                            {% endif %}
+                                            </label>
+                                            {{ form.password2 }}  
+                                        </div>                                         
+                                    </div>                                     
+                                    <hr> 
                                 {% endif %}
-                                {{ form.avatar }}                                      
-                            </div>
-                            <div class="top-margin"> 
-                                <label>Biography
-                                    {% if form.bio.field.required %}
-                                    <span class="text-danger">*</span>
-                                    {% endif %}
-                                </label>   
-                                {% if form.errors.bio %}
-                                    <div class="alert alert-danger" role="alert">{{ form.errors.bio }}</div>
+                            {% endif %}
+                            {% if form.avatar %}
+                                {% if form.avatar in form.visible_fields %}
+                                    <div class="top-margin"> 
+                                        <label>Profile picture
+                                            {% if form.avatar.field.required %}
+                                            <span class="text-danger">*</span>
+                                            {% endif %}
+                                        </label>   
+                                        {% if form.errors.avatar %}
+                                            <div class="alert alert-danger" role="alert">{{ form.errors.avatar }}</div>
+                                        {% endif %}
+                                        {{ form.avatar }}                                      
+                                    </div>
                                 {% endif %}
-                                {{ form.bio }}                                      
-                            </div>
-                            <h3 class="thin text-center">Affiliation</h3> 
-                            <hr>
-                            <div class="top-margin"> 
-                                <label>Name
-                                    {% if form.name.field.required %}
-                                    <span class="text-danger">*</span>
-                                    {% endif %}
-                                </label>   
-                                {% if form.errors.name %}
-                                    <div class="alert alert-danger" role="alert">{{ form.errors.name }}</div>
+                            {% endif %}
+                            {% if form.bio %}
+                                {% if form.bio in form.visible_fields %}
+                                    <div class="top-margin"> 
+                                        <label>Biography
+                                            {% if form.bio.field.required %}
+                                            <span class="text-danger">*</span>
+                                            {% endif %}
+                                        </label>   
+                                        {% if form.errors.bio %}
+                                            <div class="alert alert-danger" role="alert">{{ form.errors.bio }}</div>
+                                        {% endif %}
+                                        {{ form.bio }}                                      
+                                    </div>
                                 {% endif %}
-                                {{ form.name }}                                      
-                            </div>
-                            <div class="top-margin"> 
-                                <label>Country
-                                    {% if form.country.field.required %}
-                                    <span class="text-danger">*</span>
-                                    {% endif %}
-                                </label>   
-                                {% if form.errors.country %}
-                                    <div class="alert alert-danger" role="alert">{{ form.errors.country }}</div>
+                            {% endif %}
+                            {% if form.name %}
+                                {% if form.name in form.visible_fields %}
+                                    <h3 class="thin text-center">Affiliation</h3> 
+                                    <hr>
+                                    <div class="top-margin"> 
+                                        <label>Name
+                                            {% if form.name.field.required %}
+                                            <span class="text-danger">*</span>
+                                            {% endif %}
+                                        </label>   
+                                        {% if form.errors.name %}
+                                            <div class="alert alert-danger" role="alert">{{ form.errors.name }}</div>
+                                        {% endif %}
+                                        {{ form.name }}                                      
+                                    </div>
                                 {% endif %}
-                                {{ form.country }}                                      
-                            </div>
-                            <div class="top-margin"> 
-                                <label>City
-                                    {% if form.city.field.required %}
-                                    <span class="text-danger">*</span>
-                                    {% endif %}
-                                </label>   
-                                {% if form.errors.city %}
-                                    <div class="alert alert-danger" role="alert">{{ form.errors.city }}</div>
+                            {% endif %}
+                            {% if form.country %}
+                                {% if form.country in form.visible_fields %}
+                                    <div class="top-margin"> 
+                                        <label>Country
+                                            {% if form.country.field.required %}
+                                            <span class="text-danger">*</span>
+                                            {% endif %}
+                                        </label>   
+                                        {% if form.errors.country %}
+                                            <div class="alert alert-danger" role="alert">{{ form.errors.country }}</div>
+                                        {% endif %}
+                                        {{ form.country }}                                      
+                                    </div>
                                 {% endif %}
-                                {{ form.city }}                                      
-                            </div>
+                            {% endif %}
+                            {% if form.city %}
+                                {% if form.city in form.visible_fields %}
+                                    <div class="top-margin"> 
+                                        <label>City
+                                            {% if form.city.field.required %}
+                                            <span class="text-danger">*</span>
+                                            {% endif %}
+                                        </label>   
+                                        {% if form.errors.city %}
+                                            <div class="alert alert-danger" role="alert">{{ form.errors.city }}</div>
+                                        {% endif %}
+                                        {{ form.city }}                                      
+                                    </div>
+                                {% endif %}
+                            {% endif %}
                             <hr> 
                             <div class="row">
                                 <div class="col-lg-4 col-lg-offset-8 text-right"> 

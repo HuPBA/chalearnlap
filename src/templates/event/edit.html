@@ -50,7 +50,7 @@
                                 {{ eventform.description }} 
                             </div>  
                             <hr>
-                            <h3 class="thin text-center">Members <a href="{% url "profile_creation" id=event.id %}"><img class="plus-icon" src="{% static "images/plus-icon.jpg" %}" alt="Add Member"></a></h3>
+                            <h3 class="thin text-center">Members <a href="{% url "profile_select" id=event.id %}"><img class="plus-icon" src="{% static "images/plus-icon.jpg" %}" alt="Add Member"></a></h3>
                             {% if members.count > 0 %}
                                 <hr>
                                 <div class="row">

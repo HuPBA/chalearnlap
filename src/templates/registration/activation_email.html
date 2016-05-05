@@ -27,6 +27,13 @@
     </a>
 </p>
 <p>
+    {% blocktrans %}
+    If you haven't set a username and password, the default values to login are: 
+        - Username: your email adress before the @
+        - Password: chalearn
+    {% endblocktrans %}
+</p>
+<p>
     {% blocktrans with site_name=site.name %}
     Sincerely,
     {{ site_name }} Management

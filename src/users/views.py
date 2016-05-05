@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
-from .forms import UserRegForm, UserLogForm, ProfileForm, AffiliationForm, SelectRoleForm, UserEditForm, UserRegisterForm, EditProfileForm, EditExtraForm, DatasetCreationForm, DataCreationForm, EventCreationForm, EditEventForm, RoleCreationForm, NewsCreationForm, FileCreationForm, NewsEditForm, SelectDatasetForm
+from .forms import ProfileForm, AffiliationForm, SelectRoleForm, UserEditForm, UserRegisterForm, EditProfileForm, EditExtraForm, DatasetCreationForm, DataCreationForm, EventCreationForm, EditEventForm, RoleCreationForm, NewsCreationForm, FileCreationForm, NewsEditForm, SelectDatasetForm, MemberCreationForm, MemberSelectForm
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_protect
 from django.contrib import messages
@@ -11,6 +11,28 @@ from django.template import RequestContext
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.db.models import Q
+from registration.backends.default.views import RegistrationView
+from registration.models import RegistrationProfile
+from registration.users import UserModel
+from django.contrib.sites.models import Site
+from registration import signals
+
+class Backend(RegistrationView):
+	def register(self, form):
+		email = form.cleaned_data["email"]
+		# password = User.objects.make_random_password()
+		password = 'chalearn'
+		username = email.split("@")[0]
+		site = Site.objects.get_current()
+		new_user_instance = (UserModel().objects.create_user(username=username,email=email,password=password))
+		new_user = RegistrationProfile.objects.create_inactive_user(
+			new_user=new_user_instance,
+			site=site,
+			send_email=self.SEND_ACTIVATION_EMAIL,
+			request=self.request,
+		)
+		signals.user_registered.send(sender=self.__class__,user=new_user,request=self.request)
+		return new_user
 
 def home(request):
 	news = News.objects.order_by('-upload_date')[:5]
@@ -35,37 +57,40 @@ def user_list(request):
 @login_required(login_url='/users/login/')
 def user_edit(request, id=None):
 	profile = Profile.objects.filter(user__id=id)[0]
-	news = News.objects.order_by('-upload_date')[:5]
 	user = profile.user
 	affiliation = profile.affiliation
+	if affiliation==None:
+		form = EditProfileForm(user=user)
 	form = EditProfileForm(profile=profile, user=user, affiliation=affiliation)
 	if request.method == 'POST':
 		form = EditProfileForm(request.POST, profile=profile, user=user, affiliation=affiliation)
 		if form.is_valid():
 			username = form.cleaned_data["username"]
-			first_name = form.cleaned_data["first_name"]
 			email = form.cleaned_data["email"]
-			last_name = form.cleaned_data["last_name"]
-			staff = form.cleaned_data["staff"]
-			avatar = form.cleaned_data["avatar"]
-			bio = form.cleaned_data["bio"]
-			name = form.cleaned_data["name"]
-			country = form.cleaned_data["country"]
-			city = form.cleaned_data["city"]
+			if affiliation==None:
+				affiliation = Affiliation()
+			if 'first_name' in form.cleaned_data:
+				profile.first_name = form.cleaned_data["first_name"]
+			if 'last_name' in form.cleaned_data:
+				profile.last_name = form.cleaned_data["last_name"]
+			if 'staff' in form.cleaned_data:
+				user.is_staff = form.cleaned_data["staff"]
+			if 'avatar' in form.cleaned_data:
+				profile.avatar = form.cleaned_data["avatar"]
+			if 'bio' in form.cleaned_data:
+				profile.bio = form.cleaned_data["bio"]
+			if 'name' in form.cleaned_data:
+				affiliation.name = form.cleaned_data["name"]
+			if 'country' in form.cleaned_data:
+				affiliation.country = form.cleaned_data["country"]
+			if 'city' in form.cleaned_data:
+				affiliation.city = form.cleaned_data["city"]
 			user.username = username
 			user.email = email
-			user.is_staff = staff
 			user.save()
-			affiliation.name = name
-			affiliation.country = country
-			affiliation.city = city
 			affiliation.save()
 			profile.user = user
 			profile.affiliation = affiliation
-			profile.first_name = first_name
-			profile.last_name = last_name
-			profile.avatar = avatar
-			profile.bio = bio
 			profile.save()
 			return HttpResponseRedirect(reverse('home'))
 	context = {
@@ -78,7 +103,6 @@ def user_edit(request, id=None):
 @user_passes_test(lambda u:u.is_staff, login_url='/')
 def profile_edit(request, id=None):
 	profile = Profile.objects.filter(id=id)[0]
-	news = News.objects.order_by('-upload_date')[:5]
 	affiliation = profile.affiliation
 	form = EditExtraForm(profile=profile, affiliation=affiliation)
 	if request.method == 'POST':
@@ -110,39 +134,36 @@ def profile_edit(request, id=None):
 @login_required(login_url='/users/login/')
 @user_passes_test(lambda u:u.is_staff, login_url='/')
 @csrf_protect
-def profile_creation(request, id=None):
+def profile_select(request, id=None):
 	choices = []
 	event = Event.objects.filter(id=id)[0]
 	roles = Role.objects.all()
 	for r in roles:
 	    choices.append((r.id, r.name))
+	profile_events = Profile_Event.objects.filter(event_id=id)
+	ids = []
+	for p in profile_events:
+		ids.append(p.profile.id)
+	qset = Profile.objects.exclude(id__in = ids)
 	selectRoleForm = SelectRoleForm(choices)
-	profileForm = ProfileForm()
-	affiliationForm = AffiliationForm()
+	selectform = MemberSelectForm(qset=qset)
 	if request.method == 'POST':
 		selectRoleForm = SelectRoleForm(choices, request.POST)
-		profileForm = ProfileForm(request.POST)
-		affiliationForm = AffiliationForm(request.POST)
-		if selectRoleForm.is_valid() and profileForm.is_valid() and affiliationForm.is_valid():
-			fname = profileForm.cleaned_data["first_name"]
-			lname = profileForm.cleaned_data["last_name"]
-			bio = profileForm.cleaned_data["bio"]
-			aff_name = affiliationForm.cleaned_data["name"]
-			aff_country = affiliationForm.cleaned_data["country"]
-			aff_city = affiliationForm.cleaned_data["city"]
+		selectform = MemberSelectForm(request.POST, qset=qset)
+		if selectRoleForm.is_valid() and selectform.is_valid():
+			members = selectform.cleaned_data['email']
 			role = Role.objects.filter(id=selectRoleForm.cleaned_data["role_select"])[0]
-			new_aff = Affiliation.objects.create(name=aff_name, country=aff_country, city=aff_city)
-			new_profile = Profile.objects.create(first_name=fname, last_name=lname, affiliation=new_aff, bio=bio)
-			new_profile_event = Profile_Event.objects.create(profile=new_profile, event=event)
-			role.profile_event = new_profile_event
-			role.save()
+			for m in members:
+				new_profile = Profile.objects.filter(id=m.id)[0]
+				new_profile_event = Profile_Event.objects.create(profile=new_profile, event=event)
+				role.profile_event = new_profile_event
+				role.save()
 			return HttpResponseRedirect(reverse('event_edit', kwargs={'id':id}))
 	context = {
 		"selectRoleForm": selectRoleForm,
-		"profileForm": profileForm,
-		"affiliationForm": affiliationForm,
+		"selectform": selectform,
 	}
-	return render(request, "profile/creation.html", context, context_instance=RequestContext(request))
+	return render(request, "profile/select.html", context, context_instance=RequestContext(request))
 
 @login_required(login_url='/users/login/')
 @user_passes_test(lambda u:u.is_staff, login_url='/')
