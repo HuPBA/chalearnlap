@@ -4,12 +4,13 @@
     <head> 
         <meta charset="utf-8"> 
         <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
-        <title>SEE4.C</title>         
+        <title>Chalearn</title>         
         <link rel="stylesheet" media="screen" href="http://fonts.googleapis.com/css?family=Open+Sans:300,400,700"> 
         <link rel="stylesheet" href="{% static "css/bootstrap.min.css" %}"> 
         <link rel="stylesheet" href="{% static "css/font-awesome.min.css" %}"> 
         <link rel="stylesheet" href="{% static "css/bootstrap-theme.css" %}" media="screen"> 
-        <link rel="stylesheet" href="{% static "css/main.css" %}">        
+        <link rel="stylesheet" href="{% static "css/main.css" %}">    
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.2/css/select2.min.css" rel="stylesheet" />
     </head>     
     <body class="home">        
         <div class="navbar navbar-inverse navbar-fixed-top headroom"> 
@@ -17,84 +18,53 @@
                 <div class="navbar-header"> 
                     <!-- Button for smallest screens -->                     
                     <a class="navbar-brand" href="{% url "home" %}">
-                        <img src="{% static "images/icon-see4c.png" %}" alt="ChaLearn">
+                        <img id="header-icon" src="{% static "images/icon-see4c.png" %}" alt="ChaLearn">
                     </a>                     
                 </div>
                 <div class="navbar-collapse collapse"> 
                     <ul class="nav navbar-nav pull-right navbar-header"> 
                         <li class="dropdown"> 
                             <a href="#" class="dropdown-toggle btn-header-margin" data-toggle="dropdown">Challenges <b class="caret"></b></a> 
-                            <ul class="dropdown-menu"> 
-                                <li>
-                                    <a href="#">2011/12 Gesture Challenge</a>
-                                </li>                                 
-                                <li>
-                                    <a href="#">2013 Multi-modal Challenge</a>
-                                </li>  
-                                <li>
-                                    <a href="#">2014 Looking at people Challenge</a>
-                                </li> 
-                                <li>
-                                    <a href="#">2015 Looking at people CVPR Challenge</a>
-                                </li> 
-                                <li>
-                                    <a href="#">2016 Looking at people ICCV Challenge</a>
-                                </li>                                
-                            </ul>                             
+                            {% if datasets.count > 0 %}
+                                <ul class="dropdown-menu"> 
+                                    {% for c in challenges %}
+                                        <li><a href='{% url 'event_detail' id=c.id %}'>{{ c.title }}</a></li>
+                                    {% endfor %}                               
+                                </ul>   
+                            {% endif %}                           
                         </li>
                         <li class="dropdown"> 
                             <a href="#" class="dropdown-toggle btn-header btn-header-margin" data-toggle="dropdown">Data<b class="caret"></b></a> 
-                            <ul class="dropdown-menu"> 
-                                <li>
-                                    <a href="#">CGD 2011</a>
-                                </li>                                 
-                                <li>
-                                    <a href="#">CMGR 2013</a>
-                                </li>   
-                                <li>
-                                    <a href="#">LAP 2014</a>
-                                </li>                                
-                            </ul>                             
-                        </li>
+                            {% if datasets.count > 0 %}
+                                <ul class="dropdown-menu"> 
+                                    {% for d in datasets %}
+                                        <li><a href='{% url 'dataset_detail' id=d.id %}'>{{ d.title }}</a></li>
+                                    {% endfor %}                                
+                                </ul>        
+                            {% endif %}                     
+                        </li> 
                         <li class="dropdown"> 
                             <a href="#" class="dropdown-toggle btn-header btn-header-margin" data-toggle="dropdown">Workshops <b class="caret"></b></a> 
-                            <ul class="dropdown-menu"> 
-                                <li>
-                                    <a href="#">CVPR 2011</a>
-                                </li>                                 
-                                <li>
-                                    <a href="#">CVPR 2012</a>
-                                </li>  
-                                <li>
-                                    <a href="#">ICPR 2012</a>
-                                </li>  
-                                <li>
-                                    <a href="#">ICMI 2013</a>
-                                </li>  
-                                <li>
-                                    <a href="#">ECCV 2014</a>
-                                </li>  
-                                <li>
-                                    <a href="#">CVPR 2015</a>
-                                </li>                                 
-                            </ul>                             
+                            {% if datasets.count > 0 %}
+                                <ul class="dropdown-menu"> 
+                                    {% for w in workshops %}
+                                        <li><a href='{% url 'event_detail' id=w.id %}'>{{ w.title }}</a></li>
+                                    {% endfor %}                                 
+                                </ul>  
+                            {% endif %}                            
                         </li>
                         <li class="dropdown"> 
                             <a href="#" class="dropdown-toggle btn-header btn-header-margin" data-toggle="dropdown">Special issues <b class="caret"></b></a> 
-                            <ul class="dropdown-menu"> 
-                                <li>
-                                    <a href="#">JMLR 2012</a>
-                                </li>                                 
-                                <li>
-                                    <a href="#">TPAMI 2015</a>
-                                </li>   
-                                <li>
-                                    <a href="#">IJCV 2016</a>
-                                </li>                               
-                            </ul>                             
+                            {% if datasets.count > 0 %}
+                                <ul class="dropdown-menu"> 
+                                    {% for s in special_issues %}
+                                        <li><a href='{% url 'event_detail' id=s.id %}'>{{ s.title }}</a></li>
+                                    {% endfor %}                              
+                                </ul>   
+                            {% endif %}                           
                         </li>
                         <li class="dropdown"> 
-                            <a href="{% url "partners-list" %}" class="dropdown-toggle btn-header btn-header-margin">Partners</a>                            
+                            <a href="{% url "partners_list" %}" class="dropdown-toggle btn-header btn-header-margin">Partners</a>                            
                         </li>
                         {% if user.is_authenticated %}
                             <li class="div-header">
@@ -104,12 +74,13 @@
                                         <li class="dropdown-submenu">
                                         <a>Admin site</a>
                                             <ul class="dropdown-menu">
-                                                <li><a href="{% url "users-list" %}">Users zone</a></li> 
-                                                <li><a href="{% url "data-zone" %}">Data zone</a></li> 
+                                                <li><a href="{% url "user_list" %}">Users zone</a></li> 
+                                                <li><a href="{% url "dataset_list" %}">Data zone</a></li> 
+                                                <li><a href="{% url "event_list" %}">Event zone</a></li> 
                                             </ul>
                                         </li>
                                     {% endif %} 
-                                    <li><a href="{% url "edit-profile" id=user.id %}">Edit profile</a>
+                                    <li><a href="{% url "user_edit" id=user.id %}">Edit profile</a>
                                     <a href="{% url "auth_logout" %}">Log out</a></li> 
                                 </ul>  
                             </li>                       
@@ -144,19 +115,13 @@
             <div class="footer1"> 
                 <div class="container"> 
                     <div class="row"> 
-                        <div class="col-md-3 widget"> 
-                            <h3 class="widget-title"></h3> 
-                            <div class="widget-body"> 
-                                <img src="{% static "images/funded-by-the-CEE.png" %}" alt="Funded by CEE">   
-                            </div>
-                        </div> 
-                        <div class="col-md-4 widget"> 
+                        <div class="col-md-6 widget"> 
                             <h3 class="widget-title">Contact</h3> 
                             <div class="widget-body"> 
-                                <p>Florin Popescu, Fraunhofer <br>+49303463997486<br> <a href="mailto:#">florin.popescu@fokus.fraunhofer.de</a><br> </p>
+                                <p>Sergio Escalera, Computer Vision Center (UAB) and University of Barcelona, Catalonia (Spain) <br>+49303463997486<br> <a href="mailto:mmgesture@chalearn.org">mmgesture@chalearn.org</a><br> </p>
                             </div>                             
                         </div>                         
-                        <div class="col-md-4 widget"> 
+                        <div class="col-md-6 widget"> 
                             <h3 class="widget-title">Follow me</h3> 
                             <div class="widget-body"> 
                                 <p class="follow-me-icons"> <a href="#"><i class="fa fa-twitter fa-2"></i><a href="#"><i class="fa fa-github fa-2"></i></a> <a href="#"><i class="fa fa-facebook fa-2"></i></a> </p> 
@@ -185,7 +150,8 @@
         </footer>         
         <!-- JavaScript libs are placed at the end of the document so the pages load faster -->         
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>         
-        <script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>         
+        <script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script> 
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.2/js/select2.min.js"></script>        
         <script src="{% static "js/headroom.min.js" %}"></script>         
         <script src="{% static "js/jQuery.headroom.min.js" %}"></script>    
         <script src="{% static "js/template.js" %}"></script>         

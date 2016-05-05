@@ -12,15 +12,22 @@
                 </div>
             </div>
             <br><br>
-            <p>Numerous improvements of the efficiency of energy infrastructure are anticipated in the next decade from the deployment of smart grid technology in electricity distribution networks and with the Commission’s 2020 goal in sight. As we progress in deploying renewable energy harnessing wind and solar power generation, we also expected to see growth in power demand for new applications such as electric vehicles. As is known, electricity is difficult to store. Hence supply and demand on the electricity network must be balanced at all times to the extent possible. Failure to achieve this balance may result in network breakdown and subsequent power outages of various levels of gravity. Principally, shutting down and restarting power plants (particularly nuclear power plants) is very difficult and costly as is a redundant grid infrastructure with multiple layers of standby generation sources that are idle a significant portion of time. Many consumers, including hospitals and people hospitalized at home as well as factories critically suffer from power outages. Using information technology to balance the network will allow us to make use of natural energy alongside nuclear power and other conventional power sources to help to reduce CO2 emissions. Other beneficial effects are to reduce redundancy in transmission and distribution lines, and make better utilization of generators, leading to lower power prices. Achieving these goals will require integrating many sources of spatiotemporal information, including weather forecasts (to predict wind or sun availability) and demand forecasts (for example turning on/off air conditioners or heaters).</p> 
-            <p>The goal of this project is to design a data science challenge to engage the scientific community to solve this difficult the problem of managing better the electricity distribution network, using spatiotemporal data.</p>
+            <br><p><b>What is the challenge exactly?</b></p>
+            <p>See.4C will define a set of analytics tasks (the principal task being forecasting electricity grid traffic) and design a specially tailored competition (more specifically, a coopetition).</p>
+            <p>Participants and teams will submit algorithms to be evaluated on an special cloud-based computational environment. Some of the data will be hidden from participants, as in previous competitions.</p>
+            <br><p><b>What type of data is provided?</b></p>
+            <p>The general task we are interested in is spatiotemporal forecasting. We access big open data (predictors including satellite imagery of Europe and the Atlantic, weather forecasts etc.,) and private data which is the target of the prediction (the flows across the electrical grid linking generation to load or usage, especially prepared for this project) to challenge participants to beat the best forecasting methods now available.</p>
+            <br><p><b>Using which methods?</b></p>
+            <p>That is up to you! We believe that a blend of forecasting and analysis in (normal) video and geo-spatial images forecasting energy data would get maximal community involvement and cross-disciplinary convergence/emergence. Stay tuned!</p>
         </div>                 
         <div class="col-sm-3"> 
             <div class="thumbnail">
                 <h2 class="text-center top-space">News</h2> 
                 <div class="caption">
-                    <h3>See4.C kickoff in Paris</h3> 
-                    <p>The past 12th and 13th of January 2016 took place the presentation of See4.C project funded within the H2020 programme of the EU. The meeting took place at the University of Paris-Saclay and RTE facilities.</p> 
+                    {% for n in news %}
+                        <h3>{{ n.title }}</h3> 
+                        <p>{{ n.description }}</p>
+                    {% endfor %}
                 </div>
             </div> 
         </div>  

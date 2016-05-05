@@ -70,13 +70,15 @@
     font-size: 24px;
     color: white;
     padding: 0 0 0 15px;
-    margin: 12px 0 0 0;
+    margin: 0 0 0 0;
 }
 
 .navbar-inverse .navbar-brand img
 {
     margin-top: -8px;
+    margin-bottom: 8px;
 }
+
 
 .navbar-nav .dropdown-menu
 {
@@ -178,7 +180,6 @@
     -moz-border-radius: 3px;
     border-radius: 3px;
 }
-
 
 .btn-lg
 {

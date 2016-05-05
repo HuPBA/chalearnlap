@@ -21,9 +21,8 @@ from users import views
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^users/', include("users.urls")),
+    url(r'^', include("users.urls")),
     url(r'^$', views.home, name="home"),
-    # url(r'^accounts/', include('registration.backends.default.urls')),
 ]
 
 handler404 = 'views.handler404'

@@ -350,9 +350,10 @@ img.pull-left
 
 .content
 {
-    margin-top: 130px;
+    margin-top: 140px;
     margin-bottom: 30px;
 }
+
 
 .input-search
 {
@@ -396,9 +397,6 @@ img.pull-left
     left: 100%;
     margin-top: -6px;
     margin-left: -1px;
-    -webkit-border-radius: 0 6px 6px 6px;
-    -moz-border-radius: 0 6px 6px;
-    border-radius: 0 6px 6px 6px;
 }
 
 .dropdown-submenu:hover>.dropdown-menu
@@ -413,7 +411,6 @@ img.pull-left
     float: right;
     width: 0;
     height: 0;
-    border-width: 5px 0 5px 5px;
     margin-top: 5px;
     margin-right: -10px;
 }
@@ -427,9 +424,6 @@ img.pull-left
 {
     left: -100%;
     margin-left: 10px;
-    -webkit-border-radius: 6px 0 6px 6px;
-    -moz-border-radius: 6px 0 6px 6px;
-    border-radius: 6px 0 6px 6px;
 }
 
 .plus-icon
@@ -443,3 +437,16 @@ img.pull-left
     width: auto;
     height: auto;
 }
+
+#header-icon
+{
+    max-width: 160px;
+    height: auto;
+}
+
+#input-addmembers
+{
+    width: 100%;
+    min-width: 50px;
+}
+

@@ -3,21 +3,23 @@ from __future__ import unicode_literals
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
-
+from django.utils import timezone
 from registration.signals import user_registered
+import os
 
 def user_registered_callback(sender, user, request, **kwargs):
-	aff_name = request.POST["name"]
-	aff_city = request.POST["city"]
-	aff_country = request.POST["country"]
-	bio = request.POST["bio"]
-	first_name = request.POST["first_name"]
-	last_name = request.POST["last_name"]
-	avatar = request.POST["avatar"]
-	new_affiliation = Affiliation(name=aff_name, country=aff_country, city=aff_city)
-	new_affiliation.save()
-	profile = Profile(user=user, affiliation=new_affiliation, bio=bio, first_name=first_name, last_name=last_name, avatar=avatar)
-	profile.save()
+	aff_name = request.POST.get('name','')
+	aff_city = request.POST.get('city','')
+	aff_country = request.POST.get('country','')
+	bio = request.POST.get('bio','')
+	first_name = request.POST.get('first_name','')
+	last_name = request.POST.get('last_name','')
+	avatar = request.FILES.get('avatar',None)
+	if first_name == 'zyx':
+		first_name = user.username
+		last_name = ''
+	new_affiliation = Affiliation.objects.create(name=aff_name, country=aff_country, city=aff_city)
+	profile = Profile.objects.create(user=user, affiliation=new_affiliation, bio=bio, first_name=first_name, last_name=last_name, avatar=avatar)
 
 user_registered.connect(user_registered_callback)
 
@@ -41,41 +43,57 @@ class Event(models.Model):
 	def __str__(self):
 		return unicode(self.title).encode('utf-8')
 
+	def get_absolute_url(self):
+		return reverse("event_edit", kwargs={"id": self.id})
+
+def user_avatar_path(instance, filename):
+	return 'userpics/%s-%s/%s' % (instance.first_name, instance.last_name, filename)
+
 class Profile(models.Model):
 	user = models.OneToOneField(User, on_delete=models.CASCADE, null=True)
 	first_name = models.CharField(max_length=30, null=True)
 	last_name = models.CharField(max_length=30, null=True)
 	affiliation = models.OneToOneField(Affiliation, on_delete=models.CASCADE, null=True)
 	bio = models.TextField(max_length=3000)
-	avatar = models.ImageField(upload_to='userpics/', null=True)
+	avatar = models.ImageField(upload_to=user_avatar_path, null=True)
 	events = models.ManyToManyField(Event, through='Profile_Event')
 
 	def __str__(self):
 		return unicode(self.first_name).encode('utf-8')
 
 	def get_absolute_url(self):
-		return reverse("edit-profile", kwargs={"id": self.id})
+		return reverse("profile_detail", kwargs={"id": self.id})
 
 class Profile_Event(models.Model):
 	profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='fk_profile')
 	event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='fk_event')
-	role = models.CharField(max_length=50)
+	# role = models.OneToOneField(Role, on_delete=models.CASCADE, null=True)
+
+class Role(models.Model):
+	name = models.CharField(max_length=50)
+	profile_event = models.ForeignKey(Profile_Event, on_delete=models.SET_NULL, null=True)
+
+def partner_member_avatar_path(instance, filename):
+	return 'partner/members/%s-%s/%s' % (instance.first_name, instance.last_name, filename)
 
 class Member_Partner(models.Model):
 	first_name = models.CharField(max_length=30, null=True)
 	last_name = models.CharField(max_length=30, null=True)
 	bio = models.TextField(max_length=3000)
-	avatar = models.ImageField(upload_to='userpics/', null=True)
+	avatar = models.ImageField(upload_to=partner_member_avatar_path, null=True)
 	email = models.CharField(max_length=100, null=True)
 
 	def __str__(self):
 		return unicode(self.first_name).encode('utf-8')
 
+def partner_avatar_path(instance, filename):
+	return 'partner/%s/%s' % (instance.name, filename)
+
 class Partner(models.Model):
 	name = models.CharField(max_length=100)
 	url = models.CharField(max_length=300)
-	banner = models.ImageField(upload_to='partnerpics/', null=True)
-	events = models.ManyToManyField(Event, through='Challenge_Partner', null=True)
+	banner = models.ImageField(upload_to=partner_avatar_path, null=True)
+	events = models.ManyToManyField(Event, through='Challenge_Partner')
 	member = models.ForeignKey(Member_Partner, on_delete=models.CASCADE, null=True)
 
 	def __str__(self):
@@ -95,41 +113,49 @@ class Schedule_Event(models.Model):
 	def __str__(self):
 		return unicode(self.description).encode('utf-8')
 
-class New(models.Model):
+class News(models.Model):
+	title = models.CharField(max_length=100)
 	description = models.TextField(max_length=3000)
+	upload_date = models.DateTimeField()
 	event = models.ForeignKey(Event, on_delete=models.SET_NULL, null=True)
 
-	def __str__(self):
-		return unicode(self.description).encode('utf-8')
-
-class Special_Issue(models.Model):
-	event = models.ForeignKey(Event, on_delete=models.CASCADE)
-
-	def __str__(self):
-		return unicode(self.event.title).encode('utf-8')
-
-class Workshop(models.Model):
-	event = models.ForeignKey(Event, on_delete=models.CASCADE)
-
-	def __str__(self):
-		return unicode(self.event.title).encode('utf-8')
-
-class Challenge(models.Model):
-	event = models.ForeignKey(Event, on_delete=models.CASCADE)
-
-	def __str__(self):
-		return unicode(self.event.title).encode('utf-8')
-
-class Dataset(models.Model):
-	title = models.CharField(max_length=100, null=True)
-	description = models.TextField(max_length=3000, null=True)
-	chalearn = models.ForeignKey(Chalearn, on_delete=models.SET_NULL, null=True)
+	def save(self, *args, **kwargs):
+		if not self.id:
+			self.upload_date = timezone.now()
+		return super(News, self).save(*args, **kwargs)
 
 	def __str__(self):
 		return unicode(self.title).encode('utf-8')
 
 	def get_absolute_url(self):
-		return reverse("edit-dataset", kwargs={"id": self.id})
+		return reverse("news_edit", kwargs={"id": self.id})
+
+class Special_Issue(Event):
+
+	def __str__(self):
+		return unicode(self.title).encode('utf-8')
+
+class Workshop(Event):
+
+	def __str__(self):
+		return unicode(self.title).encode('utf-8')
+
+class Challenge(Event):
+
+	def __str__(self):
+		return unicode(self.title).encode('utf-8')
+
+class Dataset(models.Model):
+	title = models.CharField(max_length=100, null=True)
+	description = models.TextField(max_length=3000, null=True)
+	chalearn = models.ForeignKey(Chalearn, on_delete=models.SET_NULL, null=True)
+	track = models.ManyToManyField(Challenge)
+
+	def __str__(self):
+		return unicode(self.title).encode('utf-8')
+
+	def get_absolute_url(self):
+		return reverse("dataset_edit", kwargs={"id": self.id})
 
 class Result(models.Model):
 	title = models.CharField(max_length=100)
@@ -142,11 +168,27 @@ class Result(models.Model):
 
 class Data(models.Model):
 	title = models.CharField(max_length=100)
-	file = models.FileField(upload_to='data/', null=True)
 	dataset = models.ForeignKey(Dataset, on_delete=models.SET_NULL, null=True)
 
 	def __str__(self):
 		return unicode(self.title).encode('utf-8')
+
+	def get_absolute_url(self):
+		return reverse("data_detail", kwargs={"id": self.id, "dataset_id": self.dataset.id})
+
+def data_path(instance, filename):
+	return 'datasets/%s/%s/%s' % (instance.data.dataset.title, instance.data.title, filename)
+
+class File(models.Model):
+	title = models.CharField(max_length=100, null=True)
+	file = models.FileField(upload_to=data_path, null=True)
+	data = models.ForeignKey(Data, on_delete=models.SET_NULL, null=True)
+
+	def __str__(self):
+		return unicode(self.file.url).encode('utf-8')
+
+	def filename(self):
+		return os.path.basename(self.file.name)
 
 class Publication(models.Model):
 	publicated = models.BooleanField()

@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block container %}
+	<ol class="breadcrumb"> 
+        <li>
+            <a href="{% url "home" %}">Home</a>
+        </li>                 
+        <li class="active">Events list</li>                 
+    </ol> 
+    <div class="row"> 
+        <article class="col-xs-12 maincontent"> 
+            <header class="page-header"> 
+                <h1 class="page-title">Events <a href="{% url "event_creation" %}"><img class="plus-icon" src="{% static "images/plus-icon.jpg" %}" alt="Add Event"></a> </h1> 
+            </header>                     
+            <div class="col-md-6"> 
+                <div class="panel panel-default"> 
+                    <div class="panel-body"> 
+                       <div class="col-sm-6 col-separator"> 
+                            {% for e in events %}
+                                <p><a href='{{ e.get_absolute_url }}'>{{ e.title }}</a></p>
+                            {% endfor %}
+                        </div>                              
+                    </div>                             
+                </div>                         
+            </div>
+        </article>
+    </div>                      
+{% endblock container %}   

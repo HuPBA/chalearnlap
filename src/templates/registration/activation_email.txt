@@ -11,6 +11,12 @@ To activate this account, please click the following link within the next
 
 http://{{site.domain}}{% url 'registration_activate' activation_key %}
 
+{% blocktrans %}
+If you haven't set a username and password, the default values to login are: 
+    - Username: your email adress before the @
+    - Password: chalearn
+{% endblocktrans %}
+
 {% blocktrans with site_name=site.name %}
 Sincerely,
 {{ site_name }} Management

@@ -4,37 +4,6 @@ from .models import Profile, Affiliation, Dataset, Data
 from registration.forms import RegistrationForm
 from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm, PasswordResetForm, SetPasswordForm
 
-class UserRegForm(forms.ModelForm):
-	def __init__(self, *args, **kwargs):
-		super(UserRegForm, self).__init__(*args, **kwargs)
-		self.fields['username'].required = True
-		self.fields['password'].required = True
-		self.fields['email'].required = True
-
-	confirm_password = forms.CharField(widget=forms.PasswordInput(attrs={'class': "form-control"}), required=True)
-
-	class Meta:
-		model = User
-		fields = [
-			"username",
-			"password",
-			"email"
-		]
-		widgets = {
-			'username': forms.TextInput(attrs={'class': "form-control"}),
-			'password': forms.PasswordInput(attrs={'class': "form-control"}),
-			'email': forms.EmailInput(attrs={'class': "form-control"}),
-		}
-
-	def clean(self):
-		password1 = self.cleaned_data.get('password')
-		password2 = self.cleaned_data.get('confirm_password')
-		print password1
-		print password2
-		if password1 != password2:
-			raise forms.ValidationError(("Passwords don't match"), code='passwords_not_match')
-		return self.cleaned_data	
-
 class UserEditForm(forms.ModelForm):
 	def __init__(self, *args, **kwargs):
 		super(UserEditForm, self).__init__(*args, **kwargs)
@@ -51,6 +20,15 @@ class UserEditForm(forms.ModelForm):
 			'username': forms.TextInput(attrs={'class': "form-control"}),
 			'email': forms.EmailInput(attrs={'class': "form-control"}),
 		}
+
+	def clean(self):
+		return self.cleaned_data
+
+class MemberSelectForm(forms.Form):
+	def __init__(self, *args, **kwargs):
+		qset = kwargs.pop('qset', User.objects.all())
+		super(MemberSelectForm, self).__init__(*args, **kwargs)
+		self.fields['email'] = forms.ModelMultipleChoiceField(required=True, widget=forms.SelectMultiple(attrs={'class': "js-example-basic-multiple", 'id': "input-addmembers"}), queryset=qset)
 
 	def clean(self):
 		return self.cleaned_data
@@ -98,7 +76,6 @@ class AffiliationForm(forms.ModelForm):
 			'city': forms.TextInput(attrs={'class': "form-control"}),
 		}
 
-
 class UserLogForm(forms.Form):
 	def __init__(self, *args, **kwargs):
 		super(UserLogForm, self).__init__(*args, **kwargs)
@@ -108,16 +85,41 @@ class UserLogForm(forms.Form):
 	def clean(self):
 		return self.cleaned_data
 
-class UserCreationForm(forms.Form):
+class SelectRoleForm(forms.Form):
 	def __init__(self, choices, *args, **kwargs):
-		super(UserCreationForm, self).__init__(*args, **kwargs)
-		self.fields['event_select'] = forms.ChoiceField(widget=forms.Select(attrs={'class': "form-control"}), required=True)
-		self.fields['event_select'].choices = choices
+		super(SelectRoleForm, self).__init__(*args, **kwargs)
+		self.fields['role_select'] = forms.ChoiceField(widget=forms.Select(attrs={'class': "form-control"}), required=True)
+		self.fields['role_select'].choices = choices
 
-	event_select = forms.ChoiceField(choices=(), required=True)
+	role_select = forms.ChoiceField(choices=(), required=True)
 
 	def clean(self):
 		return self.cleaned_data	
+
+class RoleCreationForm(forms.Form):
+	def __init__(self, *args, **kwargs):
+		super(RoleCreationForm, self).__init__(*args, **kwargs)
+		self.fields['name'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}))
+
+	def clean(self):
+		return self.cleaned_data
+
+class MemberCreationForm(RegistrationForm):
+	def __init__(self, *args, **kwargs):
+		super(MemberCreationForm, self).__init__(*args, **kwargs)
+		self.fields['username'] = forms.CharField(required=True, initial='zyx')
+		self.fields['first_name'] = forms.CharField(required=True, initial='zyx')
+		self.fields['last_name'] = forms.CharField(required=True, initial='zyx')
+		self.fields['email'] = forms.CharField(required=True, widget=forms.EmailInput(attrs={'class': "form-control"}))
+		self.fields['password1'] = forms.CharField(required=True, initial='a1234567')
+		self.fields['password2'] = forms.CharField(required=True, initial='a1234567')
+
+	def clean(self):
+		username = self.cleaned_data.get('email').split("@")[0]
+		if username:
+			if User.objects.filter(username=username).exists():
+				raise forms.ValidationError('This email is not unique.')
+		return self.cleaned_data
 
 class UserRegisterForm(RegistrationForm):
 	def __init__(self, *args, **kwargs):
@@ -135,6 +137,10 @@ class UserRegisterForm(RegistrationForm):
 		self.fields['city'] = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}))
 
 	def clean(self):
+		username = self.cleaned_data.get('email')
+		if username:
+			if User.objects.filter(username=username).exists():
+				raise forms.ValidationError('Your username is not unique.')
 		return self.cleaned_data
 
 class EditProfileForm(forms.Form):
@@ -143,16 +149,27 @@ class EditProfileForm(forms.Form):
 		user = kwargs.pop('user', None)
 		affiliation = kwargs.pop('affiliation', None)
 		super(EditProfileForm, self).__init__(*args, **kwargs)
-		self.fields['username'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}), initial=user.username)
-		self.fields['email'] = forms.CharField(required=True, widget=forms.EmailInput(attrs={'class': "form-control"}), initial=user.email)
-		self.fields['first_name'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}), initial=profile.first_name)
-		self.fields['last_name'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}), initial=profile.last_name)
-		self.fields['staff'] = forms.TypedChoiceField(required=False, choices=((False, 'False'), (True, 'True')), widget=forms.RadioSelect, initial=user.is_staff)
-		self.fields['avatar'] = forms.ImageField(required=False, widget=forms.FileInput(attrs={'class': "form-control"}), initial=profile.avatar)
-		self.fields['bio'] = forms.CharField(required=False, widget=forms.Textarea(attrs={'class': "form-control"}), initial=profile.bio)
-		self.fields['name'] = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}), initial=affiliation.name)
-		self.fields['country'] = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}), initial=affiliation.country)
-		self.fields['city'] = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}), initial=affiliation.city)
+		if affiliation == None:
+			self.fields['username'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}), initial=user.username)
+			self.fields['email'] = forms.CharField(required=True, widget=forms.EmailInput(attrs={'class': "form-control"}), initial=user.email)
+			self.fields['first_name'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}))
+			self.fields['last_name'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}))
+			self.fields['avatar'] = forms.ImageField(required=False, widget=forms.FileInput(attrs={'class': "form-control"}))
+			self.fields['bio'] = forms.CharField(required=False, widget=forms.Textarea(attrs={'class': "form-control"}))
+			self.fields['name'] = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}))
+			self.fields['country'] = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}))
+			self.fields['city'] = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}))
+		else:
+			self.fields['username'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}), initial=user.username)
+			self.fields['email'] = forms.CharField(required=True, widget=forms.EmailInput(attrs={'class': "form-control"}), initial=user.email)
+			self.fields['first_name'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}), initial=profile.first_name)
+			self.fields['last_name'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}), initial=profile.last_name)
+			self.fields['staff'] = forms.TypedChoiceField(required=False, choices=((False, 'False'), (True, 'True')), widget=forms.RadioSelect, initial=user.is_staff)
+			self.fields['avatar'] = forms.ImageField(required=False, widget=forms.FileInput(attrs={'class': "form-control"}), initial=profile.avatar)
+			self.fields['bio'] = forms.CharField(required=False, widget=forms.Textarea(attrs={'class': "form-control"}), initial=profile.bio)
+			self.fields['name'] = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}), initial=affiliation.name)
+			self.fields['country'] = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}), initial=affiliation.country)
+			self.fields['city'] = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}), initial=affiliation.city)
 
 	def clean(self):
 		return self.cleaned_data
@@ -162,6 +179,14 @@ class EditExtraForm(forms.Form):
 		profile = kwargs.pop('profile', None)
 		affiliation = kwargs.pop('affiliation', None)
 		super(EditExtraForm, self).__init__(*args, **kwargs)
+		if profile == None and affiliation == None:
+			self.fields['first_name'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}))
+			self.fields['last_name'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}))
+			self.fields['avatar'] = forms.ImageField(required=False, widget=forms.FileInput(attrs={'class': "form-control"}))
+			self.fields['bio'] = forms.CharField(required=False, widget=forms.Textarea(attrs={'class': "form-control"}))
+			self.fields['name'] = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}))
+			self.fields['country'] = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}))
+			self.fields['city'] = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}))
 		self.fields['first_name'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}), initial=profile.first_name)
 		self.fields['last_name'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}), initial=profile.last_name)
 		self.fields['avatar'] = forms.ImageField(required=False, widget=forms.FileInput(attrs={'class': "form-control"}), initial=profile.avatar)
@@ -189,30 +214,76 @@ class SetPassForm(SetPasswordForm):
 	new_password1 = forms.CharField(required=True, widget=forms.PasswordInput(attrs={'class': "form-control"}))
 	new_password2 = forms.CharField(required=True, widget=forms.PasswordInput(attrs={'class': "form-control"}))
 
-class DatasetCreationForm(forms.ModelForm):
+class DatasetCreationForm(forms.Form):
 	def __init__(self, *args, **kwargs):
 		super(DatasetCreationForm, self).__init__(*args, **kwargs)
-		self.fields['title'].required = True
-		self.fields['description'].required = True
+		self.fields['dataset_title'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}))
+		self.fields['description'] = forms.CharField(required=True, widget=forms.Textarea(attrs={'class': "form-control"}))
 
-	class Meta:
-		model = Dataset
-		fields = [
-			"title",
-			"description",
-		]
-		widgets = {
-			'title': forms.TextInput(attrs={'class': "form-control"}),
-			'description': forms.Textarea(attrs={'class': "form-control"}),
-		}
 	def clean(self):
 		return self.cleaned_data
 
 class DataCreationForm(forms.Form):
 	def __init__(self, *args, **kwargs):
 		super(DataCreationForm, self).__init__(*args, **kwargs)
-		self.fields['title'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}))
+		self.fields['data_title'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}))
+		# self.fields['file'] = forms.FileField(required=True, widget=forms.FileInput(attrs={'class': "form-control"}))
+
+	def clean(self):
+		return self.cleaned_data
+
+class FileCreationForm(forms.Form):
+	def __init__(self, *args, **kwargs):
+		super(FileCreationForm, self).__init__(*args, **kwargs)
+		# self.fields['title'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}))
 		self.fields['file'] = forms.FileField(required=True, widget=forms.FileInput(attrs={'class': "form-control"}))
+
+	def clean(self):
+		return self.cleaned_data
+
+class EventCreationForm(forms.Form):
+	def __init__(self, *args, **kwargs):
+		super(EventCreationForm, self).__init__(*args, **kwargs)
+		self.fields['title'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}))
+		self.fields['description'] = forms.CharField(required=True, widget=forms.Textarea(attrs={'class': "form-control"}))
+		self.fields['event_type'] = forms.ChoiceField(widget=forms.Select(attrs={'class': "form-control"}), required=True, choices=[('1','Challenge'),('2','Special Issue'),('3', 'Workshop')])
+
+	def clean(self):
+		return self.cleaned_data
+
+class EditEventForm(forms.Form):
+	def __init__(self, *args, **kwargs):
+		event = kwargs.pop('event', None)
+		super(EditEventForm, self).__init__(*args, **kwargs)
+		self.fields['title'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}), initial=event.title)
+		self.fields['description'] = forms.CharField(required=True, widget=forms.Textarea(attrs={'class': "form-control"}), initial=event.description)
+
+	def clean(self):
+		return self.cleaned_data
+
+class NewsCreationForm(forms.Form):
+	def __init__(self, *args, **kwargs):
+		super(NewsCreationForm, self).__init__(*args, **kwargs)
+		self.fields['title'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}))
+		self.fields['description'] = forms.CharField(required=True, widget=forms.Textarea(attrs={'class': "form-control"}))
+
+	def clean(self):
+		return self.cleaned_data
+
+class NewsEditForm(forms.Form):
+	def __init__(self, *args, **kwargs):
+		news = kwargs.pop('news', None)
+		super(NewsEditForm, self).__init__(*args, **kwargs)
+		self.fields['title'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}), initial=news.title)
+		self.fields['description'] = forms.CharField(required=True, widget=forms.Textarea(attrs={'class': "form-control"}), initial=news.description)
+
+	def clean(self):
+		return self.cleaned_data
+
+class SelectDatasetForm(forms.Form):
+	def __init__(self, choices, *args, **kwargs):
+		super(SelectDatasetForm, self).__init__(*args, **kwargs)
+		self.fields['select_dataset'] = forms.MultipleChoiceField(required=True, widget=forms.CheckboxSelectMultiple(), choices=choices)
 
 	def clean(self):
 		return self.cleaned_data
