@@ -6,11 +6,13 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
         <title>Chalearn</title>         
         <link rel="stylesheet" media="screen" href="http://fonts.googleapis.com/css?family=Open+Sans:300,400,700"> 
-        <link rel="stylesheet" href="{% static "css/bootstrap.min.css" %}"> 
+        <!-- <link rel="stylesheet" href="{% static "css/bootstrap.min.css" %}">  -->
+        <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
         <link rel="stylesheet" href="{% static "css/font-awesome.min.css" %}"> 
         <link rel="stylesheet" href="{% static "css/bootstrap-theme.css" %}" media="screen"> 
         <link rel="stylesheet" href="{% static "css/main.css" %}">    
         <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.2/css/select2.min.css" rel="stylesheet" />
+        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>         
     </head>     
     <body class="home">        
         <div class="navbar navbar-inverse navbar-fixed-top headroom"> 
@@ -25,10 +27,10 @@
                     <ul class="nav navbar-nav pull-right navbar-header"> 
                         <li class="dropdown"> 
                             <a href="#" class="dropdown-toggle btn-header-margin" data-toggle="dropdown">Challenges <b class="caret"></b></a> 
-                            {% if datasets.count > 0 %}
+                            {% if challenges.count > 0 %}
                                 <ul class="dropdown-menu"> 
                                     {% for c in challenges %}
-                                        <li><a href='{% url 'event_detail' id=c.id %}'>{{ c.title }}</a></li>
+                                        <li><a href='{% url 'challenge_info' id=c.id %}'>{{ c.title }}</a></li>
                                     {% endfor %}                               
                                 </ul>   
                             {% endif %}                           
@@ -38,27 +40,27 @@
                             {% if datasets.count > 0 %}
                                 <ul class="dropdown-menu"> 
                                     {% for d in datasets %}
-                                        <li><a href='{% url 'dataset_detail' id=d.id %}'>{{ d.title }}</a></li>
+                                        <li><a href='{% url 'dataset_info' id=d.id %}'>{{ d.title }}</a></li>
                                     {% endfor %}                                
                                 </ul>        
                             {% endif %}                     
                         </li> 
                         <li class="dropdown"> 
                             <a href="#" class="dropdown-toggle btn-header btn-header-margin" data-toggle="dropdown">Workshops <b class="caret"></b></a> 
-                            {% if datasets.count > 0 %}
+                            {% if workshops.count > 0 %}
                                 <ul class="dropdown-menu"> 
                                     {% for w in workshops %}
-                                        <li><a href='{% url 'event_detail' id=w.id %}'>{{ w.title }}</a></li>
+                                        <li><a href='{% url 'workshop_info' id=w.id %}'>{{ w.title }}</a></li>
                                     {% endfor %}                                 
                                 </ul>  
                             {% endif %}                            
                         </li>
                         <li class="dropdown"> 
                             <a href="#" class="dropdown-toggle btn-header btn-header-margin" data-toggle="dropdown">Special issues <b class="caret"></b></a> 
-                            {% if datasets.count > 0 %}
+                            {% if special_issues.count > 0 %}
                                 <ul class="dropdown-menu"> 
                                     {% for s in special_issues %}
-                                        <li><a href='{% url 'event_detail' id=s.id %}'>{{ s.title }}</a></li>
+                                        <li><a href='{% url 'special_issue_info' id=s.id %}'>{{ s.title }}</a></li>
                                     {% endfor %}                              
                                 </ul>   
                             {% endif %}                           
@@ -77,11 +79,13 @@
                                                 <li><a href="{% url "user_list" %}">Users zone</a></li> 
                                                 <li><a href="{% url "dataset_list" %}">Data zone</a></li> 
                                                 <li><a href="{% url "event_list" %}">Event zone</a></li> 
+                                                <li><a href="{% url "partner_creation" %}">Add partner</a></li> 
                                             </ul>
                                         </li>
                                     {% endif %} 
-                                    <li><a href="{% url "user_edit" id=user.id %}">Edit profile</a>
-                                    <a href="{% url "auth_logout" %}">Log out</a></li> 
+                                    <li><a href="{% url "event_proposal" %}">Propose event</a></li> 
+                                    <li><a href="{% url "user_edit" id=user.id %}">Edit profile</a></li> 
+                                    <li><a href="{% url "auth_logout" %}">Log out</a></li> 
                                 </ul>  
                             </li>                       
                         {% else %}
@@ -98,18 +102,9 @@
                 </div>                 
             </div>             
         </div>                
-        <div class="container content"> 
-           <!--  {% if messages %}
-                {% for msg in messages %} 
-                    <div class="row"> 
-                        <div class="col-md-3 widget col-md-offset-4"> 
-                            <div class="alert alert-{{ msg.tags }}" role="alert">{{msg.message}}</div>
-                        </div>
-                    </div>
-                {% endfor %}
-            {% endif %} -->
-        {% block title %} {% endblock %}
-        {% block container %} {% endblock container %}
+        <div id="container-height" class="container content"> 
+            {% block container %} 
+            {% endblock container %}
         </div>              
         <footer id="footer" class="top-space"> 
             <div class="footer1"> 
@@ -135,7 +130,7 @@
                     <div class="row"> 
                         <div class="col-md-6 widget"> 
                             <div class="widget-body"> 
-                                <p class="simplenav"> <a href="{% url "home" %}">Home</a> | <a href="#">Challenges</a> | <a href="#">Data</a> | <a href="#">Workshops</a> | <a href="#">Special issues</a> | <a href="{% url "register" %}">Sign up</a> </p> 
+                                <p class="simplenav"> <a href="{% url "home" %}">Home</a> | <a href="{% url "register" %}">Sign up</a> </p> 
                             </div>                             
                         </div>                         
                         <div class="col-md-6 widget"> 
@@ -149,11 +144,12 @@
             </div>             
         </footer>         
         <!-- JavaScript libs are placed at the end of the document so the pages load faster -->         
-        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>         
-        <script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script> 
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.2/js/select2.min.js"></script>        
-        <script src="{% static "js/headroom.min.js" %}"></script>         
-        <script src="{% static "js/jQuery.headroom.min.js" %}"></script>    
-        <script src="{% static "js/template.js" %}"></script>         
+        <script type="text/javascript" src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script> 
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.2/js/select2.min.js"></script>  
+        <script type="text/javascript" src="{% static "js/headroom.min.js" %}"></script>         
+        <script type="text/javascript" src="{% static "js/jQuery.headroom.min.js" %}"></script>    
+        <script type="text/javascript" src="{% static "js/template.js" %}"></script>      
+        <script type="text/javascript" src="{% static "ckeditor/ckeditor/ckeditor.js" %}"></script>
+        <script type="text/javascript" src="{% static "ckeditor/ckeditor-init.js" %}"></script>   
     </body>     
 </html>

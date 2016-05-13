@@ -27,12 +27,18 @@
                         <hr> 
                         <form method="POST" action=""> 
                         	{% csrf_token %}
-                            <div class="top-margin"> 
-                                {% if form.errors.select_dataset %}
-                                    <div class="alert alert-danger" role="alert">{{ form.errors.select_dataset }}</div>
-                                {% endif %}
-                                {{ form.select_dataset }} 
-                            </div>                                     
+                            {% if select %}
+                                <div class="top-margin"> 
+                                    {% if form.errors.select_dataset %}
+                                        <div class="alert alert-danger" role="alert">{{ form.errors.select_dataset }}</div>
+                                    {% endif %}
+                                    {{ form.select_dataset }} 
+                                </div> 
+                            {% else %}
+                                <div class="top-margin"> 
+                                    <p> There is no datasets in the database</p>
+                                </div>
+                            {% endif %}                                    
                             <hr>
                             <div class="row">
                                 <div class="col-lg-4 col-lg-offset-8 text-right"> 

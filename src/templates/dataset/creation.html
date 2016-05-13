@@ -82,8 +82,19 @@
 	                                {% endif %}
 	                                {{ dataform.data_title }} 
 	                            </div>
+                                <div class="top-margin"> 
+                                    <label>Description 
+                                        {% if dataform.data_desc.field.required %}
+                                        <span class="text-danger">*</span>
+                                        {% endif %}
+                                    </label>  
+                                    {% if dataform.errors.data_desc %}
+                                        <div class="alert alert-danger" role="alert">{{ dataform.errors.data_desc }}</div>
+                                    {% endif %}
+                                    {{ dataform.data_desc }} 
+                                </div>
 	                            <div class="top-margin"> 
-	                                <label>File 
+	                                <label>File or URL
 	                                    {% if fileform.file.field.required %}
 	                                    <span class="text-danger">*</span>
 	                                    {% endif %}
@@ -91,7 +102,9 @@
 	                                {% if fileform.errors.file %}
 	                                    <div class="alert alert-danger" role="alert">{{ fileform.errors.file }}</div>
 	                                {% endif %}
-	                                {{ fileform.file }} 
+	                                {{ fileform.file }}
+                                    <br>
+                                    {{ fileform.url }} 
 	                            </div>
 						    </div>
                             <hr> 

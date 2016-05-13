@@ -22,7 +22,7 @@
                 <div class="caption">
                     {% for n in news %}
                         <h3>{{ n.title }}</h3> 
-                        <p>{{ n.description }}</p>
+                        <p>{{ n.description|safe }}</p>
                     {% endfor %}
                 </div>
             </div> 

@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block container %}
+    {% if fileform.non_field_errors  %}
+        {% for e in fileform.non_field_errors %} 
+            <div class="row"> 
+                <div class="col-md-6 widget col-md-offset-3"> 
+                    <div class="alert alert-danger" role="alert">{{ e }}</div>
+                </div>
+            </div>
+        {% endfor %} 
+    {% endif %}
+    <ol class="breadcrumb"> 
+        <li> <a href="{% url "home" %}">Home</a> </li>
+        <li> <a href="{% url "dataset_edit" id=dataset_id%}">Dataset edit</a> </li>                 
+        <li class="active"> Data detail </li>                 
+    </ol>            
+    <div class="row"> 
+        <article class="col-xs-12 maincontent"> 
+            <header class="page-header"> 
+                <h1 class="page-title">Data detail</h1> 
+            </header>                     
+            <div class="col-md-10"> 
+                <div class="panel panel-default"> 
+                    <div class="panel-body"> 
+                        <h3 class="thin text-center">Data</h3> 
+                        <hr> 
+                        <div class="top-margin"> 
+                            <label>Title: </label> {{ data.title }}
+                        </div> 
+                        {% if files.count > 0 %}
+                            <hr>
+                            <h3 class="thin text-center">Files</h3> 
+                            <hr>
+                            {% for f in files %} 
+                                {% if f.file %}
+                                    <div class="top-margin"> 
+                                        <p><a href='{{ f.file.url }}'>{{ f.filename }}</a></p>
+                                    </div>
+                                {% else %}
+                                    <div class="top-margin"> 
+                                        <p><a href='{{ f.url }}'>{{ f.url }}</a></p>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}  
+                        {% endif %}  
+                        <form method="POST" action="" enctype="multipart/form-data"> 
+                            {% csrf_token %}
+                            <div class="item">
+                                <div class="top-margin"> 
+                                    <label>File or URL
+                                        {% if fileform.file.field.required %}
+                                            <span class="text-danger">*</span>
+                                        {% endif %}
+                                    </label> 
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-8"> 
+                                    {% if fileform.errors.file %}
+                                        <div class="alert alert-danger" role="alert">{{ fileform.errors.file }}</div>
+                                    {% endif %}
+                                    {{ fileform.file }} 
+                                    <br>
+                                    {{ fileform.url }} 
+                                </div>
+                                <div class="col-sm-4">
+                                    <button class="btn btn-action" type="submit" name="signup-button">Add file</button>
+                                </div>
+                            </div>
+                            <hr> 
+                        </form> 
+                    </div>                             
+                </div>                         
+            </div>
+        </article>
+    </div>
+{% endblock container %} 

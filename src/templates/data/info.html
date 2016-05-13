@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block container %}
+    <ol class="breadcrumb"> 
+        <li> <a href="{% url "home" %}">Home</a> </li>
+        <li class="active"> Dataset detail </li>                 
+    </ol>            
+    <div class="row"> 
+        <article class="col-xs-12 maincontent"> 
+            <header class="page-header"> 
+                <h1 class="page-title">{{ data.title }}</h1> 
+            </header>   
+            <div class="col-md-2" id="leftCol">
+                <ul class="nav nav-stacked" id="sidebar">
+                    <li><a href='{% url 'dataset_info' id=dataset.id %}'>Information</a></li>
+                    <li><a href='{% url 'dataset_source' id=dataset.id %}'>Source code</a></li>
+                    {% for d in datas %}
+                        <li><a href='{% url 'data_info' id=d.id dataset_id=dataset.id %}'>{{ d.title }}</a></li>
+                    {% endfor %}
+                </ul>
+            </div>                  
+            <div class="col-md-10"> 
+                <div class="panel panel-default"> 
+                    <div class="panel-body"> 
+                        <h3 class="thin text-center">Data description</h3> 
+                        <hr> 
+                        {{ data.description|safe }}
+                        {% if files.count > 0 %}
+                            <hr>
+                            <h3 class="thin text-center">Files</h3> 
+                            <hr>
+                            {% for f in files %} 
+                                {% if f.file %}
+                                    <div class="top-margin"> 
+                                        <p><a href='{{ f.file.url }}'>{{ f.filename }}</a></p>
+                                    </div>
+                                {% else %}
+                                    <div class="top-margin"> 
+                                        <p><a href='{{ f.url }}'>{{ f.url }}</a></p>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}  
+                        {% endif %}  
+                    </div>                             
+                </div>                         
+            </div>
+        </article>
+    </div>
+{% endblock container %}  

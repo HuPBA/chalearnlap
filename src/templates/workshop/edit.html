@@ -13,20 +13,20 @@
     <ol class="breadcrumb"> 
         <li> <a href="{% url "home" %}">Home</a> </li>
         <li> <a href="{% url "event_list" %}">Events list</a> </li>                 
-        <li class="active"> Event edit </li>                 
+        <li class="active">Workshop edit </li>                 
     </ol>            
     <div class="row"> 
         <article class="col-xs-12 maincontent"> 
             <header class="page-header"> 
-                <h1 class="page-title">Event edit</h1> 
+                <h1 class="page-title">{{ workshop.title }} edit</h1> 
             </header>                     
             <div class="col-md-10"> 
                 <div class="panel panel-default"> 
                     <div class="panel-body"> 
-                        <h3 class="thin text-center">Event</h3> 
+                        <h3 class="thin text-center">{{ workshop.title }}</h3> 
                         <hr> 
                         <form method="POST" action=""> 
-                        	{% csrf_token %}
+                            {% csrf_token %}
                             <div class="top-margin"> 
                                 <label>Title 
                                     {% if eventform.title.field.required %}
@@ -52,55 +52,25 @@
                                 {{ eventform.description }} 
                             </div>  
                             <hr>
-                            <h3 class="thin text-center">Members <a href="{% url "profile_select" id=event.id %}"><img class="plus-icon" src="{% static "images/plus-icon.jpg" %}" alt="Add Member"></a></h3>
-                            {% if members.count > 0 %}
+                            <h3 class="thin text-center">Program <a href="{% url "schedule_creation" id=workshop.id %}"><img class="plus-icon" src="{% static "images/plus-icon.jpg" %}" alt="Add schedule event"></a></h3>
+                            {% if program.count > 0 %}
                                 <hr>
                                 <div class="row">
-                                    {% for m in members %} 
+                                    {% for e in program %} 
                                         <div class="col-sm-6">
-                                            <a href='{% url 'profile_edit' id=m.profile.id %}'>{{ m.profile.first_name }} {{ m.profile.last_name }}</a></p>
+                                            <p><a href="{% url "schedule_edit" id=e.id %}">{{ e.date|date:"SHORT_DATETIME_FORMAT" }} {{ e.title }}</a></p>
                                         </div>
                                     {% endfor %}  
                                 </div>
                             {% endif %}
                             <hr>
-                            <h3 class="thin text-center">News <a href="{% url "news_creation" id=event.id %}"><img class="plus-icon" src="{% static "images/plus-icon.jpg" %}" alt="Add News"></a></h3>
-                            {% if news.count > 0 %}
+                            <h3 class="thin text-center">Invited speakers<a href="{% url "profile_select" id=workshop.id %}"><img class="plus-icon" src="{% static "images/plus-icon.jpg" %}" alt="Add invited speakers"></a></h3>
+                            {% if speakers.count > 0 %}
                                 <hr>
                                 <div class="row">
-                                    {% for n in news %} 
+                                    {% for s in speakers %} 
                                         <div class="col-sm-6">
-                                            <div class="top-margin"> 
-                                                <p><a href='{{ n.get_absolute_url }}'>{{ n.title }}</a></p>
-                                            </div>
-                                        </div>
-                                    {% endfor %}  
-                                </div>
-                            {% endif %}
-                            <hr>
-                            <h3 class="thin text-center">Datasets asigned <a href="{% url "dataset_select" id=event.id%}"><img class="plus-icon" src="{% static "images/plus-icon.jpg" %}" alt="Add Dataset"></a></h3>
-                            {% if datasets.count > 0 %}
-                                <hr>
-                                <div class="row">
-                                    {% for d in datasets %} 
-                                        <div class="col-sm-6">
-                                            <div class="top-margin"> 
-                                                <p><a href='{{ d.get_absolute_url }}'>{{ d.title }}</a></p>
-                                            </div>
-                                        </div>
-                                    {% endfor %}  
-                                </div>
-                            {% endif %}
-                            <hr>
-                            <h3 class="thin text-center">Partners<a href="{% url "partner_select" id=event.id%}"><img class="plus-icon" src="{% static "images/plus-icon.jpg" %}" alt="Add Sponsor"></a></h3>
-                            {% if partners.count > 0 %}
-                                <hr>
-                                <div class="row">
-                                    {% for p in partners %} 
-                                        <div class="col-sm-6">
-                                            <div class="top-margin"> 
-                                                <p><a href=''>{{ p.partner.name }}</a> ({{ p.role }})</p>
-                                            </div>
+                                            <p><a href='{% url 'profile_edit' id=m.profile.id %}'>{{ s.profile.first_name }} {{ s.profile.last_name }}</a></p>
                                         </div>
                                     {% endfor %}  
                                 </div>

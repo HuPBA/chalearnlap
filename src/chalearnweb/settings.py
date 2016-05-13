@@ -40,6 +40,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'users',
     'registration',
+    'ckeditor',
+    'ckeditor_uploader',
+    'datetimewidget',
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -164,3 +167,15 @@ DEFAULT_FROM_EMAIL = 'chalearnweb@gmail.com'
 DEFAULT_TO_EMAIL = ''
 
 LOGIN_REDIRECT_URL = '/'
+
+# CKEditor settings
+
+CKEDITOR_CONFIGS = {
+    'default': {
+        'toolbar': 'full',
+        'height': '300px',
+        'width': 'auto',
+    },
+}
+
+CKEDITOR_UPLOAD_PATH = "ck_uploads"

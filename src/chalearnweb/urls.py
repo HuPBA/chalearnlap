@@ -22,6 +22,7 @@ from users import views
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^', include("users.urls")),
+    url(r'^ckeditor/', include('ckeditor_uploader.urls')),
     url(r'^$', views.home, name="home"),
 ]
 

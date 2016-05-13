@@ -5,6 +5,9 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.utils import timezone
 from registration.signals import user_registered
+from ckeditor.fields import RichTextField
+from ckeditor_uploader.fields import RichTextUploadingField
+
 import os
 
 def user_registered_callback(sender, user, request, **kwargs):
@@ -36,7 +39,7 @@ class Affiliation(models.Model):
 
 class Event(models.Model):
 	title = models.CharField(max_length=100)
-	description = models.TextField()
+	description = RichTextField()
 	parent_event = models.ForeignKey("self", on_delete=models.CASCADE, null=True, blank=True)
 	chalearn = models.ForeignKey(Chalearn, on_delete=models.SET_NULL, null=True, blank=True)
 
@@ -55,7 +58,7 @@ class Profile(models.Model):
 	last_name = models.CharField(max_length=30, null=True)
 	affiliation = models.OneToOneField(Affiliation, on_delete=models.CASCADE, null=True)
 	bio = models.TextField(max_length=3000)
-	avatar = models.ImageField(upload_to=user_avatar_path, null=True)
+	avatar = models.ImageField(upload_to=user_avatar_path, null=True, default='/static/images/default.jpg')
 	events = models.ManyToManyField(Event, through='Profile_Event')
 
 	def __str__(self):
@@ -67,7 +70,6 @@ class Profile(models.Model):
 class Profile_Event(models.Model):
 	profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='fk_profile')
 	event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='fk_event')
-	# role = models.OneToOneField(Role, on_delete=models.CASCADE, null=True)
 
 class Role(models.Model):
 	name = models.CharField(max_length=50)
@@ -76,11 +78,11 @@ class Role(models.Model):
 def partner_member_avatar_path(instance, filename):
 	return 'partner/members/%s-%s/%s' % (instance.first_name, instance.last_name, filename)
 
-class Member_Partner(models.Model):
+class Contact(models.Model):
 	first_name = models.CharField(max_length=30, null=True)
 	last_name = models.CharField(max_length=30, null=True)
 	bio = models.TextField(max_length=3000)
-	avatar = models.ImageField(upload_to=partner_member_avatar_path, null=True)
+	avatar = models.ImageField(upload_to=partner_member_avatar_path, null=True, default='/static/images/default.jpg')
 	email = models.CharField(max_length=100, null=True)
 
 	def __str__(self):
@@ -91,31 +93,32 @@ def partner_avatar_path(instance, filename):
 
 class Partner(models.Model):
 	name = models.CharField(max_length=100)
-	url = models.CharField(max_length=300)
+	url = models.CharField(max_length=500)
 	banner = models.ImageField(upload_to=partner_avatar_path, null=True)
-	events = models.ManyToManyField(Event, through='Challenge_Partner')
-	member = models.ForeignKey(Member_Partner, on_delete=models.CASCADE, null=True)
+	events = models.ManyToManyField(Event, through='Event_Partner')
+	contact = models.ForeignKey(Contact, on_delete=models.CASCADE, null=True)
 
 	def __str__(self):
 		return unicode(self.name).encode('utf-8')
 
-class Challenge_Partner(models.Model):
+class Event_Partner(models.Model):
 	partner = models.ForeignKey(Partner, on_delete=models.CASCADE)
 	event = models.ForeignKey(Event, on_delete=models.CASCADE)
 	role = models.CharField(max_length=50)
 
 class Schedule_Event(models.Model):
-	description = models.TextField(max_length=3000)
-	date = models.DateField(auto_now=True)
-	parent_schedule_event = models.ForeignKey("self", on_delete=models.CASCADE)
+	title = models.CharField(max_length=100, null=True)
+	description = RichTextUploadingField()
+	date = models.DateTimeField()
+	parent_schedule_event = models.ForeignKey("self", on_delete=models.CASCADE, null=True)
 	event = models.ForeignKey(Event, on_delete=models.SET_NULL, null=True)
 
 	def __str__(self):
-		return unicode(self.description).encode('utf-8')
+		return unicode(self.title).encode('utf-8')
 
 class News(models.Model):
 	title = models.CharField(max_length=100)
-	description = models.TextField(max_length=3000)
+	description = RichTextField()
 	upload_date = models.DateTimeField()
 	event = models.ForeignKey(Event, on_delete=models.SET_NULL, null=True)
 
@@ -147,7 +150,7 @@ class Challenge(Event):
 
 class Dataset(models.Model):
 	title = models.CharField(max_length=100, null=True)
-	description = models.TextField(max_length=3000, null=True)
+	description = RichTextField()
 	chalearn = models.ForeignKey(Chalearn, on_delete=models.SET_NULL, null=True)
 	track = models.ManyToManyField(Challenge)
 
@@ -168,6 +171,7 @@ class Result(models.Model):
 
 class Data(models.Model):
 	title = models.CharField(max_length=100)
+	description = RichTextField()
 	dataset = models.ForeignKey(Dataset, on_delete=models.SET_NULL, null=True)
 
 	def __str__(self):
@@ -180,15 +184,16 @@ def data_path(instance, filename):
 	return 'datasets/%s/%s/%s' % (instance.data.dataset.title, instance.data.title, filename)
 
 class File(models.Model):
-	title = models.CharField(max_length=100, null=True)
 	file = models.FileField(upload_to=data_path, null=True)
+	url = models.CharField(max_length=500, null=True)
 	data = models.ForeignKey(Data, on_delete=models.SET_NULL, null=True)
 
 	def __str__(self):
 		return unicode(self.file.url).encode('utf-8')
 
 	def filename(self):
-		return os.path.basename(self.file.name)
+		basename, extension = os.path.splitext(os.path.basename(self.file.name))
+		return basename
 
 class Publication(models.Model):
 	publicated = models.BooleanField()
