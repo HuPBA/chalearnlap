@@ -1,6 +1,6 @@
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import render, get_object_or_404, redirect, render_to_response
 from django.http import HttpResponse
-from .forms import ProfileForm, AffiliationForm, SelectRoleForm, UserEditForm, UserRegisterForm, EditProfileForm, EditExtraForm, DatasetCreationForm, DataCreationForm, EventCreationForm, EditEventForm, RoleCreationForm, NewsCreationForm, FileCreationForm, NewsEditForm, SelectDatasetForm, MemberCreationForm, MemberSelectForm, PartnerCreationForm, PartnerSelectForm, ScheduleCreationForm, ScheduleEditForm
+from .forms import ProfileForm, AffiliationForm, SelectRoleForm, UserEditForm, UserRegisterForm, EditProfileForm, EditExtraForm, DatasetCreationForm, DataCreationForm, EventCreationForm, EditEventForm, RoleCreationForm, NewsCreationForm, FileCreationForm, NewsEditForm, SelectDatasetForm, MemberCreationForm, MemberSelectForm, PartnerCreationForm, PartnerSelectForm, ScheduleCreationForm, ScheduleEditForm, DatasetEditForm, DataEditForm
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_protect
 from django.contrib import messages
@@ -210,7 +210,18 @@ def dataset_creation(request):
 def dataset_edit(request, id=None):
 	dataset = Dataset.objects.filter(id=id)[0]
 	datas = Data.objects.all().filter(dataset=dataset)
+	datasetform = DatasetEditForm(dataset=dataset)
+	if request.method == 'POST':
+		datasetform = DatasetEditForm(request.POST, dataset=dataset)
+		if datasetform.is_valid():
+			dataset_title = datasetform.cleaned_data['dataset_title']
+			desc = datasetform.cleaned_data['description']
+			dataset.title = dataset_title
+			dataset.description = desc
+			dataset.save()
+			return HttpResponseRedirect(reverse('dataset_list'))
 	context = {
+		"datasetform": datasetform,
 		"dataset": dataset,
 		"datas": datas,
 	}
@@ -290,24 +301,42 @@ def data_creation(request, id=None):
 def data_edit(request, id=None, dataset_id=None):
 	data = Data.objects.filter(id=id)[0]
 	files = File.objects.filter(data=data)
+	dataform = DataEditForm(data=data)
+	if request.method == 'POST':
+		dataform = DataEditForm(request.POST, data=data)
+		if dataform.is_valid():
+			data_title = dataform.cleaned_data['data_title']
+			data_desc = dataform.cleaned_data['data_desc']
+			data.title = data_title
+			data.description = data_desc
+			data.save()
+	context = {
+		"dataform": dataform,
+		"data": data,
+		"files": files,
+		"dataset_id": dataset_id,
+	}
+	return render(request, "data/edit.html", context, context_instance=RequestContext(request))
+
+@login_required(login_url='/users/login/')
+@user_passes_test(lambda u:u.is_staff, login_url='/')
+def file_creation(request, id=None):
+	data = Data.objects.filter(id=id)[0]
 	fileform = FileCreationForm()
 	if request.method == 'POST':
 		fileform = FileCreationForm(request.POST, request.FILES)
 		if fileform.is_valid():
-			new_data = Data.objects.filter(id=id)[0]
+			name = fileform.cleaned_data['name']
 			if fileform.cleaned_data['file']:
 				file = fileform.cleaned_data['file']
-				File.objects.create(file=file, data=new_data)				
+				File.objects.create(name=name, file=file, data=data)				
 			else:
 				url = fileform.cleaned_data['url']
-				File.objects.create(url=url, data=new_data)
+				File.objects.create(name=name, url=url, data=data)
 	context = {
-		"data": data,
-		"files": files,
 		"fileform": fileform,
-		"dataset_id": dataset_id,
 	}
-	return render(request, "data/edit.html", context, context_instance=RequestContext(request))
+	return render(request, "file/creation.html", context, context_instance=RequestContext(request))
 
 @login_required(login_url='/users/login/')
 @user_passes_test(lambda u:u.is_staff, login_url='/')

@@ -5,8 +5,6 @@ from registration.forms import RegistrationForm
 from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm, PasswordResetForm, SetPasswordForm
 from ckeditor.widgets import CKEditorWidget
 from ckeditor_uploader.widgets import CKEditorUploadingWidget
-
-from bootstrap3_datetime.widgets import DateTimePicker
 from datetimewidget.widgets import DateTimeWidget
 
 class UserEditForm(forms.ModelForm):
@@ -239,6 +237,16 @@ class DatasetCreationForm(forms.Form):
 	def clean(self):
 		return self.cleaned_data
 
+class DatasetEditForm(forms.Form):
+	def __init__(self, *args, **kwargs):
+		dataset = kwargs.pop('dataset', None)
+		super(DatasetEditForm, self).__init__(*args, **kwargs)
+		self.fields['dataset_title'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}), initial=dataset.title)
+		self.fields['description'] = forms.CharField(required=True, widget=CKEditorWidget(), initial=dataset.description)
+
+	def clean(self):
+		return self.cleaned_data
+
 class DataCreationForm(forms.Form):
 	def __init__(self, *args, **kwargs):
 		super(DataCreationForm, self).__init__(*args, **kwargs)
@@ -248,11 +256,22 @@ class DataCreationForm(forms.Form):
 	def clean(self):
 		return self.cleaned_data
 
+class DataEditForm(forms.Form):
+	def __init__(self, *args, **kwargs):
+		data = kwargs.pop('data', None)
+		super(DataEditForm, self).__init__(*args, **kwargs)
+		self.fields['data_title'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}), initial=data.title)
+		self.fields['data_desc'] = forms.CharField(required=True, widget=CKEditorWidget(), initial=data.description)
+
+	def clean(self):
+		return self.cleaned_data
+
 class FileCreationForm(forms.Form):
 	def __init__(self, *args, **kwargs):
 		super(FileCreationForm, self).__init__(*args, **kwargs)
+		self.fields['name'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}))
 		self.fields['file'] = forms.FileField(required=False, widget=forms.FileInput(attrs={'class': "form-control"}))
-		self.fields['url'] = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}))
+		self.fields['url'] = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': "form-control", 'placeholder': 'URL'}))
 
 	def clean(self):
 		cleaned_data = super(FileCreationForm, self).clean()
@@ -339,7 +358,7 @@ class ScheduleCreationForm(forms.Form):
 		super(ScheduleCreationForm, self).__init__(*args, **kwargs)
 		self.fields['title'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}))
 		self.fields['description'] = forms.CharField(required=True, widget=CKEditorUploadingWidget())
-		self.fields['time'] = forms.DateTimeField(required=True, widget=DateTimeWidget(bootstrap_version=3))
+		self.fields['time'] = forms.DateTimeField(required=True, widget=DateTimeWidget(bootstrap_version=3, options = {'format': 'mm/dd/yyyy hh:ii'}), input_formats=['%m/%d/%Y %H:%M'])
 
 	def clean(self):
 		return self.cleaned_data
@@ -350,7 +369,7 @@ class ScheduleEditForm(forms.Form):
 		super(ScheduleEditForm, self).__init__(*args, **kwargs)
 		self.fields['title'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}), initial=schedule.title)
 		self.fields['description'] = forms.CharField(required=True, widget=CKEditorUploadingWidget(), initial=schedule.description)
-		self.fields['time'] = forms.DateTimeField(required=True, widget=DateTimeWidget(bootstrap_version=3), initial=schedule.date)
+		self.fields['time'] = forms.DateTimeField(required=True, widget=DateTimeWidget(bootstrap_version=3, options = {'format': 'mm/dd/yyyy hh:ii'}), input_formats=['%m/%d/%Y %H:%M'], initial=schedule.date)
 
 	def clean(self):
 		return self.cleaned_data

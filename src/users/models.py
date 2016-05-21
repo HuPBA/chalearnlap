@@ -65,7 +65,7 @@ class Profile(models.Model):
 		return unicode(self.first_name).encode('utf-8')
 
 	def get_absolute_url(self):
-		return reverse("profile_detail", kwargs={"id": self.id})
+		return reverse("profile_edit", kwargs={"id": self.id})
 
 class Profile_Event(models.Model):
 	profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='fk_profile')
@@ -138,15 +138,24 @@ class Special_Issue(Event):
 	def __str__(self):
 		return unicode(self.title).encode('utf-8')
 
+	def get_absolute_url(self):
+		return reverse("special_issue_info", kwargs={"id": self.id})
+
 class Workshop(Event):
 
 	def __str__(self):
 		return unicode(self.title).encode('utf-8')
 
+	def get_absolute_url(self):
+		return reverse("workshop_info", kwargs={"id": self.id})
+
 class Challenge(Event):
 
 	def __str__(self):
 		return unicode(self.title).encode('utf-8')
+
+	def get_absolute_url(self):
+		return reverse("challenge_info", kwargs={"id": self.id})
 
 class Dataset(models.Model):
 	title = models.CharField(max_length=100, null=True)
@@ -184,12 +193,13 @@ def data_path(instance, filename):
 	return 'datasets/%s/%s/%s' % (instance.data.dataset.title, instance.data.title, filename)
 
 class File(models.Model):
+	name = models.CharField(max_length=100, null=True)
 	file = models.FileField(upload_to=data_path, null=True)
 	url = models.CharField(max_length=500, null=True)
 	data = models.ForeignKey(Data, on_delete=models.SET_NULL, null=True)
 
 	def __str__(self):
-		return unicode(self.file.url).encode('utf-8')
+		return unicode(self.name).encode('utf-8')
 
 	def filename(self):
 		basename, extension = os.path.splitext(os.path.basename(self.file.name))

@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% load watson %}
+{% block container %}
+    <div class="row"> 
+        <div class="col-sm-12"> 
+            <div class="panel panel-default"> 
+                <div class="panel-body"> 
+                    <h3 class="thin text-center">Search results{% if query %} for &ldquo;{{query}}&rdquo;{% endif %}</h3>
+                    <hr>
+                    {% if search_results %}
+                        {% search_results search_results %}
+                    {% else %}
+                        {% if query %}
+                            <p>There are no results to display.</p>
+                            <p>Try entering a less specific search term.</p>
+                        {% else %}
+                            <p>Please enter a query in the search form.</p>
+                        {% endif %}
+                    {% endif %}  
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock container %}

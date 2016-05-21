@@ -20,13 +20,12 @@
             <header class="page-header"> 
                 <h1 class="page-title">Event creation</h1> 
             </header>                     
-            <div class="col-md-7"> 
+            <form method="POST" action="">{% csrf_token %}
                 <div class="panel panel-default"> 
-                    <div class="panel-body"> 
+                    <div class="panel-body">
                         <h3 class="thin text-center">Event</h3> 
                         <hr> 
-                        <form method="POST" action=""> 
-                        	{% csrf_token %}
+                        <div class="col-md-4">
                             <div class="top-margin"> 
                                 <label>Title 
                                     {% if eventform.title.field.required %}
@@ -36,19 +35,8 @@
                                 {% if eventform.errors.title %}
                                     <div class="alert alert-danger" role="alert">{{ eventform.errors.title }}</div>
                                 {% endif %}
-                                {{ eventform.title }} 
+                                {{ eventform.title }}
                             </div>                                     
-                            <div class="top-margin"> 
-                                <label>Description 
-                                    {% if eventform.description.field.required %}
-                                    <span class="text-danger">*</span>
-                                    {% endif %}
-                                </label>   
-                                {% if eventform.errors.description %}
-                                    <div class="alert alert-danger" role="alert">{{ eventform.errors.description }}</div>
-                                {% endif %}
-                                {{ eventform.description }}
-                            </div>  
                             <div class="top-margin"> 
                                 <label>Type 
                                     {% if eventform.event_type.field.required %}
@@ -59,17 +47,30 @@
                                     <div class="alert alert-danger" role="alert">{{ eventform.errors.event_type }}</div>
                                 {% endif %}
                                 {{ eventform.event_type }} 
+                            </div>
+                        </div> 
+                        <div class="col-md-8">
+                            <div class="top-margin"> 
+                                <label>Description 
+                                    {% if eventform.description.field.required %}
+                                    <span class="text-danger">*</span>
+                                    {% endif %}
+                                </label>   
+                                {% if eventform.errors.description %}
+                                    <div class="alert alert-danger" role="alert">{{ eventform.errors.description }}</div>
+                                {% endif %}
+                                {{ eventform.description }}
                             </div> 
-                            <hr>
-                            <div class="row">
-                                <div class="col-lg-4 col-lg-offset-8 text-right"> 
-                                    <button class="btn btn-action" type="submit" name="signup-button">Save</button>
-                                </div>
-                            </div>                                     
-                        </form>                                 
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-lg-4 col-lg-offset-8 text-right"> 
+                                <button class="btn btn-action" type="submit" name="signup-button">Save</button>
+                            </div>
+                        </div>  
                     </div>                             
-                </div>                         
-            </div>
+                </div>                                    
+            </form>                                 
         </article>
     </div>
 {% endblock container %}  

@@ -40,6 +40,7 @@ urlpatterns = [
     url(r'^data/creation/(?P<id>\d+)/$', views.data_creation, name="data_creation"),
     url(r'^data/(?P<id>\d+)/(?P<dataset_id>\d+)/information/$', views.data_info, name="data_info"),
     url(r'^data/(?P<id>\d+)/(?P<dataset_id>\d+)/edit/$', views.data_edit, name="data_edit"),
+    url(r'^data/(?P<id>\d+)/file/creation/$', views.file_creation, name="file_creation"),
     # Partner urls
     url(r'^partner/list/$', views.partner_list, name="partners_list"),
     url(r'^partner/creation/$', views.partner_creation, name="partner_creation"),

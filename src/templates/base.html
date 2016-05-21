@@ -93,11 +93,10 @@
                             <li class="div-header"> <a class="btn" href="{% url "register" %}">SIGN UP</a> </li>
                         {% endif %} 
                         <li>
-                            <input type="text" class="form-control input-search">
+                            <form id="search-form" action="{% url 'watson:search' %}">
+                                <input id="search-input" type="text" class="form-control input-search" name="q" value="{{request.GET.q}}" placeholder="search">
+                            </form>
                         </li>
-                        <li class="div-header">
-                            <a class="btn btn-search" href="#">Search</a>
-                        </li>                         
                     </ul>                     
                 </div>                 
             </div>             

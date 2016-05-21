@@ -1,6 +1,15 @@
 {% extends "base.html" %}
 {% load staticfiles %}
 {% block container %}
+    {% if datasetform.non_field_errors  %}
+        {% for e in datasetform.non_field_errors %} 
+            <div class="row"> 
+                <div class="col-md-6 widget col-md-offset-3"> 
+                    <div class="alert alert-danger" role="alert">{{ e }}</div>
+                </div>
+            </div>
+        {% endfor %} 
+    {% endif %}
     <ol class="breadcrumb"> 
         <li> <a href="{% url "home" %}">Home</a> </li>
         <li> <a href="{% url "dataset_list" %}">Dataset list</a> </li>                 
@@ -10,35 +19,66 @@
         <article class="col-xs-12 maincontent"> 
             <header class="page-header"> 
                 <h1 class="page-title">Dataset edit</h1> 
-            </header>                     
-            <div class="col-md-10"> 
+            </header> 
+            <form method="POST" action=""> {% csrf_token %}                    
                 <div class="panel panel-default"> 
                     <div class="panel-body"> 
-                        <h3 class="thin text-center">Dataset</h3> 
-                        <hr> 
-                        <div class="top-margin"> 
-                            <label>Title: </label> {{ dataset.title }}
-                        </div> 
-                        <div class="top-margin"> 
-                            <label>Description: </label> {{ dataset.description }}
-                        </div>  
-                        {% if datas.count > 0 %}
-                            <hr>
-                            <h3 class="thin text-center">Data <a href="{% url "data_creation" id=dataset.id%}"><img class="plus-icon" src="{% static "images/plus-icon.jpg" %}" alt="Add Data"></a> </h3> 
-                            <hr>
-                            <div class="row">
-                                {% for d in datas %} 
-                                    <div class="col-sm-6">
-                                        <div class="top-margin"> 
-                                            <p><a href='{% url 'data_edit' id=d.id dataset_id=dataset.id %}'>{{ d.title }}</a></p>
+                        <div class="row">
+                            <div class="col-md-8"> 
+                                <h3 class="thin text-center">Dataset information</h3> 
+                                <hr> 
+                                <div class="top-margin"> 
+                                    <label>Title 
+                                        {% if datasetform.dataset_title.field.required %}
+                                        <span class="text-danger">*</span>
+                                        {% endif %}
+                                    </label>  
+                                    {% if datasetform.errors.dataset_title %}
+                                        <div class="alert alert-danger" role="alert">{{ datasetform.errors.dataset_title }}</div>
+                                    {% endif %}
+                                    {{ datasetform.dataset_title }} 
+                                </div> 
+                                <div class="top-margin"> 
+                                    <label>Description 
+                                        {% if datasetform.description.field.required %}
+                                        <span class="text-danger">*</span>
+                                        {% endif %}
+                                    </label>  
+                                    {% if datasetform.errors.description %}
+                                        <div class="alert alert-danger" role="alert">{{ datasetform.errors.description }}</div>
+                                    {% endif %}
+                                    {{ datasetform.description }} 
+                                </div> 
+                            </div>
+                            <div class="col-md-4"> 
+                                <h3 class="thin text-center">Data's assigned<a href="{% url "data_creation" id=dataset.id%}"><img class="plus-icon" src="{% static "images/plus-icon.jpg" %}" alt="Add Data"></a> </h3> 
+                                <hr>
+                                {% if datas.count > 0 %}
+                                    <div class="panel panel-default"> 
+                                        <div class="panel-body"> 
+                                            <div class="row">
+                                                {% for d in datas %} 
+                                                    <div class="col-sm-12">
+                                                        <div class="top-margin"> 
+                                                            <p><a href='{% url 'data_edit' id=d.id dataset_id=dataset.id %}'>{{ d.title }}</a></p>
+                                                        </div>
+                                                    </div>
+                                                {% endfor %} 
+                                            </div> 
                                         </div>
                                     </div>
-                                {% endfor %} 
-                            </div> 
-                        {% endif %}                                    
-                    </div>                             
-                </div>                         
-            </div>
+                                {% endif %}                                    
+                            </div>   
+                        </div> 
+                        <hr>
+                        <div class="row">
+                            <div class="col-lg-4 col-lg-offset-8 text-right"> 
+                                <button class="btn btn-action" type="submit" name="signup-button">Save</button>
+                            </div>
+                        </div>                           
+                    </div>                         
+                </div>
+            </form>
         </article>
     </div>
 {% endblock container %}  

@@ -1,7 +1,8 @@
 {% extends "base.html" %}
+{% load staticfiles %}
 {% block container %}
-    {% if fileform.non_field_errors  %}
-        {% for e in fileform.non_field_errors %} 
+    {% if dataform.non_field_errors  %}
+        {% for e in dataform.non_field_errors %} 
             <div class="row"> 
                 <div class="col-md-6 widget col-md-offset-3"> 
                     <div class="alert alert-danger" role="alert">{{ e }}</div>
@@ -18,60 +19,74 @@
         <article class="col-xs-12 maincontent"> 
             <header class="page-header"> 
                 <h1 class="page-title">Data detail</h1> 
-            </header>                     
-            <div class="col-md-10"> 
+            </header>  
+            <form method="POST" action=""> {% csrf_token %}                    
                 <div class="panel panel-default"> 
                     <div class="panel-body"> 
-                        <h3 class="thin text-center">Data</h3> 
-                        <hr> 
-                        <div class="top-margin"> 
-                            <label>Title: </label> {{ data.title }}
-                        </div> 
-                        {% if files.count > 0 %}
-                            <hr>
-                            <h3 class="thin text-center">Files</h3> 
-                            <hr>
-                            {% for f in files %} 
-                                {% if f.file %}
-                                    <div class="top-margin"> 
-                                        <p><a href='{{ f.file.url }}'>{{ f.filename }}</a></p>
-                                    </div>
-                                {% else %}
-                                    <div class="top-margin"> 
-                                        <p><a href='{{ f.url }}'>{{ f.url }}</a></p>
-                                    </div>
-                                {% endif %}
-                            {% endfor %}  
-                        {% endif %}  
-                        <form method="POST" action="" enctype="multipart/form-data"> 
-                            {% csrf_token %}
-                            <div class="item">
+                        <div class="row">
+                            <div class="col-md-8"> 
+                                <h3 class="thin text-center">Data information</h3> 
+                                <hr> 
                                 <div class="top-margin"> 
-                                    <label>File or URL
-                                        {% if fileform.file.field.required %}
-                                            <span class="text-danger">*</span>
+                                    <label>Title 
+                                        {% if dataform.data_title.field.required %}
+                                        <span class="text-danger">*</span>
                                         {% endif %}
-                                    </label> 
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-sm-8"> 
-                                    {% if fileform.errors.file %}
-                                        <div class="alert alert-danger" role="alert">{{ fileform.errors.file }}</div>
+                                    </label>  
+                                    {% if dataform.errors.data_title %}
+                                        <div class="alert alert-danger" role="alert">{{ dataform.errors.data_title }}</div>
                                     {% endif %}
-                                    {{ fileform.file }} 
-                                    <br>
-                                    {{ fileform.url }} 
-                                </div>
-                                <div class="col-sm-4">
-                                    <button class="btn btn-action" type="submit" name="signup-button">Add file</button>
-                                </div>
+                                    {{ dataform.data_title }} 
+                                </div> 
+                                <div class="top-margin"> 
+                                    <label>Description 
+                                        {% if dataform.data_desc.field.required %}
+                                        <span class="text-danger">*</span>
+                                        {% endif %}
+                                    </label>  
+                                    {% if dataform.errors.data_desc %}
+                                        <div class="alert alert-danger" role="alert">{{ dataform.errors.data_desc }}</div>
+                                    {% endif %}
+                                    {{ dataform.data_desc }} 
+                                </div> 
                             </div>
-                            <hr> 
-                        </form> 
-                    </div>                             
-                </div>                         
-            </div>
+                            <div class="col-md-4"> 
+                                <h3 class="thin text-center">File's assigned<a href="{% url "file_creation" id=data.id %}"><img class="plus-icon" src="{% static "images/plus-icon.jpg" %}" alt="Add File"></a> </h3> 
+                                <hr>
+                                {% if files.count > 0 %}
+                                    <div class="panel panel-default"> 
+                                        <div class="panel-body"> 
+                                            <div class="row">
+                                                {% for f in files %} 
+                                                    <div class="col-sm-12">
+                                                        <div class="top-margin"> 
+                                                            {% if f.file %}
+                                                                <div class="top-margin"> 
+                                                                    <p><a href='{{ f.file.url }}'>{{ f.name }}</a></p>
+                                                                </div>
+                                                            {% else %}
+                                                                <div class="top-margin"> 
+                                                                    <p><a href='{{ f.url }}'>{{ f.name }}</a></p>
+                                                                </div>
+                                                            {% endif %}
+                                                        </div>
+                                                    </div>
+                                                {% endfor %} 
+                                            </div> 
+                                        </div>
+                                    </div>
+                                {% endif %}                                    
+                            </div>   
+                        </div> 
+                        <hr>
+                        <div class="row">
+                            <div class="col-lg-4 col-lg-offset-8 text-right"> 
+                                <button class="btn btn-action" type="submit" name="signup-button">Save</button>
+                            </div>
+                        </div>                           
+                    </div>                         
+                </div>
+            </form>
         </article>
     </div>
 {% endblock container %} 

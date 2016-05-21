@@ -23,6 +23,7 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^', include("users.urls")),
     url(r'^ckeditor/', include('ckeditor_uploader.urls')),
+    url(r"^search/", include("watson.urls", namespace="watson")),
     url(r'^$', views.home, name="home"),
 ]
 
