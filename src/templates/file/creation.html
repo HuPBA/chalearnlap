@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block container %}
+    {% if fileform.non_field_errors  %}
+        {% for e in fileform.non_field_errors %} 
+            <div class="row"> 
+                <div class="col-md-6 widget col-md-offset-3"> 
+                    <div class="alert alert-danger" role="alert">{{ e }}</div>
+                </div>
+            </div>
+        {% endfor %} 
+    {% endif %}
+    <ol class="breadcrumb"> 
+        <li> <a href="{% url "home" %}">Home</a> </li>
+        <li class="active"> File creation </li>                 
+    </ol>            
+    <div class="row"> 
+        <article class="col-xs-12 maincontent"> 
+            <header class="page-header"> 
+                <h1 class="page-title">File creation</h1> 
+            </header>    
+            <form method="POST" action="" enctype="multipart/form-data"> {% csrf_token %}            
+                <div class="row">
+                    <div class="col-md-6 col-md-offset-3"> 
+                        <div class="panel panel-default"> 
+                            <div class="panel-body">
+                                <h3 class="thin text-center">File</h3> 
+                                <hr>
+    						    <div class="top-margin"> 
+                                    <label>Name 
+                                        {% if fileform.name.field.required %}
+                                        <span class="text-danger">*</span>
+                                        {% endif %}
+                                    </label>  
+                                    {% if fileform.errors.name %}
+                                        <div class="alert alert-danger" role="alert">{{ fileform.errors.name }}</div>
+                                    {% endif %}
+                                    {{ fileform.name }} 
+                                </div>
+                                <div class="top-margin"> 
+                                    <label>File or URL
+                                        {% if fileform.file.field.required %}
+                                        <span class="text-danger">*</span>
+                                        {% endif %}
+                                    </label>  
+                                    {% if fileform.errors.file %}
+                                        <div class="alert alert-danger" role="alert">{{ fileform.errors.file }}</div>
+                                    {% endif %}
+                                    {{ fileform.file }} 
+                                    <br>
+                                    {{ fileform.url }}
+                                </div>
+                                <hr> 
+                                <div class="row">
+                                    <div class="col-lg-4 col-lg-offset-8 text-right"> 
+                                        <button class="btn btn-action" type="submit" name="signup-button">Save</button>
+                                    </div>
+                                </div>  
+                            </div>                                   
+                        </div>                             
+                    </div>                         
+                </div>
+            </form>                                 
+        </article>
+    </div>
+{% endblock container %}  

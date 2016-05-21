@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block container %}
+    <ol class="breadcrumb"> 
+        <li> <a href="{% url "home" %}">Home</a> </li>
+        <li class="active"> Event detail </li>                 
+    </ol>            
+    <div class="row"> 
+        <article class="col-xs-12 maincontent"> 
+            <header class="page-header"> 
+                <h1 class="page-title">{{ workshop.title }}</h1> 
+            </header> 
+            <div class="col-md-2" id="leftCol">
+                <ul class="nav nav-stacked" id="sidebar">
+                    <li><a href='{% url 'workshop_info' id=workshop.id %}'>Information</a></li>
+                    <li><a href='{% url 'workshop_program' id=workshop.id %}'>Program</a></li>
+                    <li><a href='{% url 'workshop_speakers' id=workshop.id %}'>Invited speakers</a></li>
+                </ul>
+            </div>
+            <div class="col-md-7"> 
+                <div class="panel panel-default"> 
+                    <div class="panel-body"> 
+                        <h3 class="thin text-center">Workshop invited speakers</h3> 
+                        <hr> 
+
+                    </div>                             
+                </div>                         
+            </div>
+            <div class="col-sm-3"> 
+            <div class="thumbnail">
+                <h2 class="text-center top-space">News</h2> 
+                <div class="caption">
+                    {% for n in news %}
+                        <h3>{{ n.title }}</h3> 
+                        <p>{{ n.description|safe }}</p>
+                    {% endfor %}
+                </div>
+            </div> 
+        </div> 
+        </article>
+    </div>
+{% endblock container %}  
