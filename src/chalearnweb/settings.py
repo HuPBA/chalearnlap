@@ -86,7 +86,7 @@ WSGI_APPLICATION = 'chalearnweb.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'chalearnwebdb',
+        'NAME': 'see4cdb',
 	'USER': 'oriol',
 	'PASSWORD': 'oriol',
 	'HOST': 'localhost',
