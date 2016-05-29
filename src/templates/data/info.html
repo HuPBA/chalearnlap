@@ -7,7 +7,7 @@
     <div class="row"> 
         <article class="col-xs-12 maincontent"> 
             <header class="page-header"> 
-                <h1 class="page-title">{{ data.title }}</h1> 
+                <h1 class="page-title">{{ dataset.title }} - {{ data.title }}</h1> 
             </header>   
             <div class="col-md-2" id="leftCol">
                 <ul class="nav nav-stacked" id="sidebar">
@@ -31,11 +31,11 @@
                             {% for f in files %} 
                                 {% if f.file %}
                                     <div class="top-margin"> 
-                                        <p><a href='{{ f.file.url }}'>{{ f.filename }}</a></p>
+                                        <p><a href='{{ f.file.url }}'>{{ f.name }}</a></p>
                                     </div>
                                 {% else %}
                                     <div class="top-margin"> 
-                                        <p><a href='{{ f.url }}'>{{ f.url }}</a></p>
+                                        <p><a href='{{ f.url }}'>{{ f.name }}</a></p>
                                     </div>
                                 {% endif %}
                             {% endfor %}  

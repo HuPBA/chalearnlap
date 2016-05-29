@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block container %}
+    <ol class="breadcrumb"> 
+        <li> <a href="{% url "home" %}">Home</a> </li>
+        <li class="active"> Event detail </li>                 
+    </ol>            
+    <div class="row"> 
+        <article class="col-xs-12 maincontent"> 
+            <header class="page-header"> 
+                <h1 class="page-title">{{ track.title }}</h1> 
+            </header> 
+            <div class="col-md-7"> 
+                <div class="panel panel-default"> 
+                    <div class="panel-body"> 
+                        <h3 class="thin text-center">Track description</h3> 
+                        <hr> 
+                        {{ track.description|safe }}
+                    </div>                             
+                </div>                         
+            </div>
+        </div> 
+        </article>
+    </div>
+{% endblock container %}  

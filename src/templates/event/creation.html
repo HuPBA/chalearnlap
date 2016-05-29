@@ -25,44 +25,46 @@
                     <div class="panel-body">
                         <h3 class="thin text-center">Event</h3> 
                         <hr> 
-                        <div class="col-md-4">
-                            <div class="top-margin"> 
-                                <label>Title 
-                                    {% if eventform.title.field.required %}
-                                    <span class="text-danger">*</span>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="top-margin"> 
+                                    <label>Title 
+                                        {% if eventform.title.field.required %}
+                                        <span class="text-danger">*</span>
+                                        {% endif %}
+                                    </label>  
+                                    {% if eventform.errors.title %}
+                                        <div class="alert alert-danger" role="alert">{{ eventform.errors.title }}</div>
                                     {% endif %}
-                                </label>  
-                                {% if eventform.errors.title %}
-                                    <div class="alert alert-danger" role="alert">{{ eventform.errors.title }}</div>
-                                {% endif %}
-                                {{ eventform.title }}
-                            </div>                                     
-                            <div class="top-margin"> 
-                                <label>Type 
-                                    {% if eventform.event_type.field.required %}
-                                    <span class="text-danger">*</span>
+                                    {{ eventform.title }}
+                                </div>                                     
+                                <div class="top-margin"> 
+                                    <label>Type 
+                                        {% if eventform.event_type.field.required %}
+                                        <span class="text-danger">*</span>
+                                        {% endif %}
+                                    </label>   
+                                    {% if eventform.errors.event_type %}
+                                        <div class="alert alert-danger" role="alert">{{ eventform.errors.event_type }}</div>
                                     {% endif %}
-                                </label>   
-                                {% if eventform.errors.event_type %}
-                                    <div class="alert alert-danger" role="alert">{{ eventform.errors.event_type }}</div>
-                                {% endif %}
-                                {{ eventform.event_type }} 
-                            </div>
-                        </div> 
-                        <div class="col-md-8">
-                            <div class="top-margin"> 
-                                <label>Description 
-                                    {% if eventform.description.field.required %}
-                                    <span class="text-danger">*</span>
-                                    {% endif %}
-                                </label>   
-                                {% if eventform.errors.description %}
-                                    <div class="alert alert-danger" role="alert">{{ eventform.errors.description }}</div>
-                                {% endif %}
-                                {{ eventform.description }}
+                                    {{ eventform.event_type }} 
+                                </div>
                             </div> 
+                            <div class="col-md-8">
+                                <div class="top-margin"> 
+                                    <label>Description 
+                                        {% if eventform.description.field.required %}
+                                        <span class="text-danger">*</span>
+                                        {% endif %}
+                                    </label>   
+                                    {% if eventform.errors.description %}
+                                        <div class="alert alert-danger" role="alert">{{ eventform.errors.description }}</div>
+                                    {% endif %}
+                                    {{ eventform.description }}
+                                </div> 
+                            </div>
                         </div>
-                        <hr>
+                            <hr>
                         <div class="row">
                             <div class="col-lg-4 col-lg-offset-8 text-right"> 
                                 <button class="btn btn-action" type="submit" name="signup-button">Save</button>

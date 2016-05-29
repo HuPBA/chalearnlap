@@ -11,3 +11,4 @@ class UsersConfig(AppConfig):
         watson.register(self.get_model("Challenge"))
         watson.register(self.get_model("Special_Issue"))
         watson.register(self.get_model("Workshop"))
+        watson.register(self.get_model("Dataset"))

@@ -78,15 +78,27 @@
                                 </div>
                             {% endif %}
                             <hr>
-                            <h3 class="thin text-center">Datasets asigned <a href="{% url "dataset_select" id=event.id%}"><img class="plus-icon" src="{% static "images/plus-icon.jpg" %}" alt="Add Dataset"></a></h3>
-                            {% if datasets.count > 0 %}
+                            <h3 class="thin text-center">Tracks<a href="{% url "track_creation" id=event.id%}"><img class="plus-icon" src="{% static "images/plus-icon.jpg" %}" alt="Add Track"></a></h3>
+                            {% if tracks.count > 0 %}
                                 <hr>
                                 <div class="row">
-                                    {% for d in datasets %} 
+                                    {% for t in tracks %} 
                                         <div class="col-sm-6">
                                             <div class="top-margin"> 
-                                                <p><a href='{{ d.get_absolute_url }}'>{{ d.title }}</a></p>
+                                                <p><a href='{{ t.get_absolute_url }}'>{{ t.title }}</a></p>
                                             </div>
+                                        </div>
+                                    {% endfor %}  
+                                </div>
+                            {% endif %}
+                            <hr>
+                            <h3 class="thin text-center">Program<a href="{% url "schedule_creation" id=event.id%}"><img class="plus-icon" src="{% static "images/plus-icon.jpg" %}" alt="Add schedule event"></a></h3>
+                            {% if program.count > 0 %}
+                                <hr>
+                                <div class="row">
+                                    {% for e in program %} 
+                                        <div class="col-sm-6">
+                                            <p><a href="{% url "schedule_edit" id=e.id %}">{{ e.date|date:"SHORT_DATETIME_FORMAT" }} {{ e.title }}</a></p>
                                         </div>
                                     {% endfor %}  
                                 </div>

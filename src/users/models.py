@@ -149,6 +149,16 @@ class Workshop(Event):
 	def get_absolute_url(self):
 		return reverse("workshop_info", kwargs={"id": self.id})
 
+def workshop_gallery(gallery, filename):
+	return 'gallery/%s/%s' % (gallery.workshop.title, filename)
+
+class Gallery_Image(models.Model):
+	image = models.ImageField(upload_to=workshop_gallery, null=True)
+	workshop = models.ForeignKey(Workshop, on_delete=models.SET_NULL, null=True)
+
+	def __str__(self):
+		return unicode(self.id).encode('utf-8')
+
 class Challenge(Event):
 
 	def __str__(self):
@@ -161,13 +171,19 @@ class Dataset(models.Model):
 	title = models.CharField(max_length=100, null=True)
 	description = RichTextField()
 	chalearn = models.ForeignKey(Chalearn, on_delete=models.SET_NULL, null=True)
-	track = models.ManyToManyField(Challenge)
+	tracks = models.ManyToManyField(Challenge, through='Track')
 
 	def __str__(self):
 		return unicode(self.title).encode('utf-8')
 
 	def get_absolute_url(self):
-		return reverse("dataset_edit", kwargs={"id": self.id})
+		return reverse("dataset_info", kwargs={"id": self.id})
+
+class Track(models.Model):
+	title = models.CharField(max_length=100)
+	description = RichTextField()
+	challenge = models.ForeignKey(Challenge, on_delete=models.CASCADE)
+	dataset = models.ForeignKey(Dataset, on_delete=models.CASCADE)
 
 class Result(models.Model):
 	title = models.CharField(max_length=100)

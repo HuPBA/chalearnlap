@@ -117,6 +117,16 @@ class RoleCreationForm(forms.Form):
 	def clean(self):
 		return self.cleaned_data
 
+class TrackCreationForm(forms.Form):
+	def __init__(self, choices, *args, **kwargs):
+		super(TrackCreationForm, self).__init__(*args, **kwargs)
+		self.fields['title'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}))
+		self.fields['description'] = forms.CharField(required=True, widget=CKEditorWidget())
+		self.fields['dataset_select'] = forms.ChoiceField(widget=forms.Select(attrs={'class': "form-control"}), required=True, choices=choices)
+
+	def clean(self):
+		return self.cleaned_data
+
 class MemberCreationForm(RegistrationForm):
 	def __init__(self, *args, **kwargs):
 		super(MemberCreationForm, self).__init__(*args, **kwargs)

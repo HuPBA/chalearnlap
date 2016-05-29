@@ -1,7 +1,5 @@
 {% extends "base.html" %}
 {% block container %}
-<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/jasny-bootstrap/3.1.3/css/jasny-bootstrap.min.css">
-<script src="//cdnjs.cloudflare.com/ajax/libs/jasny-bootstrap/3.1.3/js/jasny-bootstrap.min.js"></script>
     <ol class="breadcrumb"> 
         <li> <a href="{% url "home" %}">Home</a> </li>
         <li class="active"> Event detail </li>                 
@@ -25,7 +23,6 @@
                             </ul>   
                         {% endif %} 
                     </li>
-                    <li><a href='{% url 'challenge_program' id=challenge.id %}'>Program</a></li>
                     <li><a href='{% url 'challenge_sponsors' id=challenge.id %}'>Sponsors</a></li>
                     <li><a href='{% url 'challenge_result' id=challenge.id %}'>Results</a></li>
                 </ul>
@@ -33,9 +30,18 @@
             <div class="col-md-7"> 
                 <div class="panel panel-default"> 
                     <div class="panel-body"> 
-                        <h3 class="thin text-center">Challenge description</h3> 
+                        <h3 class="thin text-center">Challenge program</h3> 
                         <hr> 
-                        {{ challenge.description|safe }}
+                        {% if program.count > 0 %}
+                            <div class="row">
+                                {% for e in program %} 
+                                    <div class="col-sm-12">
+                                        <h4>{{ e.date|date:"SHORT_DATETIME_FORMAT" }} {{ e.title }}</h4>
+                                        <p>{{ e.description|safe }}</p>
+                                    </div>
+                                {% endfor %}  
+                            </div>
+                        {% endif %}
                     </div>                             
                 </div>                         
             </div>
