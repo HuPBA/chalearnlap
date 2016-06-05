@@ -51,7 +51,7 @@
                                 </div> 
                             </div>
                             <div class="col-md-4"> 
-                                <h3 class="thin text-center">File's assigned<a href="{% url "file_creation" id=data.id %}"><img class="plus-icon" src="{% static "images/plus-icon.jpg" %}" alt="Add File"></a> </h3> 
+                                <h3 class="thin text-center">File's assigned &ensp;<a href="{% url "file_creation" id=data.id dataset_id=dataset_id %}"><i class="fa fa-plus-circle" aria-hidden="true"></i></a> </h3> 
                                 <hr>
                                 {% if files.count > 0 %}
                                     <div class="panel panel-default"> 
@@ -61,18 +61,40 @@
                                                     <div class="col-sm-12">
                                                         <div class="top-margin"> 
                                                             {% if f.file %}
-                                                                <div class="top-margin"> 
-                                                                    <p><a href='{{ f.file.url }}'>{{ f.name }}</a></p>
-                                                                </div>
+                                                                {% if f.name %}
+                                                                    <div class="top-margin"> 
+                                                                        <a href='{{ f.file.url }}'>{{ f.name }}</a>                                                                    
+                                                                        &ensp;<a href="{% url "file_remove" id=data.id file_id=f.id dataset_id=dataset_id %}"><i class="fa fa-minus-circle" aria-hidden="true"></i></a> </p>
+                                                                    </div>
+                                                                {% else %}
+                                                                    <div class="top-margin"> 
+                                                                        <p><a href='{{ f.file.url }}'>{{ f.filename }}</a>                                                               
+                                                                        &ensp;<a href="{% url "file_remove" id=data.id file_id=f.id dataset_id=dataset_id %}"><i class="fa fa-minus-circle" aria-hidden="true"></i></a> </p>
+                                                                    </div>
+                                                                {% endif %}
                                                             {% else %}
-                                                                <div class="top-margin"> 
-                                                                    <p><a href='{{ f.url }}'>{{ f.name }}</a></p>
-                                                                </div>
+                                                                {% if f.name %}
+                                                                    <div class="top-margin"> 
+                                                                        <a href='{{ f.url }}'>{{ f.name }}</a>                                                                    
+                                                                        &ensp;<a href="{% url "file_remove" id=data.id file_id=f.id dataset_id=dataset_id %}"><i class="fa fa-minus-circle" aria-hidden="true"></i></a> </p>
+                                                                    </div>
+                                                                {% else %}
+                                                                    <div class="top-margin"> 
+                                                                        <p><a href='{{ f.url }}'>{{ f.url }}</a>                                                               
+                                                                        &ensp;<a href="{% url "file_remove" id=data.id file_id=f.id dataset_id=dataset_id %}"><i class="fa fa-minus-circle" aria-hidden="true"></i></a> </p>
+                                                                    </div>
+                                                                {% endif %}
                                                             {% endif %}
                                                         </div>
                                                     </div>
                                                 {% endfor %} 
                                             </div> 
+                                        </div>
+                                    </div>
+                                {% else %}
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <p class="text-center"> There are no files registered in {{ data.title }}</p>
                                         </div>
                                     </div>
                                 {% endif %}                                    

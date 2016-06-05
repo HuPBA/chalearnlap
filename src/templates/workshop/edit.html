@@ -19,86 +19,128 @@
         <article class="col-xs-12 maincontent"> 
             <header class="page-header"> 
                 <h1 class="page-title">{{ workshop.title }} edit</h1> 
-            </header>                     
-            <div class="col-md-10 col-md-offset-1"> 
+            </header>  
+            <form method="POST" action=""> {% csrf_token %}                   
                 <div class="panel panel-default"> 
                     <div class="panel-body"> 
                         <h3 class="thin text-center">{{ workshop.title }}</h3> 
                         <hr> 
-                        <form method="POST" action=""> 
-                            {% csrf_token %}
-                            <div class="top-margin"> 
-                                <label>Title 
-                                    {% if eventform.title.field.required %}
-                                    <span class="text-danger">*</span>
-                                    {% endif %}
-                                </label>  
-                                {% if eventform.errors.title %}
-                                    <div class="alert alert-danger" role="alert">{{ eventform.errors.title }}</div>
-                                {% endif %}
-                                {{ eventform.title }} 
-                            </div>                                     
-                            <div class="top-margin"> 
-                                <label>Description 
-                                    {% if eventform.description.field.required %}
-                                    <span class="text-danger">*</span>
-                                    {% endif %}
-                                </label>   
-                                {% if eventform.errors.description %}
-                                    <div class="alert alert-danger" role="alert">{{ eventform.errors.description }}</div>
-                                {% endif %}
-                                </div>
+                        <div class="row">
+                            <div class="col-md-8"> 
                                 <div class="top-margin"> 
-                                {{ eventform.description }} 
-                            </div>  
-                            <hr>
-                            <h3 class="thin text-center">Program <a href="{% url "schedule_creation" id=workshop.id %}"><img class="plus-icon" src="{% static "images/plus-icon.jpg" %}" alt="Add schedule event"></a></h3>
-                            {% if program.count > 0 %}
-                                <hr>
-                                <div class="row">
-                                    {% for e in program %} 
-                                        <div class="col-sm-6">
-                                            <p><a href="{% url "schedule_edit" id=e.id %}">{{ e.date|date:"SHORT_DATETIME_FORMAT" }} {{ e.title }}</a></p>
-                                        </div>
-                                    {% endfor %}  
-                                </div>
-                            {% endif %}
-                            <hr>
-                            <h3 class="thin text-center">Invited speakers<a href="{% url "profile_select" id=workshop.id %}"><img class="plus-icon" src="{% static "images/plus-icon.jpg" %}" alt="Add invited speakers"></a></h3>
-                            {% if speakers.count > 0 %}
-                                <hr>
-                                <div class="row">
-                                    {% for s in speakers %} 
-                                        <div class="col-sm-6">
-                                            <p><a href='{% url 'profile_edit' id=m.profile.id %}'>{{ s.profile.first_name }} {{ s.profile.last_name }}</a></p>
-                                        </div>
-                                    {% endfor %}  
-                                </div>
-                            {% endif %}
-                            <hr>
-                            <h3 class="thin text-center">Gallery pictures <a href="{% url "add_gallery_picture" id=workshop.id %}"><img class="plus-icon" src="{% static "images/plus-icon.jpg" %}" alt="Add picture to gallery"></a></h3>
-                            {% if gallery.count > 0 %}
-                                <hr>
-                                <div class="row">
-                                    {% for i in gallery %} 
-                                        <div class="row">
-                                            <div class="col-sm-12">
-                                                <img class="img-responsive img-center" src="{{ i.image.url }}" />
+                                    <label>Title 
+                                        {% if eventform.title.field.required %}
+                                        <span class="text-danger">*</span>
+                                        {% endif %}
+                                    </label>  
+                                    {% if eventform.errors.title %}
+                                        <div class="alert alert-danger" role="alert">{{ eventform.errors.title }}</div>
+                                    {% endif %}
+                                    {{ eventform.title }} 
+                                </div>                                     
+                                <div class="top-margin"> 
+                                    <label>Description 
+                                        {% if eventform.description.field.required %}
+                                        <span class="text-danger">*</span>
+                                        {% endif %}
+                                    </label>   
+                                    {% if eventform.errors.description %}
+                                        <div class="alert alert-danger" role="alert">{{ eventform.errors.description }}</div>
+                                    {% endif %}
+                                    </div>
+                                    <div class="top-margin"> 
+                                    {{ eventform.description }} 
+                                </div> 
+                            </div>
+                            <div class="col-md-4"> 
+                                <div class="panel panel-default"> 
+                                    <div class="panel-body"> 
+                                        <h3 class="thin text-center">News &ensp;<a href="{% url "news_creation" id=workshop.id %}"><i class="fa fa-plus-circle" aria-hidden="true"></i></a></h3>
+                                        <hr> 
+                                        {% if news.count > 0 %}
+                                            <div class="row">
+                                                {% for n in news %} 
+                                                    <div class="col-sm-12">
+                                                        <div class="top-margin"> 
+                                                            <p class="text-center"><a href='{{ n.get_absolute_url }}'>{{ n.title }}</a>&ensp;<a href="{% url 'event_news_remove' id=workshop.id news_id=n.id %}"><i class="fa fa-minus-circle fa" aria-hidden="true"></i></a></p>
+                                                        </div>
+                                                    </div>
+                                                {% endfor %}  
                                             </div>
-                                        </div>
-                                    {% endfor %}  
+                                        {% else %}
+                                            <div class="row">
+                                                <div class="col-sm-12">
+                                                    <p class="text-center"> There are no news registered in {{ workshop.title }}</p>
+                                                </div>
+                                            </div>  
+                                        {% endif %}
+                                        <h3 class="thin text-center">Program &ensp;<a href="{% url "program_creation" id=workshop.id %}"><i class="fa fa-plus-circle" aria-hidden="true"></i></a></h3>
+                                        <hr> 
+                                        {% if program.count > 0 %}
+                                            <div class="row">
+                                                {% for e in program %} 
+                                                    <div class="col-sm-12">
+                                                        <p class="text-center"><a href="{% url "program_edit" id=workshop.id program_id=e.id %}">{{ e.date|date:"SHORT_DATETIME_FORMAT" }} {{ e.title }}</a>&ensp;<a href="{% url 'event_program_remove' id=workshop.id program_id=e.id %}"><i class="fa fa-minus-circle fa" aria-hidden="true"></i></a></p>
+                                                    </div>
+                                                {% endfor %}  
+                                            </div>
+                                        {% else %}
+                                            <div class="row">
+                                                <div class="col-sm-12">
+                                                    <p class="text-center"> There are no schedule events registered in {{ workshop.title }}</p>
+                                                </div>
+                                            </div>  
+                                        {% endif %}
+                                        <h3 class="thin text-center">Invited speakers&ensp;<a href="{% url "speaker_select" id=workshop.id %}"><i class="fa fa-plus-circle" aria-hidden="true"></i></a></h3>
+                                        <hr> 
+                                        {% if speakers.count > 0 %}
+                                            <div class="row">
+                                                {% for s in speakers %} 
+                                                    <div class="col-sm-12">
+                                                        <p class="text-center"><a href='{% url 'profile_edit' id=s.profile.id %}'>{{ s.profile.first_name }} {{ s.profile.last_name }}</a>&ensp;<a href="{% url 'event_member_remove' id=workshop.id member_id=s.id %}"><i class="fa fa-minus-circle fa" aria-hidden="true"></i></a></p>
+                                                    </div>
+                                                {% endfor %}  
+                                            </div>
+                                        {% else %}
+                                            <div class="row">
+                                                <div class="col-sm-12">
+                                                    <p class="text-center"> There are no invited speakers registered in {{ workshop.title }}</p>
+                                                </div>
+                                            </div>  
+                                        {% endif %}
+                                        <h3 class="thin text-center">Gallery pictures &ensp;<a href="{% url "add_gallery_picture" id=workshop.id %}"><i class="fa fa-plus-circle" aria-hidden="true"></i></a></h3>
+                                        <hr>
+                                        {% if images.count > 0 %}
+                                            <div class="row">
+                                                {% for i in images %} 
+                                                    <div class="row">
+                                                        <div class="col-sm-12">
+                                                            <img class="img-responsive img-center" src="{{ i.image.url }}"/>
+                                                            <br>
+                                                        </div>
+                                                    </div>
+                                                {% endfor %}  
+                                            </div>
+                                        {% else %}
+                                            <div class="row">
+                                                <div class="col-sm-12">
+                                                    <p class="text-center"> There are no pictures registered in {{ workshop.title }}</p>
+                                                </div>
+                                            </div>  
+                                        {% endif %}
+                                    </div>
                                 </div>
-                            {% endif %}
-                            <hr>
-                            <div class="row">
-                                <div class="col-lg-4 col-lg-offset-8 text-right"> 
-                                    <button class="btn btn-action" type="submit" name="signup-button">Save</button>
-                                </div>
-                            </div>                                     
-                        </form>                                 
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-lg-4 col-lg-offset-8 text-right"> 
+                                <button class="btn btn-action" type="submit" name="signup-button">Save</button>
+                            </div>
+                        </div>                                     
                     </div>                             
                 </div>                         
-            </div>
+            </form>
         </article>
     </div>
 {% endblock container %}  

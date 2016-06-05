@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'ckeditor_uploader',
     'datetimewidget',
     'watson',
+    'jfu',
 ]
 
 MIDDLEWARE_CLASSES = [

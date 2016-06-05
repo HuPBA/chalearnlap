@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block container %}
-    {% if eventform.non_field_errors  %}
-        {% for e in eventform.non_field_errors %} 
+    {% if form.non_field_errors  %}
+        {% for e in form.non_field_errors %} 
             <div class="row"> 
                 <div class="col-md-6 widget col-md-offset-3"> 
                     <div class="alert alert-danger" role="alert">{{ e }}</div>
@@ -24,18 +24,30 @@
                     <div class="panel-body"> 
                         <h3 class="thin text-center">{{ workshop.title }}</h3> 
                         <hr> 
-                        <form method="POST" action=""> 
+                        <form method="POST" action="" enctype="multipart/form-data"> 
                             {% csrf_token %}
                             <div class="top-margin"> 
                                 <label>Picture
-                                    {% if fileform.file.field.required %}
+                                    {% if form.image.field.required %}
                                     <span class="text-danger">*</span>
                                     {% endif %}
                                 </label>  
-                                {% if fileform.errors.file %}
-                                    <div class="alert alert-danger" role="alert">{{ fileform.errors.file }}</div>
+                                {% if form.errors.image %}
+                                    <div class="alert alert-danger" role="alert">{{ form.errors.image }}</div>
                                 {% endif %}
-                                {{ fileform.image }} 
+                                {{ form.image }} 
+                                <br>
+                            </div>
+                            <div class="top-margin"> 
+                                <label>Short description
+                                    {% if form.desc.field.required %}
+                                    <span class="text-danger">*</span>
+                                    {% endif %}
+                                </label>  
+                                {% if form.errors.desc %}
+                                    <div class="alert alert-danger" role="alert">{{ form.errors.desc }}</div>
+                                {% endif %}
+                                {{ form.desc }} 
                                 <br>
                             </div>
                             <hr>

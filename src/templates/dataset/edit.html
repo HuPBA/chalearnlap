@@ -51,7 +51,7 @@
                                 </div> 
                             </div>
                             <div class="col-md-4"> 
-                                <h3 class="thin text-center">Data's assigned<a href="{% url "data_creation" id=dataset.id%}"><img class="plus-icon" src="{% static "images/plus-icon.jpg" %}" alt="Add Data"></a> </h3> 
+                                <h3 class="thin text-center">Data's assigned&ensp;<a href="{% url "data_creation" id=dataset.id%}"><i class="fa fa-plus-circle" aria-hidden="true"></i></a> </h3> 
                                 <hr>
                                 {% if datas.count > 0 %}
                                     <div class="panel panel-default"> 
@@ -60,11 +60,17 @@
                                                 {% for d in datas %} 
                                                     <div class="col-sm-12">
                                                         <div class="top-margin"> 
-                                                            <p><a href='{% url 'data_edit' id=d.id dataset_id=dataset.id %}'>{{ d.title }}</a></p>
+                                                            <p><a href='{% url 'data_edit' id=d.id dataset_id=dataset.id %}'>{{ d.title }}</a>&ensp;<a href="{% url 'data_remove' id=d.id dataset_id=dataset.id %}"><i class="fa fa-minus-circle fa" aria-hidden="true"></i></a></p>
                                                         </div>
                                                     </div>
                                                 {% endfor %} 
                                             </div> 
+                                        </div>
+                                    </div>
+                                {% else %}
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <p class="text-center"> There are no data registered in this dataset</p>
                                         </div>
                                     </div>
                                 {% endif %}                                    

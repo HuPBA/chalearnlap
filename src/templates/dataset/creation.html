@@ -19,15 +19,6 @@
             </div>
         {% endfor %} 
     {% endif %}
-    {% if fileform.non_field_errors  %}
-        {% for e in fileform.non_field_errors %} 
-            <div class="row"> 
-                <div class="col-md-6 widget col-md-offset-3"> 
-                    <div class="alert alert-danger" role="alert">{{ e }}</div>
-                </div>
-            </div>
-        {% endfor %} 
-    {% endif %}
     <ol class="breadcrumb"> 
         <li> <a href="{% url "home" %}">Home</a> </li>
         <li> <a href="{% url "dataset_list" %}">Dataset list</a> </li>                 
@@ -96,38 +87,6 @@
                                         {{ dataform.data_desc }} 
                                     </div>
     						    </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <h3 class="thin text-center">File</h3> 
-                            <hr>
-                            <div class="col-md-6"> 
-                                <div class="top-margin"> 
-                                    <label>Name
-                                        {% if fileform.name.field.required %}
-                                        <span class="text-danger">*</span>
-                                        {% endif %}
-                                    </label>  
-                                    {% if fileform.errors.name %}
-                                        <div class="alert alert-danger" role="alert">{{ fileform.errors.name }}</div>
-                                    {% endif %}
-                                    {{ fileform.name }}
-                                </div>
-                            </div>
-                            <div class="col-md-6"> 
-                                <div class="top-margin"> 
-                                    <label>File or URL
-                                        {% if fileform.file.field.required %}
-                                        <span class="text-danger">*</span>
-                                        {% endif %}
-                                    </label>  
-                                    {% if fileform.errors.file %}
-                                        <div class="alert alert-danger" role="alert">{{ fileform.errors.file }}</div>
-                                    {% endif %}
-                                    {{ fileform.file }}
-                                    <br>
-                                    {{ fileform.url }}
-                                </div>
                             </div>
                         </div>
                         <hr> 

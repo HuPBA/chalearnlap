@@ -523,7 +523,7 @@ th:last-child {
   border-right:none;
 }
   
-tr {
+/*tr {
   border-top: 1px solid #C1C3D1;
   border-bottom-: 1px solid #C1C3D1;
   color:#666B85;
@@ -562,7 +562,7 @@ tr:last-child td:first-child {
 tr:last-child td:last-child {
   border-bottom-right-radius:3px;
 }
- 
+ */
 td {
   background:#FFFFFF;
   padding:20px;

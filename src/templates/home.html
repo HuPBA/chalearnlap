@@ -18,14 +18,23 @@
         </div>                 
         <div class="col-sm-3"> 
             <div class="thumbnail">
-                <h2 class="text-center top-space">News</h2> 
+                <h2 class="text-center top-space">News</h2>
+                <hr> 
                 <div class="caption">
-                    {% for n in news %}
-                        <h3>{{ n.title }}</h3> 
-                        <p>{{ n.description|safe }}</p>
-                    {% endfor %}
+                    {% if news.count > 0 %}
+                        {% for n in news %}
+                            <h3>{{ n.title }}</h3> 
+                            <p>{{ n.description|safe }}</p>
+                        {% endfor %}
+                    {% else %}
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <p class="text-center"> There are no news</p>
+                            </div>
+                        </div>
+                    {% endif %}
                 </div>
             </div> 
-        </div>  
+        </div> 
     </div>    
 {% endblock container %}

@@ -7,7 +7,7 @@
     <div class="row"> 
         <article class="col-xs-12 maincontent"> 
             <header class="page-header"> 
-                <h1 class="page-title">{{ dataset.title }} - {{ data.title }}</h1> 
+                <h1 class="page-title">{{ dataset.title }}</h1> 
             </header>   
             <div class="col-md-2" id="leftCol">
                 <ul class="nav nav-stacked" id="sidebar">
@@ -18,37 +18,8 @@
                     {% endfor %}
                 </ul>
             </div>                  
-            <div class="col-md-7"> 
-                <div class="panel panel-default"> 
-                    <div class="panel-body"> 
-                        <h3 class="thin text-center">Data description</h3> 
-                        <hr> 
-                        {{ data.description|safe }}
-                        <hr>
-                        {% if files.count > 0 %}
-                            <h3 class="thin text-center">Files</h3> 
-                            <hr>
-                            {% for f in files %} 
-                                {% if f.file %}
-                                    <div class="top-margin"> 
-                                        <p><a href='{{ f.file.url }}'>{{ f.name }}</a></p>
-                                    </div>
-                                {% else %}
-                                    <div class="top-margin"> 
-                                        <p><a href='{{ f.url }}'>{{ f.name }}</a></p>
-                                    </div>
-                                {% endif %}
-                            {% endfor %}  
-                        {% else %}
-                            <div class="row">
-                                <div class="col-sm-12">
-                                    <p class="text-center"> There are no files registered in {{ data.title }}</p>
-                                </div>
-                            </div>
-                        {% endif %}  
-                    </div>                             
-                </div>                         
-            </div>
+            {% block content %}
+            {% endblock content %}
             <div class="col-sm-3"> 
                 <div class="thumbnail">
                     <h2 class="text-center top-space">News</h2>

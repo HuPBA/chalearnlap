@@ -1,89 +1,47 @@
-{% extends "base.html" %}
-{% block container %}
-<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/jasny-bootstrap/3.1.3/css/jasny-bootstrap.min.css">
-<script src="//cdnjs.cloudflare.com/ajax/libs/jasny-bootstrap/3.1.3/js/jasny-bootstrap.min.js"></script>
-    <ol class="breadcrumb"> 
-        <li> <a href="{% url "home" %}">Home</a> </li>
-        <li class="active"> Event detail </li>                 
-    </ol>            
-    <div class="row"> 
-        <article class="col-xs-12 maincontent"> 
-            <header class="page-header"> 
-                <h1 class="page-title">{{ challenge.title }}</h1> 
-            </header> 
-            <div class="col-md-2" id="leftCol">
-                <ul class="nav nav-stacked" id="sidebar">
-                    <li><a href='{% url 'challenge_info' id=challenge.id %}'>Information</a></li>
-                    <li><a href='{% url 'challenge_members' id=challenge.id %}'>Members</a></li>
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Tracks <b class="caret"></b></a>
-                        {% if tracks.count > 0 %}
-                            <ul class="dropdown-menu navmenu-nav">
-                                {% for t in tracks %}
-                                    <li><a href='{% url 'track_info' id=t.id %}'>{{ t.title }}</a></li>
-                                {% endfor %}                               
-                            </ul>   
-                        {% endif %} 
-                    </li>
-                    <li><a href='{% url 'challenge_sponsors' id=challenge.id %}'>Sponsors</a></li>
-                    <li><a href='{% url 'challenge_result' id=challenge.id %}'>Results</a></li>
-                </ul>
-            </div>
-            <div class="col-md-7"> 
-                <div class="panel panel-default"> 
-                    <div class="panel-body"> 
-                        <h3 class="thin text-center">Challenge results</h3> 
-                        <hr> 
-                        <table class="table-fill">
-                            <thead>
-                                <tr>
-                                    <th class="text-left">Position</th>
-                                    <th class="text-left">User</th>
-                                    <th class="text-left">Error</th>
-                                </tr>
-                            </thead>
-                            <tbody class="table-hover">
-                                <tr>
-                                    <td class="text-left">1</td>
-                                    <td class="text-left">csmath</td>
-                                    <td class="text-left">0.215327</td>
-                                </tr>
-                                <tr>
-                                    <td class="text-left">2</td>
-                                    <td class="text-left">xperzy</td>
-                                    <td class="text-left">0.236426</td>
-                                </tr>
-                                <tr>
-                                    <td class="text-left">1</td>
-                                    <td class="text-left">uricamic</td>
-                                    <td class="text-left">0.240429</td>
-                                </tr>
-                                <tr>
-                                    <td class="text-left">1</td>
-                                    <td class="text-left">OLE</td>
-                                    <td class="text-left">0.265452</td>
-                                </tr>
-                                <tr>
-                                    <td class="text-left">1</td>
-                                    <td class="text-left">xbaro</td>
-                                    <td class="text-left">0.272212</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>                             
-                </div>                         
-            </div>
-            <div class="col-sm-3"> 
-            <div class="thumbnail">
-                <h2 class="text-center top-space">News</h2> 
-                <div class="caption">
-                    {% for n in news %}
-                        <h3>{{ n.title }}</h3> 
-                        <p>{{ n.description|safe }}</p>
-                    {% endfor %}
-                </div>
-            </div> 
-        </div> 
-        </article>
+{% extends "challenge/base.html" %}
+{% block content %}
+    <div class="col-md-7"> 
+        <div class="panel panel-default"> 
+            <div class="panel-body"> 
+                <h3 class="thin text-center">Challenge results</h3> 
+                <hr> 
+                <table class="table-fill">
+                    <thead>
+                        <tr>
+                            <th class="text-left">Position</th>
+                            <th class="text-left">User</th>
+                            <th class="text-left">Error</th>
+                        </tr>
+                    </thead>
+                    <tbody class="table-hover">
+                        <tr>
+                            <td class="text-left">1</td>
+                            <td class="text-left">csmath</td>
+                            <td class="text-left">0.215327</td>
+                        </tr>
+                        <tr>
+                            <td class="text-left">2</td>
+                            <td class="text-left">xperzy</td>
+                            <td class="text-left">0.236426</td>
+                        </tr>
+                        <tr>
+                            <td class="text-left">1</td>
+                            <td class="text-left">uricamic</td>
+                            <td class="text-left">0.240429</td>
+                        </tr>
+                        <tr>
+                            <td class="text-left">1</td>
+                            <td class="text-left">OLE</td>
+                            <td class="text-left">0.265452</td>
+                        </tr>
+                        <tr>
+                            <td class="text-left">1</td>
+                            <td class="text-left">xbaro</td>
+                            <td class="text-left">0.272212</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>                             
+        </div>                         
     </div>
-{% endblock container %}  
+{% endblock content %}  

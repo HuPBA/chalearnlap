@@ -10,47 +10,65 @@
     <div class="row"> 
         <article class="col-xs-12 maincontent"> 
             <header class="page-header"> 
-                <h1 class="page-title">Events <a href="{% url "event_creation" %}"><img class="plus-icon" src="{% static "images/plus-icon.jpg" %}" alt="Add Event"></a> </h1> 
+                <h1 class="page-title">Events &ensp;<a href="{% url "event_creation" %}"><i class="fa fa-plus-circle" aria-hidden="true"></i></a> </h1> 
             </header>                     
-            {% if challenges.count > 0 %}
-                <div class="col-sm-4">
-                    <div class="panel panel-default"> 
-                        <div class="panel-body"> 
-                            <h3 class="thin text-center">Challenges</h3> 
-                            <hr>
+            <div class="col-sm-4">
+                <div class="panel panel-default"> 
+                    <div class="panel-body"> 
+                        <h3 class="thin text-center">Challenges</h3> 
+                        <hr>
+                        {% if challenges.count > 0 %}
                             {% for c in challenges %}
-                                <p><a href="{% url "challenge_edit" id=c.id %}">{{ c.title }}</a></p>
+                                <p><a href="{% url "challenge_edit" id=c.id %}">{{ c.title }}</a>&ensp;<a href="{% url "event_remove" id=c.id %}"><i class="fa fa-minus-circle fa" aria-hidden="true"></i></a></p>
                             {% endfor %} 
-                        </div>
-                    </div>    
-                </div>                          
-            {% endif %}   
-            {% if workshops.count > 0 %}
-                <div class="col-sm-4">
-                    <div class="panel panel-default"> 
-                        <div class="panel-body">
-                            <h3 class="thin text-center">Workshops</h3> 
-                            <hr>
+                        {% else %}
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <p class="text-center"> There are no challenges registered</p>
+                                </div>
+                            </div>
+                        {% endif %} 
+                    </div>
+                </div>    
+            </div>                          
+            <div class="col-sm-4">
+                <div class="panel panel-default"> 
+                    <div class="panel-body">
+                        <h3 class="thin text-center">Workshops</h3> 
+                        <hr>
+                        {% if workshops.count > 0 %}
                             {% for w in workshops %}
-                                <p><a href="{% url "workshop_edit" id=w.id %}">{{ w.title }}</a></p>
-                            {% endfor %}  
-                        </div>
-                    </div>            
-                </div>                 
-            {% endif %} 
-            {% if special_issues.count > 0 %}
+                                <p><a href="{% url "workshop_edit" id=w.id %}">{{ w.title }}</a>&ensp;<a href="{% url "event_remove" id=w.id %}"><i class="fa fa-minus-circle fa" aria-hidden="true"></i></a></p>
+                            {% endfor %}
+                        {% else %}
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <p class="text-center"> There are no workshops registered</p>
+                                </div>
+                            </div>
+                        {% endif %}   
+                    </div>
+                </div>            
+            </div>                 
             <div class="col-sm-4">
                 <div class="panel panel-default"> 
                     <div class="panel-body">
                         <h3 class="thin text-center">Special issues</h3> 
                         <hr>
-                        {% for s in special_issues %}
-                            <p><a href="{% url "special_issue_edit" id=s.id %}">{{ s.title }}</a></p>
-                        {% endfor %}  
+                        {% if special_issues.count > 0 %}
+                            {% for s in special_issues %}
+                                <p><a href="{% url "special_issue_edit" id=s.id %}">{{ s.title }}</a>&ensp;<a href="{% url "event_remove" id=s.id %}"><i class="fa fa-minus-circle fa" aria-hidden="true"></i></a></p>
+                            {% endfor %} 
+                        {% else %}
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <p class="text-center">There are no special issues registered</p>
+                                </div>
+                            </div>
+                        {% endif %}  
                     </div>
                 </div>  
             </div>                           
-            {% endif %}                        
         </article>
     </div>                      
 {% endblock container %}   

@@ -12,7 +12,9 @@
         <link rel="stylesheet" href="{% static "css/bootstrap-theme.css" %}" media="screen"> 
         <link rel="stylesheet" href="{% static "css/main.css" %}">    
         <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.2/css/select2.min.css" rel="stylesheet" />
-        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>         
+        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>       
+        {% block header %} 
+        {% endblock header %}  
     </head>     
     <body class="home">        
         <div class="navbar navbar-inverse navbar-fixed-top headroom"> 

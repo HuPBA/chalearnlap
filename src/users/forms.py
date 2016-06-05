@@ -41,7 +41,6 @@ class PartnerSelectForm(forms.Form):
 		qset = kwargs.pop('qset', Partner.objects.all())
 		super(PartnerSelectForm, self).__init__(*args, **kwargs)
 		self.fields['partner'] = forms.ModelMultipleChoiceField(required=True, widget=forms.SelectMultiple(attrs={'class': "js-example-basic-multiple", 'id': "input-addmembers"}), queryset=qset)
-		self.fields['role'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}))
 
 	def clean(self):
 		return self.cleaned_data
@@ -123,6 +122,26 @@ class TrackCreationForm(forms.Form):
 		self.fields['title'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}))
 		self.fields['description'] = forms.CharField(required=True, widget=CKEditorWidget())
 		self.fields['dataset_select'] = forms.ChoiceField(widget=forms.Select(attrs={'class': "form-control"}), required=True, choices=choices)
+
+	def clean(self):
+		return self.cleaned_data
+
+class TrackEditForm(forms.Form):
+	def __init__(self, choices, *args, **kwargs):
+		track = kwargs.pop('track', None)
+		super(TrackEditForm, self).__init__(*args, **kwargs)
+		self.fields['title'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}), initial=track.title)
+		self.fields['description'] = forms.CharField(required=True, widget=CKEditorWidget(), initial=track.description)
+		self.fields['dataset_select'] = forms.ChoiceField(widget=forms.Select(attrs={'class': "form-control"}), required=True, choices=choices, initial=track.dataset.id)
+
+	def clean(self):
+		return self.cleaned_data
+
+class GalleryImageForm(forms.Form):
+	def __init__(self, *args, **kwargs):
+		super(GalleryImageForm, self).__init__(*args, **kwargs)
+		self.fields['image'] = forms.ImageField(required=True, widget=forms.FileInput(attrs={'class': "form-control"}))
+		self.fields['desc'] = forms.CharField(required=True, widget=CKEditorWidget())
 
 	def clean(self):
 		return self.cleaned_data
@@ -279,18 +298,12 @@ class DataEditForm(forms.Form):
 class FileCreationForm(forms.Form):
 	def __init__(self, *args, **kwargs):
 		super(FileCreationForm, self).__init__(*args, **kwargs)
-		self.fields['name'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}))
-		self.fields['file'] = forms.FileField(required=False, widget=forms.FileInput(attrs={'class': "form-control"}))
-		self.fields['url'] = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': "form-control", 'placeholder': 'URL'}))
+		self.fields['name'] = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}))
+		self.fields['url'] = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}))
+		self.fields['f_id'] = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}))
 
 	def clean(self):
-		cleaned_data = super(FileCreationForm, self).clean()
-		file = cleaned_data.get("file")
-		url = cleaned_data.get("url")
-		if not url and not file:
-			raise forms.ValidationError("Please, insert a file or a URL")
-		else:
-			return cleaned_data
+		return self.cleaned_data
 
 class EventCreationForm(forms.Form):
 	def __init__(self, *args, **kwargs):

@@ -67,13 +67,16 @@ class Profile(models.Model):
 	def get_absolute_url(self):
 		return reverse("profile_edit", kwargs={"id": self.id})
 
-class Profile_Event(models.Model):
-	profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='fk_profile')
-	event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='fk_event')
-
 class Role(models.Model):
 	name = models.CharField(max_length=50)
-	profile_event = models.ForeignKey(Profile_Event, on_delete=models.SET_NULL, null=True)
+
+	def __str__(self):
+		return unicode(self.name).encode('utf-8')
+
+class Profile_Event(models.Model):
+	profile = models.ForeignKey(Profile, on_delete=models.SET_NULL, related_name='fk_profile', null=True)
+	event = models.ForeignKey(Event, on_delete=models.SET_NULL, related_name='fk_event', null=True)
+	role = models.ForeignKey(Role, on_delete=models.SET_NULL, null=True)
 
 def partner_member_avatar_path(instance, filename):
 	return 'partner/members/%s-%s/%s' % (instance.first_name, instance.last_name, filename)
@@ -102,15 +105,15 @@ class Partner(models.Model):
 		return unicode(self.name).encode('utf-8')
 
 class Event_Partner(models.Model):
-	partner = models.ForeignKey(Partner, on_delete=models.CASCADE)
-	event = models.ForeignKey(Event, on_delete=models.CASCADE)
-	role = models.CharField(max_length=50)
+	partner = models.ForeignKey(Partner, on_delete=models.SET_NULL, null=True)
+	event = models.ForeignKey(Event, on_delete=models.SET_NULL, null=True)
+	role = models.ForeignKey(Role, on_delete=models.SET_NULL, null=True)
 
 class Schedule_Event(models.Model):
 	title = models.CharField(max_length=100, null=True)
 	description = RichTextUploadingField()
 	date = models.DateTimeField()
-	parent_schedule_event = models.ForeignKey("self", on_delete=models.CASCADE, null=True)
+	schedule_event_parent = models.ForeignKey("self", on_delete=models.CASCADE, null=True)
 	event = models.ForeignKey(Event, on_delete=models.SET_NULL, null=True)
 
 	def __str__(self):
@@ -153,7 +156,8 @@ def workshop_gallery(gallery, filename):
 	return 'gallery/%s/%s' % (gallery.workshop.title, filename)
 
 class Gallery_Image(models.Model):
-	image = models.ImageField(upload_to=workshop_gallery, null=True)
+	image = models.ImageField(upload_to='workshop_gallery', null=True)
+	description = RichTextField(null=True)
 	workshop = models.ForeignKey(Workshop, on_delete=models.SET_NULL, null=True)
 
 	def __str__(self):
@@ -182,8 +186,8 @@ class Dataset(models.Model):
 class Track(models.Model):
 	title = models.CharField(max_length=100)
 	description = RichTextField()
-	challenge = models.ForeignKey(Challenge, on_delete=models.CASCADE)
-	dataset = models.ForeignKey(Dataset, on_delete=models.CASCADE)
+	challenge = models.ForeignKey(Challenge, on_delete=models.SET_NULL, null=True)
+	dataset = models.ForeignKey(Dataset, on_delete=models.SET_NULL, null=True)
 
 class Result(models.Model):
 	title = models.CharField(max_length=100)

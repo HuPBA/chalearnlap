@@ -1,53 +1,28 @@
-{% extends "base.html" %}
-{% load imagekit %}
-{% block container %}
-    <ol class="breadcrumb"> 
-        <li> <a href="{% url "home" %}">Home</a> </li>
-        <li class="active"> Event detail </li>                 
-    </ol>            
-    <div class="row"> 
-        <article class="col-xs-12 maincontent"> 
-            <header class="page-header"> 
-                <h1 class="page-title">{{ workshop.title }}</h1> 
-            </header> 
-            <div class="col-md-2" id="leftCol">
-                <ul class="nav nav-stacked" id="sidebar">
-                    <li><a href='{% url 'workshop_info' id=workshop.id %}'>Information</a></li>
-                    <li><a href='{% url 'workshop_program' id=workshop.id %}'>Program</a></li>
-                    <li><a href='{% url 'workshop_speakers' id=workshop.id %}'>Invited speakers</a></li>
-                    <li><a href='{% url 'workshop_gallery' id=workshop.id %}'>Gallery</a></li>
-                </ul>
-            </div>
-            <div class="col-md-7"> 
-                <div class="panel panel-default"> 
-                    <div class="panel-body"> 
-                        <h3 class="thin text-center">Workshop gallery</h3> 
-                        {% if images.count > 0 %}
-                            {% for i in images %} 
-                                <hr>
-                                <div class="row">
-                                    <div class="col-sm-12">
-                                        <img class="img-responsive img-center" src="{{ i.image.url }}" />
-                                    </div>
-                                </div>
-                            {% endfor %}
-                        {% else %}
-                            <hr>
-                        {% endif %}
-                    </div>                             
-                </div>                         
-            </div>
-            <div class="col-sm-3"> 
-            <div class="thumbnail">
-                <h2 class="text-center top-space">News</h2> 
-                <div class="caption">
-                    {% for n in news %}
-                        <h3>{{ n.title }}</h3> 
-                        <p>{{ n.description|safe }}</p>
+{% extends "workshop/base.html" %}
+{% block content %}
+    <div class="col-md-7"> 
+        <div class="panel panel-default"> 
+            <div class="panel-body"> 
+                <h3 class="thin text-center">Workshop gallery</h3> 
+                <hr>
+                {% if images.count > 0 %}
+                    {% for i in images %} 
+                        <br><br>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <img class="img-responsive img-center" src="{{ i.image.url }}" />
+                                <h4 class="thin text-center">{{ i.description|safe }}</h4>
+                            </div>
+                        </div>
                     {% endfor %}
-                </div>
-            </div> 
-        </div> 
-        </article>
+                {% else %}
+                    <div class="row">
+                        <div class="col-sm-12"> 
+                            <p class="text-center"> There is no pictures registered in this workshop</p>
+                        </div>  
+                    </div>
+                {% endif %}
+            </div>                             
+        </div>                         
     </div>
-{% endblock container %}  
+{% endblock content %}  

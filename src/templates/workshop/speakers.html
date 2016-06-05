@@ -1,42 +1,41 @@
-{% extends "base.html" %}
-{% block container %}
-    <ol class="breadcrumb"> 
-        <li> <a href="{% url "home" %}">Home</a> </li>
-        <li class="active"> Event detail </li>                 
-    </ol>            
-    <div class="row"> 
-        <article class="col-xs-12 maincontent"> 
-            <header class="page-header"> 
-                <h1 class="page-title">{{ workshop.title }}</h1> 
-            </header> 
-            <div class="col-md-2" id="leftCol">
-                <ul class="nav nav-stacked" id="sidebar">
-                    <li><a href='{% url 'workshop_info' id=workshop.id %}'>Information</a></li>
-                    <li><a href='{% url 'workshop_program' id=workshop.id %}'>Program</a></li>
-                    <li><a href='{% url 'workshop_speakers' id=workshop.id %}'>Invited speakers</a></li>
-                    <li><a href='{% url 'workshop_gallery' id=workshop.id %}'>Gallery</a></li>
-                </ul>
-            </div>
-            <div class="col-md-7"> 
-                <div class="panel panel-default"> 
-                    <div class="panel-body"> 
-                        <h3 class="thin text-center">Workshop invited speakers</h3> 
-                        <hr> 
-
-                    </div>                             
-                </div>                         
-            </div>
-            <div class="col-sm-3"> 
-            <div class="thumbnail">
-                <h2 class="text-center top-space">News</h2> 
-                <div class="caption">
-                    {% for n in news %}
-                        <h3>{{ n.title }}</h3> 
-                        <p>{{ n.description|safe }}</p>
-                    {% endfor %}
-                </div>
-            </div> 
-        </div> 
-        </article>
+{% extends "workshop/base.html" %}
+{% block content %}
+    <div class="col-md-7"> 
+        <div class="panel panel-default"> 
+            <div class="panel-body"> 
+                <h3 class="thin text-center">Workshop invited speakers</h3> 
+                <hr> 
+                {% if speakers.count > 0 %}
+                    <div class="row">
+                        {% for s in speakers %} 
+                            <div class="top-margin"> 
+                                {% if s.profile.avatar %}
+                                    <div class="col-sm-2">
+                                        <img class="img-responsive" src="{{ s.profile.avatar.url }}">
+                                    </div>
+                                    <div class="col-sm-10">
+                                        <p>{{ s.profile.first_name }} {{ s.profile.last_name }}</p> 
+                                        <p>{{ s.profile.user.email }}</p>
+                                        <p>{{ s.profile.bio }}</p>
+                                    </div>
+                                {% else %}
+                                    <div class="col-sm-12">
+                                        <p class="text-center">{{ s.profile.first_name }} {{ s.profile.last_name }}</p> 
+                                        <p class="text-center">{{ s.profile.user.email }}</p>
+                                        <p class="text-center">{{ s.profile.bio }}</p>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}  
+                    </div>
+                {% else %}
+                    <div class="row">
+                        <div class="col-sm-12"> 
+                            <p class="text-center"> There is no member registered in this workshop</p>
+                        </div>  
+                    </div>
+                {% endif %}
+            </div>                             
+        </div>                         
     </div>
-{% endblock container %}  
+{% endblock content %}  

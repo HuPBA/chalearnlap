@@ -19,56 +19,88 @@
         <article class="col-xs-12 maincontent"> 
             <header class="page-header"> 
                 <h1 class="page-title">Special Issue edit</h1> 
-            </header>                     
-            <div class="col-md-10 col-md-offset-1"> 
-                <div class="panel panel-default col-md-offset-1"> 
+            </header> 
+            <form method="POST" action=""> {% csrf_token %}                    
+                <div class="panel panel-default"> 
                     <div class="panel-body"> 
                         <h3 class="thin text-center">Special Issue</h3> 
                         <hr> 
-                        <form method="POST" action=""> 
-                        	{% csrf_token %}
-                            <div class="top-margin"> 
-                                <label>Title 
-                                    {% if eventform.title.field.required %}
-                                    <span class="text-danger">*</span>
-                                    {% endif %}
-                                </label>  
-                                {% if eventform.errors.title %}
-                                    <div class="alert alert-danger" role="alert">{{ eventform.errors.title }}</div>
-                                {% endif %}
-                                {{ eventform.title }} 
-                            </div>                                     
-                            <div class="top-margin"> 
-                                <label>Description 
-                                    {% if eventform.description.field.required %}
-                                    <span class="text-danger">*</span>
-                                    {% endif %}
-                                </label>   
-                                {% if eventform.errors.description %}
-                                    <div class="alert alert-danger" role="alert">{{ eventform.errors.description }}</div>
-                                {% endif %}
-                                </div>
+                        <div class="row">
+                            <div class="col-md-8"> 
                                 <div class="top-margin"> 
-                                {{ eventform.description }} 
-                            </div>  
-                            <hr>
-                            <h3 class="thin text-center">Members <a href="{% url "profile_select" id=issue.id %}"><img class="plus-icon" src="{% static "images/plus-icon.jpg" %}" alt="Add Member"></a></h3>
-                            {% if members.count > 0 %}
-                                <hr>
-                                <div class="row">
-                                    {% for m in members %} 
-                                        <div class="col-sm-6">
-                                            <a href='{% url 'profile_edit' id=m.profile.id %}'>{{ m.profile.first_name }} {{ m.profile.last_name }}</a></p>
-                                        </div>
-                                    {% endfor %}  
+                                    <label>Title 
+                                        {% if eventform.title.field.required %}
+                                        <span class="text-danger">*</span>
+                                        {% endif %}
+                                    </label>  
+                                    {% if eventform.errors.title %}
+                                        <div class="alert alert-danger" role="alert">{{ eventform.errors.title }}</div>
+                                    {% endif %}
+                                    {{ eventform.title }} 
+                                </div>                                     
+                                <div class="top-margin"> 
+                                    <label>Description 
+                                        {% if eventform.description.field.required %}
+                                        <span class="text-danger">*</span>
+                                        {% endif %}
+                                    </label>   
+                                    {% if eventform.errors.description %}
+                                        <div class="alert alert-danger" role="alert">{{ eventform.errors.description }}</div>
+                                    {% endif %}
+                                    </div>
+                                    <div class="top-margin"> 
+                                    {{ eventform.description }} 
+                                </div>  
+                            </div>
+                            <div class="col-md-4"> 
+                                <div class="panel panel-default col-md-offset-1"> 
+                                    <div class="panel-body"> 
+                                        <h3 class="thin text-center">News &ensp;<a href="{% url "news_creation" id=issue.id %}"><i class="fa fa-plus-circle" aria-hidden="true"></i></a></h3>
+                                        <hr>
+                                        {% if news.count > 0 %}
+                                            <div class="row">
+                                                {% for n in news %} 
+                                                    <div class="col-sm-12">
+                                                        <div class="top-margin"> 
+                                                            <p class="text-center"><a href='{{ n.get_absolute_url }}'>{{ n.title }}</a>&ensp;<a href="{% url 'event_news_remove' id=issue.id news_id=n.id %}"><i class="fa fa-minus-circle fa" aria-hidden="true"></i></a></p>
+                                                        </div>
+                                                    </div>
+                                                {% endfor %}  
+                                            </div>
+                                        {% else %}
+                                            <div class="row">
+                                                <div class="col-sm-12">
+                                                    <p class="text-center"> There are no news registered in {{ issue.title }}</p>
+                                                </div>
+                                            </div>                                        
+                                        {% endif %}
+                                        <h3 class="thin text-center">Members &ensp;<a href="{% url "profile_select" id=issue.id %}"><i class="fa fa-plus-circle" aria-hidden="true"></i></a></h3>
+                                        <hr>
+                                        {% if members.count > 0 %}
+                                            <div class="row">
+                                                {% for m in members %} 
+                                                    <div class="col-sm-12">
+                                                        <p class="text-center"><a href='{% url 'profile_edit' id=m.profile.id %}'>{{ m.profile.first_name }} {{ m.profile.last_name }}</a>&ensp;<a href="{% url 'event_member_remove' id=issue.id member_id=m.id %}"><i class="fa fa-minus-circle fa" aria-hidden="true"></i></a></p>
+                                                    </div>
+                                                {% endfor %}  
+                                            </div>
+                                        {% else %}
+                                            <div class="row">
+                                                <div class="col-sm-12">
+                                                    <p class="text-center"> There are no members registered in {{ issue.title }}</p>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                    </div>
                                 </div>
-                            {% endif %}
-                            <hr>
-                            <div class="row">
-                                <div class="col-lg-4 col-lg-offset-8 text-right"> 
-                                    <button class="btn btn-action" type="submit" name="signup-button">Save</button>
-                                </div>
-                            </div>                                     
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-lg-4 col-lg-offset-8 text-right"> 
+                                <button class="btn btn-action" type="submit" name="signup-button">Save</button>
+                            </div>
+                        </div>                                     
                         </form>                                 
                     </div>                             
                 </div>                         
