@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.models import User
-from .models import Profile, Affiliation, Dataset, Data, Partner
+from .models import Profile, Affiliation, Dataset, Data, Partner, Event
 from registration.forms import RegistrationForm
 from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm, PasswordResetForm, SetPasswordForm
 from ckeditor.widgets import CKEditorWidget
@@ -121,6 +121,8 @@ class TrackCreationForm(forms.Form):
 		super(TrackCreationForm, self).__init__(*args, **kwargs)
 		self.fields['title'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}))
 		self.fields['description'] = forms.CharField(required=True, widget=CKEditorWidget())
+		self.fields['metrics'] = forms.CharField(required=True, widget=CKEditorWidget())
+		self.fields['baseline'] = forms.CharField(required=True, widget=CKEditorWidget())
 		self.fields['dataset_select'] = forms.ChoiceField(widget=forms.Select(attrs={'class': "form-control"}), required=True, choices=choices)
 
 	def clean(self):
@@ -132,6 +134,8 @@ class TrackEditForm(forms.Form):
 		super(TrackEditForm, self).__init__(*args, **kwargs)
 		self.fields['title'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}), initial=track.title)
 		self.fields['description'] = forms.CharField(required=True, widget=CKEditorWidget(), initial=track.description)
+		self.fields['metrics'] = forms.CharField(required=True, widget=CKEditorWidget(), initial=track.metrics)
+		self.fields['baseline'] = forms.CharField(required=True, widget=CKEditorWidget(), initial=track.baseline)
 		self.fields['dataset_select'] = forms.ChoiceField(widget=forms.Select(attrs={'class': "form-control"}), required=True, choices=choices, initial=track.dataset.id)
 
 	def clean(self):
@@ -281,6 +285,8 @@ class DataCreationForm(forms.Form):
 		super(DataCreationForm, self).__init__(*args, **kwargs)
 		self.fields['data_title'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}))
 		self.fields['data_desc'] = forms.CharField(required=True, widget=CKEditorWidget())
+		self.fields['data_software'] = forms.CharField(required=True, widget=CKEditorWidget())
+		self.fields['data_metric'] = forms.CharField(required=True, widget=CKEditorWidget())
 
 	def clean(self):
 		return self.cleaned_data
@@ -291,6 +297,8 @@ class DataEditForm(forms.Form):
 		super(DataEditForm, self).__init__(*args, **kwargs)
 		self.fields['data_title'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}), initial=data.title)
 		self.fields['data_desc'] = forms.CharField(required=True, widget=CKEditorWidget(), initial=data.description)
+		self.fields['data_software'] = forms.CharField(required=True, widget=CKEditorWidget(), initial=data.description)
+		self.fields['data_metric'] = forms.CharField(required=True, widget=CKEditorWidget(), initial=data.description)
 
 	def clean(self):
 		return self.cleaned_data
@@ -393,6 +401,32 @@ class ScheduleEditForm(forms.Form):
 		self.fields['title'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}), initial=schedule.title)
 		self.fields['description'] = forms.CharField(required=True, widget=CKEditorUploadingWidget(), initial=schedule.description)
 		self.fields['time'] = forms.DateTimeField(required=True, widget=DateTimeWidget(bootstrap_version=3, options = {'format': 'mm/dd/yyyy hh:ii'}), input_formats=['%m/%d/%Y %H:%M'], initial=schedule.date)
+
+	def clean(self):
+		return self.cleaned_data
+
+class RelationCreationForm(forms.Form):
+	def __init__(self, choices, *args, **kwargs):
+		super(RelationCreationForm, self).__init__(*args, **kwargs)
+		self.fields['event'] = forms.ChoiceField(widget=forms.Select(attrs={'class': "form-control"}), required=True, choices=choices)
+		self.fields['description'] = forms.CharField(required=True, widget=CKEditorUploadingWidget())
+
+	def clean(self):
+		return self.cleaned_data
+
+class RelationEditForm(forms.Form):
+	def __init__(self, choices, *args, **kwargs):
+		relation = kwargs.pop('relation', None)
+		super(RelationEditForm, self).__init__(*args, **kwargs)
+		if relation.challenge_relation:
+			self.fields['event'] = forms.ChoiceField(widget=forms.Select(attrs={'class': "form-control"}), required=True, choices=choices, initial=relation.challenge_relation.id)
+		elif relation.issue_relation:
+			self.fields['event'] = forms.ChoiceField(widget=forms.Select(attrs={'class': "form-control"}), required=True, choices=choices, initial=relation.issue_relation.id)
+		elif relation.workshop_relation:
+			self.fields['event'] = forms.ChoiceField(widget=forms.Select(attrs={'class': "form-control"}), required=True, choices=choices, initial=relation.workshop_relation.id)
+		elif relation.dataset_relation:
+			self.fields['event'] = forms.ChoiceField(widget=forms.Select(attrs={'class': "form-control"}), required=True, choices=choices, initial=relation.dataset_relation.id)
+		self.fields['description'] = forms.CharField(required=True, widget=CKEditorUploadingWidget(), initial=relation)
 
 	def clean(self):
 		return self.cleaned_data

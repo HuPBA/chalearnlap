@@ -1,0 +1,30 @@
+{% extends "data/base.html" %}
+{% block content %}
+    <div class="col-md-7"> 
+        <div class="panel panel-default"> 
+            <div class="panel-body"> 
+                <h3 class="thin text-center">Data files</h3> 
+                <hr>  
+                {% if files.count > 0 %}
+                    {% for f in files %} 
+                        {% if f.file %}
+                            <div class="top-margin"> 
+                                <p class="text-center"><a href='{{ f.file.url }}'>{{ f.name }}</a></p>
+                            </div>
+                        {% else %}
+                            <div class="top-margin"> 
+                                <p class="text-center"><a href='{{ f.url }}'>{{ f.name }}</a></p>
+                            </div>
+                        {% endif %}
+                    {% endfor %}  
+                {% else %}
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <p class="text-center"> There are no files registered in {{ data.title }}</p>
+                        </div>
+                    </div>
+                {% endif %}  
+            </div>                             
+        </div>                         
+    </div>
+{% endblock content %}  

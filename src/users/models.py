@@ -109,16 +109,6 @@ class Event_Partner(models.Model):
 	event = models.ForeignKey(Event, on_delete=models.SET_NULL, null=True)
 	role = models.ForeignKey(Role, on_delete=models.SET_NULL, null=True)
 
-class Schedule_Event(models.Model):
-	title = models.CharField(max_length=100, null=True)
-	description = RichTextUploadingField()
-	date = models.DateTimeField()
-	schedule_event_parent = models.ForeignKey("self", on_delete=models.CASCADE, null=True)
-	event = models.ForeignKey(Event, on_delete=models.SET_NULL, null=True)
-
-	def __str__(self):
-		return unicode(self.title).encode('utf-8')
-
 class News(models.Model):
 	title = models.CharField(max_length=100)
 	description = RichTextField()
@@ -142,7 +132,7 @@ class Special_Issue(Event):
 		return unicode(self.title).encode('utf-8')
 
 	def get_absolute_url(self):
-		return reverse("special_issue_info", kwargs={"id": self.id})
+		return reverse("special_issue_desc", kwargs={"id": self.id})
 
 class Workshop(Event):
 
@@ -150,7 +140,7 @@ class Workshop(Event):
 		return unicode(self.title).encode('utf-8')
 
 	def get_absolute_url(self):
-		return reverse("workshop_info", kwargs={"id": self.id})
+		return reverse("workshop_desc", kwargs={"id": self.id})
 
 def workshop_gallery(gallery, filename):
 	return 'gallery/%s/%s' % (gallery.workshop.title, filename)
@@ -169,7 +159,7 @@ class Challenge(Event):
 		return unicode(self.title).encode('utf-8')
 
 	def get_absolute_url(self):
-		return reverse("challenge_info", kwargs={"id": self.id})
+		return reverse("challenge_desc", kwargs={"id": self.id})
 
 class Dataset(models.Model):
 	title = models.CharField(max_length=100, null=True)
@@ -181,11 +171,37 @@ class Dataset(models.Model):
 		return unicode(self.title).encode('utf-8')
 
 	def get_absolute_url(self):
-		return reverse("dataset_info", kwargs={"id": self.id})
+		return reverse("dataset_desc", kwargs={"id": self.id})
+
+class Schedule_Event(models.Model):
+	title = models.CharField(max_length=100, null=True)
+	description = RichTextUploadingField()
+	date = models.DateTimeField()
+	schedule_event_parent = models.ForeignKey("self", on_delete=models.CASCADE, null=True)
+	event_schedule = models.ForeignKey(Event, on_delete=models.SET_NULL, null=True, related_name='event_schedule')
+	event_program = models.ForeignKey(Event, on_delete=models.SET_NULL, null=True, related_name='event_program')
+	dataset_schedule = models.ForeignKey(Dataset, on_delete=models.SET_NULL, null=True)
+
+	def __str__(self):
+		return unicode(self.title).encode('utf-8')
+
+class Event_Relation(models.Model):
+	challenge_relation = models.ForeignKey(Challenge, on_delete=models.SET_NULL, related_name='challenge_relation', null=True)
+	issue_relation = models.ForeignKey(Special_Issue, on_delete=models.SET_NULL, related_name='issue_relation', null=True)
+	workshop_relation = models.ForeignKey(Workshop, on_delete=models.SET_NULL, related_name='workshop_relation', null=True)
+	dataset_relation = models.ForeignKey(Dataset, on_delete=models.SET_NULL, related_name='dataset_relation', null=True)
+	event_associated = models.ForeignKey(Event, on_delete=models.SET_NULL, related_name='event_associated', null=True)
+	dataset_associated = models.ForeignKey(Dataset, on_delete=models.SET_NULL, related_name='dataset_associated', null=True)
+	description = RichTextField()
+
+	def __str__(self):
+		return unicode(self.id).encode('utf-8')
 
 class Track(models.Model):
 	title = models.CharField(max_length=100)
 	description = RichTextField()
+	metrics = RichTextField(null=True)
+	baseline = RichTextField(null=True)
 	challenge = models.ForeignKey(Challenge, on_delete=models.SET_NULL, null=True)
 	dataset = models.ForeignKey(Dataset, on_delete=models.SET_NULL, null=True)
 
@@ -201,6 +217,8 @@ class Result(models.Model):
 class Data(models.Model):
 	title = models.CharField(max_length=100)
 	description = RichTextField()
+	software = RichTextField(null=True)
+	metric = RichTextField(null=True)
 	dataset = models.ForeignKey(Dataset, on_delete=models.SET_NULL, null=True)
 
 	def __str__(self):

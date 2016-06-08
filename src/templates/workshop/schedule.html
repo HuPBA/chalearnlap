@@ -1,0 +1,28 @@
+{% extends "workshop/base.html" %}
+{% block content %}
+    <div class="col-md-7"> 
+        <div class="panel panel-default"> 
+            <div class="panel-body"> 
+                <h3 class="thin text-center">Workshop Schedule</h3> 
+                <hr> 
+                {% if schedule.count > 0 %}
+                    {% for s in schedule %}
+                        <div class="row">
+                            <div class="col-sm-12"> 
+                                <p><b>{{ s.date }} {{ s.title }}</b></p>
+                                <p>{{ s.description|safe }}</p>
+                                <br>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="row">
+                        <div class="col-sm-12"> 
+                            <p class="text-center"> There are no schedule events registered in this workshop</p>
+                        </div>  
+                    </div>
+                {% endif %}
+            </div>                             
+        </div>                         
+    </div>
+{% endblock content %}  

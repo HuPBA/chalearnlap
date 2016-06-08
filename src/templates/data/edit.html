@@ -49,6 +49,28 @@
                                     {% endif %}
                                     {{ dataform.data_desc }} 
                                 </div> 
+                                <div class="top-margin"> 
+                                    <label>Software and tools 
+                                        {% if dataform.data_software.field.required %}
+                                        <span class="text-danger">*</span>
+                                        {% endif %}
+                                    </label>  
+                                    {% if dataform.errors.data_software %}
+                                        <div class="alert alert-danger" role="alert">{{ dataform.errors.data_software }}</div>
+                                    {% endif %}
+                                    {{ dataform.data_software }} 
+                                </div>
+                                <div class="top-margin"> 
+                                    <label>Evaluation metrics 
+                                        {% if dataform.data_metric.field.required %}
+                                        <span class="text-danger">*</span>
+                                        {% endif %}
+                                    </label>  
+                                    {% if dataform.errors.data_metric %}
+                                        <div class="alert alert-danger" role="alert">{{ dataform.errors.data_metric }}</div>
+                                    {% endif %}
+                                    {{ dataform.data_metric }} 
+                                </div>
                             </div>
                             <div class="col-md-4"> 
                                 <h3 class="thin text-center">File's assigned &ensp;<a href="{% url "file_creation" id=data.id dataset_id=dataset_id %}"><i class="fa fa-plus-circle" aria-hidden="true"></i></a> </h3> 
@@ -64,24 +86,24 @@
                                                                 {% if f.name %}
                                                                     <div class="top-margin"> 
                                                                         <a href='{{ f.file.url }}'>{{ f.name }}</a>                                                                    
-                                                                        &ensp;<a href="{% url "file_remove" id=data.id file_id=f.id dataset_id=dataset_id %}"><i class="fa fa-minus-circle" aria-hidden="true"></i></a> </p>
+                                                                        &ensp;<a id="{{ f.id }}" class="delete-event" value="{% url "file_remove" id=data.id file_id=f.id dataset_id=dataset_id %}" href=""><i class="fa fa-minus-circle" aria-hidden="true"></i></a> </p>
                                                                     </div>
                                                                 {% else %}
                                                                     <div class="top-margin"> 
                                                                         <p><a href='{{ f.file.url }}'>{{ f.filename }}</a>                                                               
-                                                                        &ensp;<a href="{% url "file_remove" id=data.id file_id=f.id dataset_id=dataset_id %}"><i class="fa fa-minus-circle" aria-hidden="true"></i></a> </p>
+                                                                        &ensp;<a id="{{ f.id }}" class="delete-event" value="{% url "file_remove" id=data.id file_id=f.id dataset_id=dataset_id %}" href=""><i class="fa fa-minus-circle" aria-hidden="true"></i></a> </p>
                                                                     </div>
                                                                 {% endif %}
                                                             {% else %}
                                                                 {% if f.name %}
                                                                     <div class="top-margin"> 
                                                                         <a href='{{ f.url }}'>{{ f.name }}</a>                                                                    
-                                                                        &ensp;<a href="{% url "file_remove" id=data.id file_id=f.id dataset_id=dataset_id %}"><i class="fa fa-minus-circle" aria-hidden="true"></i></a> </p>
+                                                                        &ensp;<a id="{{ f.id }}" class="delete-event" value="{% url "file_remove" id=data.id file_id=f.id dataset_id=dataset_id %}" href=""><i class="fa fa-minus-circle" aria-hidden="true"></i></a> </p>
                                                                     </div>
                                                                 {% else %}
                                                                     <div class="top-margin"> 
                                                                         <p><a href='{{ f.url }}'>{{ f.url }}</a>                                                               
-                                                                        &ensp;<a href="{% url "file_remove" id=data.id file_id=f.id dataset_id=dataset_id %}"><i class="fa fa-minus-circle" aria-hidden="true"></i></a> </p>
+                                                                        &ensp;<a id="{{ f.id }}" class="delete-event" value="{% url "file_remove" id=data.id file_id=f.id dataset_id=dataset_id %}" href=""><i class="fa fa-minus-circle" aria-hidden="true"></i></a> </p>
                                                                     </div>
                                                                 {% endif %}
                                                             {% endif %}

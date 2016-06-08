@@ -1,11 +1,11 @@
 from django.shortcuts import render, get_object_or_404, redirect, render_to_response
 from django.http import HttpResponse
-from .forms import ProfileForm, AffiliationForm, SelectRoleForm, UserEditForm, UserRegisterForm, EditProfileForm, EditExtraForm, DatasetCreationForm, DataCreationForm, EventCreationForm, EditEventForm, RoleCreationForm, NewsCreationForm, FileCreationForm, NewsEditForm, SelectDatasetForm, MemberCreationForm, MemberSelectForm, PartnerCreationForm, PartnerSelectForm, ScheduleCreationForm, ScheduleEditForm, DatasetEditForm, DataEditForm, TrackCreationForm, GalleryImageForm, TrackEditForm
+from .forms import ProfileForm, AffiliationForm, SelectRoleForm, UserEditForm, UserRegisterForm, EditProfileForm, EditExtraForm, DatasetCreationForm, DataCreationForm, EventCreationForm, EditEventForm, RoleCreationForm, NewsCreationForm, FileCreationForm, NewsEditForm, SelectDatasetForm, MemberCreationForm, MemberSelectForm, PartnerCreationForm, PartnerSelectForm, ScheduleCreationForm, ScheduleEditForm, DatasetEditForm, DataEditForm, TrackCreationForm, GalleryImageForm, TrackEditForm, RelationCreationForm, RelationEditForm
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_protect
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
-from .models import Profile, Profile_Event, Affiliation, Event, Dataset, Data, Partner, Event, Special_Issue, Workshop, Challenge, Role, News, File, Contact, Event_Partner, Schedule_Event, Track, Gallery_Image
+from .models import Profile, Profile_Event, Affiliation, Event, Dataset, Data, Partner, Event, Special_Issue, Workshop, Challenge, Role, News, File, Contact, Event_Partner, Schedule_Event, Track, Gallery_Image, Event_Relation
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.template import RequestContext
 from django.core.urlresolvers import reverse
@@ -202,21 +202,15 @@ def dataset_list(request):
 @user_passes_test(lambda u:u.is_staff, login_url='/')
 def dataset_creation(request):
 	datasetform = DatasetCreationForm()
-	dataform = DataCreationForm()
 	if request.method == 'POST':
 		datasetform = DatasetCreationForm(request.POST)
-		dataform = DataCreationForm(request.POST)
-		if datasetform.is_valid() and dataform.is_valid():
+		if datasetform.is_valid():
 			dataset_title = datasetform.cleaned_data['dataset_title']
 			desc = datasetform.cleaned_data['description']
-			data_title = dataform.cleaned_data['data_title']
-			data_desc = dataform.cleaned_data['data_desc']
 			new_dataset = Dataset.objects.create(title=dataset_title, description=desc)
-			new_data = Data.objects.create(title=data_title, description=data_desc, dataset=new_dataset)
-			return HttpResponseRedirect(reverse('dataset_edit', kwargs={'id':new_dataset.id}))
+			return HttpResponseRedirect(reverse('data_creation', kwargs={'id':new_dataset.id}))
 	context = {
 		"datasetform": datasetform,
-		"dataform": dataform,
 	}
 	return render(request, "dataset/creation.html", context, context_instance=RequestContext(request))
 
@@ -226,6 +220,8 @@ def dataset_edit(request, id=None):
 	dataset = Dataset.objects.filter(id=id)[0]
 	datas = Data.objects.all().filter(dataset=dataset)
 	datasetform = DatasetEditForm(dataset=dataset)
+	schedule = Schedule_Event.objects.filter(dataset_schedule=dataset).order_by('date')
+	relations = Event_Relation.objects.filter(dataset_associated=id)
 	if request.method == 'POST':
 		datasetform = DatasetEditForm(request.POST, dataset=dataset)
 		if datasetform.is_valid():
@@ -239,10 +235,12 @@ def dataset_edit(request, id=None):
 		"datasetform": datasetform,
 		"dataset": dataset,
 		"datas": datas,
+		"schedule": schedule,
+		"relations": relations,
 	}
 	return render(request, "dataset/edit.html", context, context_instance=RequestContext(request))
 
-def dataset_info(request, id=None):
+def dataset_desc(request, id=None):
 	dataset = Dataset.objects.filter(id=id)[0]
 	datas = Data.objects.all().filter(dataset=dataset)
 	news = News.objects.filter(event_id=id)
@@ -251,25 +249,42 @@ def dataset_info(request, id=None):
 		"news": news, 		
 		"datas": datas,
 	}
-	return render(request, "dataset/info.html", context, context_instance=RequestContext(request))
+	return render(request, "dataset/desc.html", context, context_instance=RequestContext(request))
 
-def dataset_source(request, id=None):
+def dataset_schedule(request, id=None):
 	dataset = Dataset.objects.filter(id=id)[0]
 	datas = Data.objects.all().filter(dataset=dataset)
+	schedule = Schedule_Event.objects.filter(dataset_schedule=dataset).order_by('date')
 	news = News.objects.filter(event_id=id)
 	context = {
 		"dataset": dataset,
 		"news": news, 
 		"datas": datas,
+		"schedule": schedule
 	}
-	return render(request, "dataset/source.html", context, context_instance=RequestContext(request))
+	return render(request, "dataset/schedule.html", context, context_instance=RequestContext(request))
+
+def dataset_associated_events(request, dataset_id=None):
+	dataset = Dataset.objects.filter(id=dataset_id)[0]
+	datas = Data.objects.all().filter(dataset=dataset)
+	schedule = Schedule_Event.objects.filter(dataset_schedule=dataset).order_by('date')
+	relations = Event_Relation.objects.filter(dataset_associated__id=dataset_id)
+	news = News.objects.filter(event_id=dataset_id)
+	context = {
+		"dataset": dataset,
+		"news": news, 
+		"datas": datas,
+		"schedule": schedule,
+		"relations": relations,
+	}
+	return render(request, "dataset/relations.html", context, context_instance=RequestContext(request))
 
 @login_required(login_url='auth_login')
 @user_passes_test(lambda u:u.is_staff, login_url='/')
 def dataset_remove(request, id=None):
 	dataset = Dataset.objects.filter(id=id)[0]
 	dataset.delete()
-	return HttpResponseRedirect(reverse('dataset_list'))
+	return HttpResponse(reverse('dataset_list'))
 
 # def dataset_select(request, id=None):
 # 	challenge = Challenge.objects.filter(id=id)[0]
@@ -307,14 +322,17 @@ def data_creation(request, id=None):
 			new_dataset = Dataset.objects.filter(id=id)[0]
 			title = dataform.cleaned_data['data_title']
 			desc = dataform.cleaned_data['data_desc']
-			new_data = Data.objects.create(title=title, description=desc, dataset=new_dataset)
-			file_name = fileform.cleaned_data['name']
-			if fileform.cleaned_data['file']:
-				file = fileform.cleaned_data['file']
-				File.objects.create(name=file_name, file=file, data=new_data)				
-			else:
-				url = fileform.cleaned_data['url']
-				File.objects.create(name=file_name, url=url, data=new_data)
+			metric = dataform.cleaned_data['data_metric']
+			software = dataform.cleaned_data['data_software']
+			desc = dataform.cleaned_data['data_desc']
+			new_data = Data.objects.create(title=title, description=desc, dataset=new_dataset, metric=metric, software=software)
+			# file_name = fileform.cleaned_data['name']
+			# if fileform.cleaned_data['file']:
+			# 	file = fileform.cleaned_data['file']
+			# 	File.objects.create(name=file_name, file=file, data=new_data)				
+			# else:
+			# 	url = fileform.cleaned_data['url']
+			# 	File.objects.create(name=file_name, url=url, data=new_data)
 			return HttpResponseRedirect(reverse('dataset_edit', kwargs={'id':id}))
 	context = {
 		"dataform": dataform,
@@ -328,7 +346,7 @@ def data_creation(request, id=None):
 def data_remove(request, id=None, dataset_id=None):
 	data = Data.objects.filter(id=id)[0]
 	data.delete()
-	return HttpResponseRedirect(reverse('dataset_edit', kwargs={'id':dataset_id}))
+	return HttpResponse(reverse('dataset_edit', kwargs={'id':dataset_id}))
 
 @login_required(login_url='auth_login')
 @user_passes_test(lambda u:u.is_staff, login_url='/')
@@ -341,8 +359,12 @@ def data_edit(request, id=None, dataset_id=None):
 		if dataform.is_valid():
 			data_title = dataform.cleaned_data['data_title']
 			data_desc = dataform.cleaned_data['data_desc']
+			software = dataform.cleaned_data['data_software']
+			metric = dataform.cleaned_data['data_metric']
 			data.title = data_title
 			data.description = data_desc
+			data.software = software
+			data.metric = metric
 			data.save()
 			return HttpResponseRedirect(reverse('dataset_edit', kwargs={'id':id}))
 	context = {
@@ -392,11 +414,43 @@ def file_creation(request, id=None, dataset_id=None):
 def file_remove(request, id=None, file_id=None, dataset_id=None):
 	new_file = File.objects.filter(id=file_id)[0]
 	new_file.delete()
-	return HttpResponseRedirect(reverse('data_edit', kwargs={'id':id, 'dataset_id': dataset_id}))
+	return HttpResponse(reverse('data_edit', kwargs={'id':id, 'dataset_id': dataset_id}))
 
-def data_info(request, id=None, dataset_id=None):
+def data_desc(request, id=None, dataset_id=None):
 	dataset = Dataset.objects.filter(id=dataset_id)[0]
-	datas = Data.objects.all().filter(dataset=dataset)
+	data = Data.objects.filter(id=id)[0]
+	news = News.objects.filter(event_id=dataset_id)
+	context = {
+		"data": data,
+		"dataset": dataset,
+		"news": news,
+	}
+	return render(request, "data/desc.html", context, context_instance=RequestContext(request))
+
+def data_software(request, id=None, dataset_id=None):
+	dataset = Dataset.objects.filter(id=dataset_id)[0]
+	data = Data.objects.filter(id=id)[0]
+	news = News.objects.filter(event_id=dataset_id)
+	context = {
+		"data": data,
+		"dataset": dataset,
+		"news": news,
+	}
+	return render(request, "data/software.html", context, context_instance=RequestContext(request))
+
+def data_metric(request, id=None, dataset_id=None):
+	dataset = Dataset.objects.filter(id=dataset_id)[0]
+	data = Data.objects.filter(id=id)[0]
+	news = News.objects.filter(event_id=dataset_id)
+	context = {
+		"data": data,
+		"dataset": dataset,
+		"news": news,
+	}
+	return render(request, "data/metrics.html", context, context_instance=RequestContext(request))
+
+def data_files(request, id=None, dataset_id=None):
+	dataset = Dataset.objects.filter(id=dataset_id)[0]
 	data = Data.objects.filter(id=id)[0]
 	files = File.objects.filter(data=data)
 	news = News.objects.filter(event_id=dataset_id)
@@ -404,10 +458,20 @@ def data_info(request, id=None, dataset_id=None):
 		"data": data,
 		"dataset": dataset,
 		"news": news,
-		"datas": datas,
 		"files": files,
 	}
-	return render(request, "data/info.html", context, context_instance=RequestContext(request))
+	return render(request, "data/files.html", context, context_instance=RequestContext(request))
+
+def data_results(request, id=None, dataset_id=None):
+	dataset = Dataset.objects.filter(id=dataset_id)[0]
+	data = Data.objects.filter(id=id)[0]
+	news = News.objects.filter(event_id=dataset_id)
+	context = {
+		"data": data,
+		"dataset": dataset,
+		"news": news,
+	}
+	return render(request, "data/results.html", context, context_instance=RequestContext(request))
 
 def partner_list(request):
 	partners = Partner.objects.all()
@@ -512,7 +576,25 @@ def event_creation(request):
 def event_remove(request, id=None):
 	event = Event.objects.filter(id=id)[0]
 	event.delete()
-	return HttpResponseRedirect(reverse('event_list'))
+	if request.method == 'POST':
+		return HttpResponse((reverse('event_list')))
+		# return HttpResponse(reverse('event_list'))
+
+@login_required(login_url='auth_login')
+@user_passes_test(lambda u:u.is_staff, login_url='/')
+def event_relation_remove(request, id=None, relation_id=None, dataset_id=None):
+	relation = Event_Relation.objects.filter(id=relation_id)[0]
+	relation.delete()
+	if Challenge.objects.filter(id=id).count() > 0:
+		return HttpResponse(reverse('challenge_edit', kwargs={'id':id}))
+	elif Workshop.objects.filter(id=id).count() > 0:
+		return HttpResponse(reverse('workshop_edit', kwargs={'id':id}))
+	elif Special_Issue.objects.filter(id=id).count() > 0:
+		return HttpResponse(reverse('special_issue_edit', kwargs={'id':id}))
+	elif Dataset.objects.filter(id=dataset_id).count() > 0:
+		return HttpResponse(reverse('dataset_edit', kwargs={'id':dataset_id}))
+	else:
+		return HttpResponse(reverse('home'))
 
 @login_required(login_url='auth_login')
 @user_passes_test(lambda u:u.is_staff, login_url='/')
@@ -520,13 +602,13 @@ def event_member_remove(request, id=None, member_id=None):
 	profile = Profile_Event.objects.filter(id=member_id)[0]
 	profile.delete()
 	if Challenge.objects.filter(id=id).count() > 0:
-		return HttpResponseRedirect(reverse('challenge_edit', kwargs={'id':id}))
+		return HttpResponse(reverse('challenge_edit', kwargs={'id':id}))
 	elif Workshop.objects.filter(id=id).count() > 0:
-		return HttpResponseRedirect(reverse('workshop_edit', kwargs={'id':id}))
+		return HttpResponse(reverse('workshop_edit', kwargs={'id':id}))
 	elif Special_Issue.objects.filter(id=id).count() > 0:
-		return HttpResponseRedirect(reverse('special_issue_edit', kwargs={'id':id}))
+		return HttpResponse(reverse('special_issue_edit', kwargs={'id':id}))
 	else:
-		return HttpResponseRedirect(reverse('home'))
+		return HttpResponse(reverse('home'))
 
 @login_required(login_url='auth_login')
 @user_passes_test(lambda u:u.is_staff, login_url='/')
@@ -534,13 +616,19 @@ def event_news_remove(request, id=None, news_id=None):
 	news = News.objects.filter(id=news_id)[0]
 	news.delete()
 	if Challenge.objects.filter(id=id).count() > 0:
-		return HttpResponseRedirect(reverse('challenge_edit', kwargs={'id':id}))
+		return HttpResponse(reverse('challenge_edit', kwargs={'id':id}))
 	elif Workshop.objects.filter(id=id).count() > 0:
-		return HttpResponseRedirect(reverse('workshop_edit', kwargs={'id':id}))
+		return HttpResponse(reverse('workshop_edit', kwargs={'id':id}))
 	elif Special_Issue.objects.filter(id=id).count() > 0:
-		return HttpResponseRedirect(reverse('special_issue_edit', kwargs={'id':id}))
+		return HttpResponse(reverse('special_issue_edit', kwargs={'id':id}))
 	else:
-		return HttpResponseRedirect(reverse('home'))
+		return HttpResponse(reverse('home'))
+@login_required(login_url='auth_login')
+@user_passes_test(lambda u:u.is_staff, login_url='/')
+def dataset_schedule_remove(request, dataset_id=None, schedule_id=None):
+	program = Schedule_Event.objects.filter(id=schedule_id)[0]
+	program.delete()
+	return HttpResponse(reverse('dataset_edit', kwargs={'id':dataset_id}))
 
 @login_required(login_url='auth_login')
 @user_passes_test(lambda u:u.is_staff, login_url='/')
@@ -548,13 +636,13 @@ def event_program_remove(request, id=None, program_id=None):
 	program = Schedule_Event.objects.filter(id=program_id)[0]
 	program.delete()
 	if Challenge.objects.filter(id=id).count() > 0:
-		return HttpResponseRedirect(reverse('challenge_edit', kwargs={'id':id}))
+		return HttpResponse(reverse('challenge_edit', kwargs={'id':id}))
 	elif Workshop.objects.filter(id=id).count() > 0:
-		return HttpResponseRedirect(reverse('workshop_edit', kwargs={'id':id}))
+		return HttpResponse(reverse('workshop_edit', kwargs={'id':id}))
 	elif Special_Issue.objects.filter(id=id).count() > 0:
-		return HttpResponseRedirect(reverse('special_issue_edit', kwargs={'id':id}))
+		return HttpResponse(reverse('special_issue_edit', kwargs={'id':id}))
 	else:
-		return HttpResponseRedirect(reverse('home'))
+		return HttpResponse(reverse('home'))
 
 @login_required(login_url='auth_login')
 @user_passes_test(lambda u:u.is_staff, login_url='/')
@@ -562,13 +650,13 @@ def event_partner_remove(request, id=None, partner_id=None):
 	partner = Event_Partner.objects.filter(id=partner_id)[0]
 	partner.delete()
 	if Challenge.objects.filter(id=id).count() > 0:
-		return HttpResponseRedirect(reverse('challenge_edit', kwargs={'id':id}))
+		return HttpResponse(reverse('challenge_edit', kwargs={'id':id}))
 	elif Workshop.objects.filter(id=id).count() > 0:
-		return HttpResponseRedirect(reverse('workshop_edit', kwargs={'id':id}))
+		return HttpResponse(reverse('workshop_edit', kwargs={'id':id}))
 	elif Special_Issue.objects.filter(id=id).count() > 0:
-		return HttpResponseRedirect(reverse('special_issue_edit', kwargs={'id':id}))
+		return HttpResponse(reverse('special_issue_edit', kwargs={'id':id}))
 	else:
-		return HttpResponseRedirect(reverse('home'))
+		return HttpResponse(reverse('home'))
 
 @login_required(login_url='auth_login')
 def event_proposal(request):
@@ -595,7 +683,8 @@ def challenge_edit(request, id=None):
 	news = News.objects.filter(event_id=id)
 	tracks = Track.objects.filter(challenge=challenge)
 	partners = Event_Partner.objects.filter(event_id=id)
-	program = Schedule_Event.objects.filter(event=challenge,schedule_event_parent=None).order_by('date')
+	schedule = Schedule_Event.objects.filter(event_schedule=challenge,schedule_event_parent=None).order_by('date')
+	relations = Event_Relation.objects.filter(event_associated__id=id)
 	if request.method == 'POST':
 		eventform = EditEventForm(request.POST, event=event)
 		if eventform.is_valid():
@@ -612,11 +701,12 @@ def challenge_edit(request, id=None):
 		"news": news,
 		"tracks": tracks,
 		"partners": partners,
-		"program": program,
+		"schedule": schedule,
+		"relations": relations,
 	}
 	return render(request, "challenge/edit.html", context, context_instance=RequestContext(request))
 
-def challenge_info(request, id=None):
+def challenge_desc(request, id=None):
 	challenge = Challenge.objects.filter(id=id)[0]
 	tracks = Track.objects.filter(challenge__id=id)
 	news = News.objects.filter(event_id=id).order_by('-upload_date')
@@ -625,18 +715,184 @@ def challenge_info(request, id=None):
 		"news": news,
 		"tracks": tracks,
 	}
-	return render(request, "challenge/info.html", context, context_instance=RequestContext(request))
+	return render(request, "challenge/desc.html", context, context_instance=RequestContext(request))
 
-def track_info(request, id=None,track_id=None):
+def challenge_associated_events(request, id=None):
 	challenge = Challenge.objects.filter(id=id)[0]
+	tracks = Track.objects.filter(challenge__id=id)
+	news = News.objects.filter(event_id=id).order_by('-upload_date')
+	relations = Event_Relation.objects.filter(event_associated=challenge)
+	context = {
+		"challenge": challenge,
+		"news": news,
+		"tracks": tracks,
+		"relations": relations,
+	}
+	return render(request, "challenge/relations.html", context, context_instance=RequestContext(request))
+
+@login_required(login_url='auth_login')
+@user_passes_test(lambda u:u.is_staff, login_url='/')
+def event_relation_creation(request, id=None, dataset_id=None):
+	if id==None:
+		events = Event.objects.all()
+	else:
+		events = Event.objects.exclude(id__in = [id])
+	datasets = Dataset.objects.exclude(id__in = [dataset_id])
+	choices = []
+	for x in events:
+		choices.append((x.id, x.title)) 
+	for d in datasets:
+		choices.append((d.id, d.title)) 
+	relationform = RelationCreationForm(choices)
+	if request.method == 'POST':
+		relationform = RelationCreationForm(choices,request.POST)
+		if relationform.is_valid():
+			desc = relationform.cleaned_data['description']
+			event_id = relationform.cleaned_data['event']
+			if dataset_id == None:
+				event_associated = Event.objects.filter(id=id)[0]	
+				if Challenge.objects.filter(id=event_id).count() > 0:
+					relation = Challenge.objects.filter(id=event_id)[0]
+					Event_Relation.objects.create(event_associated=event_associated,challenge_relation=relation,description=desc)
+				elif Workshop.objects.filter(id=event_id).count() > 0:
+					relation = Workshop.objects.filter(id=event_id)[0]
+					Event_Relation.objects.create(event_associated=event_associated,workshop_relation=relation,description=desc)
+				elif Special_Issue.objects.filter(id=event_id).count() > 0:
+					relation = Special_Issue.objects.filter(id=event_id)[0]
+					Event_Relation.objects.create(event_associated=event_associated,issue_relation=relation,description=desc)
+				elif Dataset.objects.filter(id=event_id).count() > 0:
+					relation = Dataset.objects.filter(id=event_id)[0]
+					Event_Relation.objects.create(event_associated=event_associated,dataset_relation=relation,description=desc)
+			else:
+				dataset_associated = Dataset.objects.filter(id=dataset_id)[0]
+				if Challenge.objects.filter(id=event_id).count() > 0:
+					relation = Challenge.objects.filter(id=event_id)[0]
+					Event_Relation.objects.create(dataset_associated=dataset_associated,challenge_relation=relation,description=desc)
+				elif Workshop.objects.filter(id=event_id).count() > 0:
+					relation = Workshop.objects.filter(id=event_id)[0]
+					Event_Relation.objects.create(dataset_associated=dataset_associated,workshop_relation=relation,description=desc)
+				elif Special_Issue.objects.filter(id=event_id).count() > 0:
+					relation = Special_Issue.objects.filter(id=event_id)[0]
+					Event_Relation.objects.create(dataset_associated=dataset_associated,issue_relation=relation,description=desc)
+				elif Dataset.objects.filter(id=event_id).count() > 0:
+					relation = Dataset.objects.filter(id=event_id)[0]
+					Event_Relation.objects.create(dataset_associated=dataset_associated,dataset_relation=relation,description=desc)
+
+			if Challenge.objects.filter(id=id).count() > 0:
+				return HttpResponseRedirect(reverse('challenge_edit', kwargs={'id':id}))
+			elif Workshop.objects.filter(id=id).count() > 0:
+				return HttpResponseRedirect(reverse('workshop_edit', kwargs={'id':id}))
+			elif Special_Issue.objects.filter(id=id).count() > 0:
+				return HttpResponseRedirect(reverse('special_issue_edit', kwargs={'id':id}))
+			elif Dataset.objects.filter(id=dataset_id).count() > 0:
+				return HttpResponseRedirect(reverse('dataset_edit', kwargs={'id':dataset_id}))
+			else:
+				return HttpResponseRedirect(reverse('home'))
+
+	context = {
+		"relationform": relationform,
+	}
+	return render(request, "relations/creation.html", context, context_instance=RequestContext(request))
+
+@login_required(login_url='auth_login')
+@user_passes_test(lambda u:u.is_staff, login_url='/')
+def event_relation_edit(request, id=None, relation_id=None):
+	relation = Event_Relation.objects.filter(id=relation_id)[0]
+	events = Event.objects.exclude(id__in = [id])
+	datasets = Dataset.objects.exclude(id__in = [id])
+	choices = []
+	for x in events:
+		choices.append((x.id, x.title)) 
+	for d in datasets:
+		choices.append((d.id, d.title)) 
+	relationform = RelationEditForm(choices, relation=relation)
+	if request.method == 'POST':
+		relationform = RelationEditForm(choices, request.POST, relation=relation)
+		if relationform.is_valid():
+			event_associated = Event.objects.filter(id=id)[0]
+			desc = relationform.cleaned_data['description']
+			event_id = relationform.cleaned_data['event']
+			relation.description = desc  
+			if Challenge.objects.filter(id=event_id).count() > 0:
+				relation = Challenge.objects.filter(id=event_id)[0]
+				relation.challenge_relation=relation
+			elif Workshop.objects.filter(id=event_id).count() > 0:
+				relation = Workshop.objects.filter(id=event_id)[0]
+				relation.workshop_relation=relation
+			elif Special_Issue.objects.filter(id=event_id).count() > 0:
+				relation = Special_Issue.objects.filter(id=event_id)[0]
+				relation.issue_relation=relation
+			elif Dataset.objects.filter(id=event_id).count() > 0:
+				relation = Dataset.objects.filter(id=event_id)[0]
+				relation.dataset_relation=relation
+			relation.save()
+			# relation = None
+			# if Challenge.objects.filter(id=event_id).count() > 0:
+			# 	relation = Challenge.objects.filter(id=event_id)[0]
+			# 	Event_Relation.objects.create(event=event_associated,challenge_relation=relation,description=desc)
+			# elif Workshop.objects.filter(id=event_id).count() > 0:
+			# 	relation = Workshop.objects.filter(id=event_id)[0]
+			# 	Event_Relation.objects.create(event=event_associated,workshop_relation=relation,description=desc)
+			# elif Special_Issue.objects.filter(id=event_id).count() > 0:
+			# 	relation = Special_Issue.objects.filter(id=event_id)[0]
+			# 	Event_Relation.objects.create(event=event_associated,issue_relation=relation,description=desc)
+			# elif Dataset.objects.filter(id=event_id).count() > 0:
+			# 	relation = Dataset.objects.filter(id=event_id)[0]
+			# 	Event_Relation.objects.create(event=event_associated,dataset_relation=relation,description=desc)
+
+			# if Challenge.objects.filter(id=id).count() > 0:
+			# 	return HttpResponseRedirect(reverse('challenge_edit', kwargs={'id':id}))
+			# elif Workshop.objects.filter(id=id).count() > 0:
+			# 	return HttpResponseRedirect(reverse('workshop_edit', kwargs={'id':id}))
+			# elif Special_Issue.objects.filter(id=id).count() > 0:
+			# 	return HttpResponseRedirect(reverse('special_issue_edit', kwargs={'id':id}))
+			# elif Dataset.objects.filter(id=id).count() > 0:
+			# 	return HttpResponseRedirect(reverse('dataset_edit', kwargs={'id':id}))
+			# else:
+			# 	return HttpResponseRedirect(reverse('home'))
+	context = {
+		"relationform": relationform,
+	}
+	return render(request, "relations/creation.html", context, context_instance=RequestContext(request))
+
+def track_desc(request, id=None,track_id=None):
+	challenge = Challenge.objects.filter(id=id)[0]
+	# tracks = Track.objects.filter(challenge__id=id)
 	news = News.objects.filter(event_id=id).order_by('-upload_date')
 	track = Track.objects.filter(id=track_id)[0]
 	context = {
 		"challenge": challenge,
 		"news": news,
 		"track": track,
+		# "tracks": tracks,
 	}
-	return render(request, "track/info.html", context, context_instance=RequestContext(request))
+	return render(request, "track/desc.html", context, context_instance=RequestContext(request))
+
+def track_metrics(request, id=None,track_id=None):
+	challenge = Challenge.objects.filter(id=id)[0]
+	# tracks = Track.objects.filter(challenge__id=id)
+	news = News.objects.filter(event_id=id).order_by('-upload_date')
+	track = Track.objects.filter(id=track_id)[0]
+	context = {
+		"challenge": challenge,
+		"news": news,
+		"track": track,
+		# "tracks": tracks,
+	}
+	return render(request, "track/metrics.html", context, context_instance=RequestContext(request))
+
+def track_baseline(request, id=None,track_id=None):
+	challenge = Challenge.objects.filter(id=id)[0]
+	# tracks = Track.objects.filter(challenge__id=id)
+	news = News.objects.filter(event_id=id).order_by('-upload_date')
+	track = Track.objects.filter(id=track_id)[0]
+	context = {
+		"challenge": challenge,
+		"news": news,
+		"track": track,
+		# "tracks": tracks,
+	}
+	return render(request, "track/baseline.html", context, context_instance=RequestContext(request))
 
 @login_required(login_url='auth_login')
 @user_passes_test(lambda u:u.is_staff, login_url='/')
@@ -652,9 +908,11 @@ def track_creation(request, id=None):
 		if trackform.is_valid():
 			title = trackform.cleaned_data['title']
 			desc = trackform.cleaned_data['description']
+			metrics = trackform.cleaned_data['metrics']
+			baseline = trackform.cleaned_data['baseline']
 			dataset_id = trackform.cleaned_data['dataset_select']
 			dataset = Dataset.objects.filter(id=dataset_id)[0]
-			Track.objects.create(title=title, description=desc, dataset=dataset, challenge=challenge)
+			Track.objects.create(title=title, description=desc, metrics=metrics, baseline=baseline, dataset=dataset, challenge=challenge)
 			return HttpResponseRedirect(reverse('challenge_edit', kwargs={'id':id}))
 	context = {
 		"trackform": trackform,
@@ -676,9 +934,13 @@ def track_edit(request, id=None, track_id=None):
 		if trackform.is_valid():
 			title = trackform.cleaned_data['title']
 			desc = trackform.cleaned_data['description']
+			metrics = trackform.cleaned_data['metrics']
+			baseline = trackform.cleaned_data['baseline']
 			dataset_id = trackform.cleaned_data['dataset_select']
 			track.title = title
 			track.description = desc 
+			track.metrics = metrics
+			track.baseline = baseline
 			track.dataset = Dataset.objects.filter(id=dataset_id)[0]
 			track.save()
 			return HttpResponseRedirect(reverse('challenge_edit', kwargs={'id':id}))
@@ -692,7 +954,7 @@ def track_edit(request, id=None, track_id=None):
 def track_remove(request, id=None, track_id=None):
 	track = Track.objects.filter(id=track_id)[0]
 	track.delete()
-	return HttpResponseRedirect(reverse('challenge_edit', kwargs={'id':id}))
+	return HttpResponse(reverse('challenge_edit', kwargs={'id':id}))
 
 def challenge_members(request, id=None):
 	challenge = Challenge.objects.filter(id=id)[0]
@@ -720,22 +982,22 @@ def challenge_sponsors(request, id=None):
 	}
 	return render(request, "challenge/sponsors.html", context, context_instance=RequestContext(request))
 
-def challenge_program(request, id=None):
+def challenge_schedule(request, id=None):
 	challenge = Challenge.objects.filter(id=id)[0]
 	tracks = Track.objects.filter(challenge__id=id)
 	news = News.objects.filter(event_id=id).order_by('-upload_date')
-	program = []
-	events = Schedule_Event.objects.filter(event=challenge,schedule_event_parent=None).order_by('date')
-	for e in events:
-		sub_events = Schedule_Event.objects.filter(schedule_event_parent=e)
-		program.append([e,sub_events])
+	# program = []
+	schedule = Schedule_Event.objects.filter(event_schedule=challenge,schedule_event_parent=None).order_by('date')
+	# for e in events:
+	# 	sub_events = Schedule_Event.objects.filter(schedule_event_parent=e)
+	# 	program.append([e,sub_events])
 	context = {
 		"challenge": challenge,
 		"news": news,
-		"program": program,
+		"schedule": schedule,
 		"tracks": tracks,				
 	}
-	return render(request, "challenge/program.html", context, context_instance=RequestContext(request))
+	return render(request, "challenge/schedule.html", context, context_instance=RequestContext(request))
 
 def challenge_result(request, id=None):
 	challenge = Challenge.objects.filter(id=id)[0]
@@ -752,9 +1014,11 @@ def workshop_edit(request, id=None):
 	workshop = Workshop.objects.filter(id=id)[0]
 	speakers = Profile_Event.objects.filter(role__name='speaker')
 	eventform = EditEventForm(event=workshop)
-	program = Schedule_Event.objects.filter(event=workshop,schedule_event_parent=None).order_by('date')
+	program = Schedule_Event.objects.filter(event_program=workshop,schedule_event_parent=None).order_by('date')
 	news = News.objects.filter(event_id=id)
 	images = Gallery_Image.objects.filter(workshop=workshop)
+	schedule = Schedule_Event.objects.filter(event_schedule=workshop,schedule_event_parent=None).order_by('date')
+	relations = Event_Relation.objects.filter(event_associated__id=id)
 	if request.method == 'POST':
 		eventform = EditEventForm(request.POST, event=workshop)
 		if eventform.is_valid():
@@ -771,26 +1035,51 @@ def workshop_edit(request, id=None):
 		"program": program,
 		"news": news,
 		"images": images, 
+		"schedule": schedule,
+		"relations": relations,
 	}
 	return render(request, "workshop/edit.html", context, context_instance=RequestContext(request))
 
-def workshop_info(request, id=None):
+def workshop_desc(request, id=None):
 	workshop = Workshop.objects.filter(id=id)[0]
 	news = News.objects.filter(event_id=id).order_by('-upload_date')
 	context = {
 		"workshop": workshop,
 		"news": news,
 	}
-	return render(request, "workshop/info.html", context, context_instance=RequestContext(request))
+	return render(request, "workshop/desc.html", context, context_instance=RequestContext(request))
+
+def workshop_schedule(request, id=None):
+	workshop = Workshop.objects.filter(id=id)[0]
+	news = News.objects.filter(event_id=id).order_by('-upload_date')
+	schedule = Schedule_Event.objects.filter(event_schedule=workshop,schedule_event_parent=None).order_by('date')
+	context = {
+		"workshop": workshop,
+		"news": news,
+		"schedule": schedule,
+	}
+	return render(request, "workshop/schedule.html", context, context_instance=RequestContext(request))
+
+def workshop_associated_events(request, id=None):
+	workshop = Workshop.objects.filter(id=id)[0]
+	news = News.objects.filter(event_id=id).order_by('-upload_date')
+	relations = Event_Relation.objects.filter(event_associated__id=id)
+	context = {
+		"workshop": workshop,
+		"news": news,
+		"relations": relations,
+	}
+	return render(request, "workshop/relation.html", context, context_instance=RequestContext(request))
 
 def workshop_program(request, id=None):
 	workshop = Workshop.objects.filter(id=id)[0]
 	news = News.objects.filter(event_id=id).order_by('-upload_date')
-	program = []
-	events = Schedule_Event.objects.filter(event=workshop,schedule_event_parent=None).order_by('date')
-	for e in events:
-		sub_events = Schedule_Event.objects.filter(schedule_event_parent=e)
-		program.append([e,sub_events])
+	# program = []
+	# events = Schedule_Event.objects.filter(event_program=workshop,schedule_event_parent=None).order_by('date')
+	# for e in events:
+	# 	sub_events = Schedule_Event.objects.filter(schedule_event_parent=e)
+	# 	program.append([e,sub_events])
+	program = Schedule_Event.objects.filter(event_program=workshop,schedule_event_parent=None).order_by('date')
 	context = {
 		"workshop": workshop,
 		"news": news,
@@ -873,7 +1162,9 @@ def special_issue_edit(request, id=None):
 	issue = Special_Issue.objects.filter(id=id)[0]
 	news = News.objects.filter(event_id=id)
 	members = Profile_Event.objects.filter(event_id=id)
+	schedule = Schedule_Event.objects.filter(event_schedule=issue,schedule_event_parent=None).order_by('date')
 	eventform = EditEventForm(event=issue)
+	relations = Event_Relation.objects.filter(event_associated__id=id) 
 	if request.method == 'POST':
 		eventform = EditEventForm(request.POST, event=issue)
 		if eventform.is_valid():
@@ -888,17 +1179,19 @@ def special_issue_edit(request, id=None):
 		"issue": issue,
 		"news": news,
 		"members": members,
+		"schedule": schedule,
+		"relations": relations,
 	}
 	return render(request, "special_issue/edit.html", context, context_instance=RequestContext(request))
 
-def special_issue_info(request, id=None):
+def special_issue_desc(request, id=None):
 	issue = Special_Issue.objects.filter(id=id)[0]
 	news = News.objects.filter(event_id=id).order_by('-upload_date')
 	context = {
 		"issue": issue,
 		"news": news,
 	}
-	return render(request, "special_issue/info.html", context, context_instance=RequestContext(request))
+	return render(request, "special_issue/desc.html", context, context_instance=RequestContext(request))
 
 def special_issue_members(request, id=None):
 	issue = Special_Issue.objects.filter(id=id)[0]
@@ -911,6 +1204,28 @@ def special_issue_members(request, id=None):
 	}
 	return render(request, "special_issue/members.html", context, context_instance=RequestContext(request))
 
+def special_issue_schedule(request, id=None):
+	issue = Special_Issue.objects.filter(id=id)[0]
+	news = News.objects.filter(event_id=id).order_by('-upload_date')
+	schedule = Schedule_Event.objects.filter(event_schedule=issue,schedule_event_parent=None).order_by('date')
+	context = {
+		"issue": issue,
+		"news": news,
+		"schedule": schedule,
+	}
+	return render(request, "special_issue/schedule.html", context, context_instance=RequestContext(request))
+
+def special_issue_associated_events(request, id=None):
+	issue = Special_Issue.objects.filter(id=id)[0]
+	news = News.objects.filter(event_id=id).order_by('-upload_date')
+	relations = Event_Relation.objects.filter(event_associated__id=id)
+	context = {
+		"issue": issue,
+		"news": news,
+		"relations": relations,
+	}
+	return render(request, "special_issue/relations.html", context, context_instance=RequestContext(request))
+	
 @login_required(login_url='auth_login')
 @user_passes_test(lambda u:u.is_staff, login_url='/')
 def role_creation(request):
@@ -972,6 +1287,39 @@ def news_edit(request, id=None):
 
 @login_required(login_url='auth_login')
 @user_passes_test(lambda u:u.is_staff, login_url='/')
+def schedule_creation(request, dataset_id=None, event_id=None):
+	scheduleform = ScheduleCreationForm()
+	if request.method == 'POST':
+		scheduleform = ScheduleCreationForm(request.POST)
+		if scheduleform.is_valid():
+			title = scheduleform.cleaned_data['title']
+			desc = scheduleform.cleaned_data['description']
+			time = scheduleform.cleaned_data['time']
+			if dataset_id==None:
+				event = Event.objects.filter(id=event_id)[0]
+				new_event = Schedule_Event.objects.create(title=title,description=desc,date=time,event_schedule=event)
+				if Challenge.objects.filter(id=event_id).count() > 0:
+					return HttpResponseRedirect(reverse('challenge_edit', kwargs={'id':event_id}))
+				elif Workshop.objects.filter(id=event_id).count() > 0:
+					return HttpResponseRedirect(reverse('workshop_edit', kwargs={'id':event_id}))
+				elif Special_Issue.objects.filter(id=event_id).count() > 0:
+					return HttpResponseRedirect(reverse('special_issue_edit', kwargs={'id':event_id}))
+				else:
+					return HttpResponseRedirect(reverse('home'))
+			else:
+				dataset = Dataset.objects.filter(id=dataset_id)[0]
+				new_event = Schedule_Event.objects.create(title=title,description=desc,date=time,dataset_schedule=dataset)
+				if Dataset.objects.filter(id=dataset_id).count() > 0:
+					return HttpResponseRedirect(reverse('dataset_edit', kwargs={'id':dataset_id}))
+				else:
+					return HttpResponseRedirect(reverse('home'))
+	context = {
+		"scheduleform": scheduleform,
+	}
+	return render(request, "program/creation.html", context, context_instance=RequestContext(request))
+
+@login_required(login_url='auth_login')
+@user_passes_test(lambda u:u.is_staff, login_url='/')
 def program_creation(request, id=None):
 	event = Event.objects.filter(id=id)[0]
 	scheduleform = ScheduleCreationForm()
@@ -981,11 +1329,12 @@ def program_creation(request, id=None):
 			title = scheduleform.cleaned_data['title']
 			desc = scheduleform.cleaned_data['description']
 			time = scheduleform.cleaned_data['time']
-			new_event = Schedule_Event.objects.create(title=title,description=desc,date=time,event=event)
-			if 'save' in request.POST:
-				return HttpResponseRedirect(reverse('home'))
-			elif 'save_continue' in request.POST:
-				return HttpResponseRedirect(reverse('subevent_creation', kwargs={'event_id':id,'program_id':new_event.id}))
+			new_event = Schedule_Event.objects.create(title=title,description=desc,date=time,event_program=event)
+			return HttpResponseRedirect(reverse('workshop_edit', kwargs={'id':id}))
+			# if 'save' in request.POST:
+			# 	return HttpResponseRedirect(reverse('home'))
+			# elif 'save_continue' in request.POST:
+			# 	return HttpResponseRedirect(reverse('subevent_creation', kwargs={'event_id':id,'program_id':new_event.id}))
 	context = {
 		"scheduleform": scheduleform,
 	}
@@ -993,11 +1342,11 @@ def program_creation(request, id=None):
 
 @login_required(login_url='auth_login')
 @user_passes_test(lambda u:u.is_staff, login_url='/')
-def program_edit(request, id=None, program_id=None):
-	event = Event.objects.filter(id=id)[0]
-	schedule = Schedule_Event.objects.filter(id=program_id)[0]
+def schedule_edit(request, schedule_id=None, dataset_id=None, event_id=None):
+	# event = Event.objects.filter(id=id)[0]
+	schedule = Schedule_Event.objects.filter(id=schedule_id)[0]
 	scheduleform = ScheduleEditForm(schedule=schedule)
-	subevents = Schedule_Event.objects.filter(schedule_event_parent=schedule).order_by('date')
+	# subevents = Schedule_Event.objects.filter(schedule_event_parent=schedule).order_by('date')
 	if request.method == 'POST':
 		scheduleform = ScheduleEditForm(request.POST, schedule=schedule)
 		if scheduleform.is_valid():
@@ -1008,19 +1357,25 @@ def program_edit(request, id=None, program_id=None):
 			schedule.description = desc
 			schedule.date = time
 			schedule.save()
-			if Challenge.objects.filter(id=id).count() > 0:
-				return HttpResponseRedirect(reverse('challenge_edit', kwargs={'id':id}))
-			elif Workshop.objects.filter(id=id).count() > 0:
-				return HttpResponseRedirect(reverse('workshop_edit', kwargs={'id':id}))
-			elif Special_Issue.objects.filter(id=id).count() > 0:
-				return HttpResponseRedirect(reverse('special_issue_edit', kwargs={'id':id}))
+			if dataset_id != None:
+				if Dataset.objects.filter(id=dataset_id).count() > 0:
+					return HttpResponseRedirect(reverse('dataset_edit', kwargs={'id':dataset_id}))
+				else:
+					return HttpResponseRedirect(reverse('home'))
 			else:
-				return HttpResponseRedirect(reverse('home'))
+				if Challenge.objects.filter(id=event_id).count() > 0:
+					return HttpResponseRedirect(reverse('challenge_edit', kwargs={'id':event_id}))
+				elif Workshop.objects.filter(id=event_id).count() > 0:
+					return HttpResponseRedirect(reverse('workshop_edit', kwargs={'id':event_id}))
+				elif Special_Issue.objects.filter(id=event_id).count() > 0:
+					return HttpResponseRedirect(reverse('special_issue_edit', kwargs={'id':event_id}))
+				else:
+					return HttpResponseRedirect(reverse('home'))
 	context = {
 		"scheduleform": scheduleform,
-		"event": event,
-		"program": schedule,
-		"subevents": subevents,
+		# "event": event,
+		"schedule": schedule,
+		# "subevents": subevents,
 	}
 	return render(request, "program/edit.html", context, context_instance=RequestContext(request))
 
@@ -1036,7 +1391,7 @@ def subevent_creation(request, event_id=None, program_id=None):
 			title = scheduleform.cleaned_data['title']
 			desc = scheduleform.cleaned_data['description']
 			time = scheduleform.cleaned_data['time']
-			Schedule_Event.objects.create(title=title,description=desc,date=time,event=event,schedule_event_parent=parent_event)
+			Schedule_Event.objects.create(title=title,description=desc,date=time,event_program=event,schedule_event_parent=parent_event)
 			return HttpResponseRedirect(reverse('program_edit', kwargs={'id':event_id, 'program_id': program_id}))
 	context = {
 		"scheduleform": scheduleform,

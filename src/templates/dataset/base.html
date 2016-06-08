@@ -11,11 +11,18 @@
             </header>   
             <div class="col-md-2" id="leftCol">
                 <ul class="nav nav-stacked" id="sidebar">
-                    <li><a href='{% url 'dataset_info' id=dataset.id %}'>Information</a></li>
-                    <li><a href='{% url 'dataset_source' id=dataset.id %}'>Source code</a></li>
-                    {% for d in datas %}
-                        <li><a href='{% url 'data_info' id=d.id dataset_id=dataset.id %}'>{{ d.title }}</a></li>
-                    {% endfor %}
+                    <li><a href='{% url 'dataset_desc' id=dataset.id %}'>Description</a></li>
+                    <li><a href='{% url 'dataset_schedule' id=dataset.id %}'>Schedule</a></li>
+                    <li><a href='{% url 'dataset_associated_events' dataset_id=dataset.id %}'>Associated events</a></li>
+                    <li><a href="#" data-toggle="collapse" data-target="#drilldown-1">Data <b class="caret"></b></a>
+                        <div style="padding-left:0px;">
+                            <ul id="drilldown-1" class="nav nav-pills nav-stacked collapse">
+                                {% for d in datas %}
+                                    <li><a href='{% url 'data_desc' id=d.id dataset_id=dataset.id %}'>{{ d.title }}</a></li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </li>
                 </ul>
             </div>                  
             {% block content %}

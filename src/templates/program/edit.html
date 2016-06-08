@@ -27,35 +27,31 @@
                         <h3 class="thin text-center">Schedule event</h3> 
                         <hr> 
                         <div class="row">
-                            <div class="col-sm-8">
-                                <div class="row"> 
-                                    <div class="col-sm-6">
-                                        <div class="top-margin"> 
-                                            <label>Title
-                                                {% if scheduleform.title.field.required %}
-                                                <span class="text-danger">*</span>
-                                                {% endif %}
-                                            </label>   
-                                            {% if scheduleform.errors.title %}
-                                                <div class="alert alert-danger" role="alert">{{ scheduleform.errors.title }}</div>
-                                            {% endif %}
-                                            {{ scheduleform.title }}                                      
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-6">
-                                        <div class="top-margin"> 
-                                            <label>Date and time
-                                                {% if scheduleform.time.field.required %}
-                                                <span class="text-danger">*</span>
-                                                {% endif %}
-                                            </label>   
-                                            {% if scheduleform.errors.time %}
-                                                <div class="alert alert-danger" role="alert">{{ scheduleform.errors.time }}</div>
-                                            {% endif %}
-                                            {{ scheduleform.time }}     
-                                        </div>
-                                    </div>
+                            <div class="col-sm-4">
+                                <div class="top-margin"> 
+                                    <label>Title
+                                        {% if scheduleform.title.field.required %}
+                                        <span class="text-danger">*</span>
+                                        {% endif %}
+                                    </label>   
+                                    {% if scheduleform.errors.title %}
+                                        <div class="alert alert-danger" role="alert">{{ scheduleform.errors.title }}</div>
+                                    {% endif %}
+                                    {{ scheduleform.title }}                                      
                                 </div>
+                                <div class="top-margin"> 
+                                    <label>Date and time
+                                        {% if scheduleform.time.field.required %}
+                                        <span class="text-danger">*</span>
+                                        {% endif %}
+                                    </label>   
+                                    {% if scheduleform.errors.time %}
+                                        <div class="alert alert-danger" role="alert">{{ scheduleform.errors.time }}</div>
+                                    {% endif %}
+                                    {{ scheduleform.time }}     
+                                </div>
+                            </div>
+                            <div class="col-sm-8">
                                 <div class="row">
                                     <div class="col-sm-12">
                                         <div class="top-margin"> 
@@ -71,29 +67,6 @@
                                         </div> 
                                     </div>
                                 </div> 
-                            </div>
-                            <div class="col-sm-4"> 
-                                <div class="panel panel-default"> 
-                                    <div class="panel-body"> 
-                                        <h3 class="thin text-center">Sub events &ensp;<a href="{% url "subevent_creation" event_id=event.id program_id=program.id %}"><i class="fa fa-plus-circle" aria-hidden="true"></i></a></h3>
-                                        <hr>
-                                        {% if subevents.count > 0 %}
-                                            <div class="row">
-                                                {% for s in subevents %} 
-                                                    <div class="col-sm-12">
-                                                        <p><a href="{% url "program_edit" id=event.id program_id=s.id %}">{{ s.date|date:"SHORT_DATETIME_FORMAT" }} {{ s.title }}</a>&ensp;<a href="{% url 'event_program_remove' id=event.id program_id=s.id %}"><i class="fa fa-minus-circle fa" aria-hidden="true"></i></a></p>
-                                                    </div>
-                                                {% endfor %}  
-                                            </div>
-                                        {% else %}
-                                            <div class="row">
-                                                <div class="col-sm-12">
-                                                    <p class="text-center"> There are no subevents registered in this schedule event</p>
-                                                </div>
-                                            </div>
-                                        {% endif %}
-                                    </div>
-                                </div>
                             </div>
                         </div>
                         <hr>

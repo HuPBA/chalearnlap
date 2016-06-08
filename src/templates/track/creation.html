@@ -60,6 +60,28 @@
                                     {% endif %}
                                     {{ trackform.description }} 
                                 </div>
+                                <div class="top-margin"> 
+                                    <label>Evaluation metrics
+                                        {% if trackform.metrics.field.required %}
+                                        <span class="text-danger">*</span>
+                                        {% endif %}
+                                    </label>  
+                                    {% if trackform.errors.metrics %}
+                                        <div class="alert alert-danger" role="alert">{{ trackform.errors.metrics }}</div>
+                                    {% endif %}
+                                    {{ trackform.metrics }} 
+                                </div>
+                                <div class="top-margin"> 
+                                    <label>Baseline
+                                        {% if trackform.baseline.field.required %}
+                                        <span class="text-danger">*</span>
+                                        {% endif %}
+                                    </label>  
+                                    {% if trackform.errors.baseline %}
+                                        <div class="alert alert-danger" role="alert">{{ trackform.errors.baseline }}</div>
+                                    {% endif %}
+                                    {{ trackform.baseline }} 
+                                </div>
                             </div>
                         </div>
                         <hr>

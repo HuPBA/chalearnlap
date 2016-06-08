@@ -2,23 +2,21 @@
 {% block container %}
     <ol class="breadcrumb"> 
         <li> <a href="{% url "home" %}">Home</a> </li>
-        <li class="active"> Event detail </li>                 
+        <li class="active"> Dataset detail </li>                 
     </ol>            
     <div class="row"> 
         <article class="col-xs-12 maincontent"> 
             <header class="page-header"> 
-                <h1 class="page-title">{{ workshop.title }}</h1> 
-            </header> 
+                <h1 class="page-title">{{ challenge.title }} - {{ track.title }}</h1> 
+            </header>   
             <div class="col-md-2" id="leftCol">
                 <ul class="nav nav-stacked" id="sidebar">
-                    <li><a href='{% url 'workshop_desc' id=workshop.id %}'>Description</a></li>
-                    <li><a href='{% url 'workshop_schedule' id=workshop.id %}'>Schedule</a></li>
-                    <li><a href='{% url 'workshop_associated_events' id=workshop.id %}'>Associated events</a></li>
-                    <li><a href='{% url 'workshop_speakers' id=workshop.id %}'>Invited speakers</a></li>
-                    <li><a href='{% url 'workshop_program' id=workshop.id %}'>Program</a></li>
-                    <li><a href='{% url 'workshop_gallery' id=workshop.id %}'>Gallery</a></li>
+                    <li><a href='{% url 'track_desc' id=challenge.id track_id=track.id %}'>Description</a></li>
+                    <li><a href='{% url 'dataset_desc' id=track.dataset.id %}'>Dataset associated</a></li>
+                    <li><a href='{% url 'track_metrics' id=challenge.id track_id=track.id %}'>Evaluation metrics</a></li>
+                    <li><a href='{% url 'track_baseline' id=challenge.id track_id=track.id %}'>Baseline</a></li>
                 </ul>
-            </div>
+            </div>                   
             {% block content %}
             {% endblock content %}
             <div class="col-sm-3"> 
@@ -40,7 +38,7 @@
                         {% endif %}
                     </div>
                 </div> 
-            </div>  
+            </div> 
         </article>
     </div>
 {% endblock container %}  

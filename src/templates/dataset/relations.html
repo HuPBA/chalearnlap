@@ -1,0 +1,38 @@
+{% extends "dataset/base.html" %}
+{% block content %}
+    <div class="col-md-7"> 
+        <div class="panel panel-default"> 
+            <div class="panel-body"> 
+                <h3 class="thin text-center">Dataset associated events</h3> 
+                <hr> 
+                {% if relations.count > 0 %}
+                    <div class="row">
+                        {% for r in relations %} 
+                            <div class="top-margin"> 
+                                <div class="col-sm-12">
+                                    {% if r.challenge_relation %} 
+                                        <h4><a href="{{ r.challenge_relation.get_absolute_url }}">{{ r.challenge_relation.title }}</a></h4>
+                                    {% elif r.issue_relation %} 
+                                        <h4><a href="{{ r.issue_relation.get_absolute_url }}">{{ r.issue_relation.title }}</a></h4>
+                                    {% elif r.workshop_relation %}
+                                        <h4><a href="{{ r.workshop_relation.get_absolute_url }}">{{ r.workshop_relation.title }}</a></h4>
+                                    {% elif r.dataset_relation %}
+                                        <h4><a href="{{ r.dataset_relation.get_absolute_url }}">{{ r.dataset_relation.title }}</a></h4>
+                                    {% endif %}
+                                    <p>{{ r.description|safe }}</p>
+                                    <br>
+                                </div>
+                            </div>
+                        {% endfor %}  
+                    </div>
+                {% else %}
+                    <div class="row">
+                        <div class="col-sm-12"> 
+                            <p class="text-center">There are no associated events in {{ challenge.title }}</p>
+                        </div>  
+                    </div>
+                {% endif %}
+            </div>                             
+        </div>                         
+    </div>
+{% endblock content %}  

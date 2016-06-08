@@ -12,7 +12,9 @@
         <link rel="stylesheet" href="{% static "css/bootstrap-theme.css" %}" media="screen"> 
         <link rel="stylesheet" href="{% static "css/main.css" %}">    
         <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.2/css/select2.min.css" rel="stylesheet" />
-        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>       
+        <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
         {% block header %} 
         {% endblock header %}  
     </head>     
@@ -32,7 +34,7 @@
                             {% if challenges.count > 0 %}
                                 <ul class="dropdown-menu"> 
                                     {% for c in challenges %}
-                                        <li><a href='{% url 'challenge_info' id=c.id %}'>{{ c.title }}</a></li>
+                                        <li><a href='{% url 'challenge_desc' id=c.id %}'>{{ c.title }}</a></li>
                                     {% endfor %}                               
                                 </ul>   
                             {% endif %}                           
@@ -42,7 +44,7 @@
                             {% if datasets.count > 0 %}
                                 <ul class="dropdown-menu"> 
                                     {% for d in datasets %}
-                                        <li><a href='{% url 'dataset_info' id=d.id %}'>{{ d.title }}</a></li>
+                                        <li><a href='{% url 'dataset_desc' id=d.id %}'>{{ d.title }}</a></li>
                                     {% endfor %}                                
                                 </ul>        
                             {% endif %}                     
@@ -52,7 +54,7 @@
                             {% if workshops.count > 0 %}
                                 <ul class="dropdown-menu"> 
                                     {% for w in workshops %}
-                                        <li><a href='{% url 'workshop_info' id=w.id %}'>{{ w.title }}</a></li>
+                                        <li><a href='{% url 'workshop_desc' id=w.id %}'>{{ w.title }}</a></li>
                                     {% endfor %}                                 
                                 </ul>  
                             {% endif %}                            
@@ -62,7 +64,7 @@
                             {% if special_issues.count > 0 %}
                                 <ul class="dropdown-menu"> 
                                     {% for s in special_issues %}
-                                        <li><a href='{% url 'special_issue_info' id=s.id %}'>{{ s.title }}</a></li>
+                                        <li><a href='{% url 'special_issue_desc' id=s.id %}'>{{ s.title }}</a></li>
                                     {% endfor %}                              
                                 </ul>   
                             {% endif %}                           
@@ -104,6 +106,7 @@
             </div>             
         </div>                
         <div id="container-height" class="container content"> 
+            <div id="dialog" title="Confirm delete" hidden="true">Are you sure to delete?</div>
             {% block container %} 
             {% endblock container %}
         </div>              

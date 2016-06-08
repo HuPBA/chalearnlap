@@ -11,8 +11,10 @@
             </header> 
             <div class="col-md-2" id="leftCol">
                 <ul class="nav nav-stacked" id="sidebar">
-                    <li><a href='{% url 'special_issue_info' id=issue.id %}'>Information</a></li>
-                    <li><a href='{% url 'special_issue_members' id=issue.id %}'>Members</a></li>
+                    <li><a href='{% url 'special_issue_desc' id=issue.id %}'>Description</a></li>
+                    <li><a href='{% url 'special_issue_members' id=issue.id %}'>People</a></li>
+                    <li><a href='{% url 'special_issue_schedule' id=issue.id %}'>Schedule</a></li>
+                    <li><a href='{% url 'special_issue_associated_events' id=issue.id %}'>Associated events</a></li>
                 </ul>
             </div>
             {% block content %}

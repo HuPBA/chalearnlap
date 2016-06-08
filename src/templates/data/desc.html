@@ -1,0 +1,12 @@
+{% extends "data/base.html" %}
+{% block content %}
+    <div class="col-md-7"> 
+        <div class="panel panel-default"> 
+            <div class="panel-body"> 
+                <h3 class="thin text-center">Data description</h3> 
+                <hr> 
+                {{ data.description|safe }}
+            </div>                             
+        </div>                         
+    </div>
+{% endblock content %}  
