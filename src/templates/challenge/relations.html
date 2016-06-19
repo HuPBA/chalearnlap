@@ -25,6 +25,22 @@
                             </div>
                         {% endfor %}  
                     </div>
+                {% elif associated.count > 0 %}
+                    <div class="row">
+                        {% for a in associated %} 
+                            <div class="top-margin"> 
+                                <div class="col-sm-12">
+                                    {% if a.event_associated %} 
+                                        <h4><a href="{{ a.event_associated.get_absolute_url }}">{{ a.event_associated.title }}</a></h4>
+                                    {% elif a.dataset_associated %} 
+                                        <h4><a href="{{ a.dataset_associated.get_absolute_url }}">{{ a.dataset_associated.title }}</a></h4>
+                                    {% endif %}
+                                    <p>{{ a.description|safe }}</p>
+                                    <br>
+                                </div>
+                            </div>
+                        {% endfor %}  
+                    </div>
                 {% else %}
                     <div class="row">
                         <div class="col-sm-12"> 

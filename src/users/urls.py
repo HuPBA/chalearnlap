@@ -27,7 +27,6 @@ urlpatterns = [
     # Profile urls (Editors, Organizers...)
     url(r'^profile/edit/(?P<id>\d+)/$', views.profile_edit, name="profile_edit"),
     url(r'^profile/creation/$', views.Backend.as_view(form_class = MemberCreationForm,template_name='registration/registration_form_email.html'), name="profile_creation"),
-    url(r'^profile/select/(?P<id>\d+)/$', views.profile_select, name="profile_select"),
     # Dataset urls
     url(r'^dataset/list/$', views.dataset_list, name="dataset_list"),
     url(r'^dataset/creation/$', views.dataset_creation, name="dataset_creation"),
@@ -61,6 +60,7 @@ urlpatterns = [
     url(r'^event/list/$', views.event_list, name="event_list"),
     url(r'^event/creation/$', views.event_creation, name="event_creation"),
     url(r'^event/(?P<id>\d+)/remove/$', views.event_remove, name="event_remove"),
+    url(r'^event/(?P<id>\d+)/member/select/$', views.profile_select, name="profile_select"),
     url(r'^event/(?P<id>\d+)/member/(?P<member_id>\d+)/remove$', views.event_member_remove, name="event_member_remove"),
     url(r'^event/(?P<id>\d+)/news/(?P<news_id>\d+)/remove$', views.event_news_remove, name="event_news_remove"),
     url(r'^event/(?P<id>\d+)/program/(?P<program_id>\d+)/remove$', views.event_program_remove, name="event_program_remove"),
@@ -76,7 +76,7 @@ urlpatterns = [
     url(r'^event/(?P<event_id>\d+)/program/(?P<program_id>\d+)/subevent/creation/$', views.subevent_creation, name="subevent_creation"),
     url(r'^event/(?P<event_id>\d+)/schedule/creation$', views.schedule_creation, name="schedule_creation"),
     # url(r'^event/edit/(?P<id>\d+)/$', views.event_edit, name="event_edit"),
-    url(r'^event/proposal/$', views.event_proposal, name="event_proposal"),
+    # url(r'^event/proposal/$', views.event_proposal, name="event_proposal"),
     url(r'^challenge/(?P<id>\d+)/edit/$', views.challenge_edit, name="challenge_edit"),
     url(r'^challenge/(?P<id>\d+)/description/$', views.challenge_desc, name="challenge_desc"),
     url(r'^challenge/(?P<id>\d+)/people/$', views.challenge_members, name="challenge_members"),
@@ -107,6 +107,9 @@ urlpatterns = [
     url(r'^specialissue/(?P<id>\d+)/associated-events/$', views.special_issue_associated_events, name="special_issue_associated_events"),
     # Role urls
     url(r'^role/creation/$', views.role_creation, name="role_creation"),
+    url(r'^event-proposal/creation/$', views.event_proposal_creation, name="event_proposal_creation"),
+    url(r'^event-proposal/list/$', views.event_proposal_list, name="event_proposal_list"),
+    url(r'^event-proposal/(?P<id>\d+)/detail/$', views.event_proposal_detail, name="event_proposal_detail"),
     # Schedule event urls
     # url(r'^schedule/creation/(?P<id>\d+)/$', views.schedule_creation, name="schedule_creation"),
     # url(r'^schedule/creation/(?P<workshop_id>\d+)/(?P<event_id>\d+)/subevent$', views.subevent_creation, name="subevent_creation"),

@@ -611,3 +611,8 @@ td.text-right {
 {
   margin: 0 auto;
 }
+
+.thumbnail-gallery
+{
+  height: 200px;
+}

@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_protect
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
-from .models import Profile, Profile_Event, Affiliation, Event, Dataset, Data, Partner, Event, Special_Issue, Workshop, Challenge, Role, News, File, Contact, Event_Partner, Schedule_Event, Track, Gallery_Image, Event_Relation
+from .models import Profile, Result, Score, Proposal, Profile_Event, Affiliation, Event, Dataset, Data, Partner, Event, Special_Issue, Workshop, Challenge, Role, News, File, Contact, Event_Partner, Schedule_Event, Track, Gallery_Image, Event_Relation
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.template import RequestContext
 from django.core.urlresolvers import reverse
@@ -19,6 +19,8 @@ from registration import signals
 from django.views.decorators.http import require_POST
 from jfu.http import upload_receive, UploadResponse, JFUResponse
 from django.conf import settings
+import csv
+from decimal import Decimal
 
 @require_POST
 def file_upload(request):
@@ -63,7 +65,7 @@ def handler404(request):
 	return response
 
 @login_required(login_url='auth_login')
-@user_passes_test(lambda u:u.is_staff, login_url='/')
+@user_passes_test(lambda u:u.is_superuser, login_url='/')
 def user_list(request):
 	users = User.objects.all().filter(is_staff=False)
 	admins = User.objects.all().filter(is_staff=True)
@@ -93,7 +95,8 @@ def user_edit(request, id=None):
 			if 'last_name' in form.cleaned_data:
 				profile.last_name = form.cleaned_data["last_name"]
 			if 'staff' in form.cleaned_data:
-				user.is_staff = form.cleaned_data["staff"]
+				if form.cleaned_data["staff"] == True:
+					user.is_staff = True
 			if 'avatar' in form.cleaned_data:
 				profile.avatar = form.cleaned_data["avatar"]
 			if 'bio' in form.cleaned_data:
@@ -269,6 +272,7 @@ def dataset_associated_events(request, dataset_id=None):
 	datas = Data.objects.all().filter(dataset=dataset)
 	schedule = Schedule_Event.objects.filter(dataset_schedule=dataset).order_by('date')
 	relations = Event_Relation.objects.filter(dataset_associated__id=dataset_id)
+	associated = Event_Relation.objects.filter(dataset_relation=dataset)
 	news = News.objects.filter(event_id=dataset_id)
 	context = {
 		"dataset": dataset,
@@ -276,6 +280,7 @@ def dataset_associated_events(request, dataset_id=None):
 		"datas": datas,
 		"schedule": schedule,
 		"relations": relations,
+		"associated": associated,
 	}
 	return render(request, "dataset/relations.html", context, context_instance=RequestContext(request))
 
@@ -659,19 +664,40 @@ def event_partner_remove(request, id=None, partner_id=None):
 		return HttpResponse(reverse('home'))
 
 @login_required(login_url='auth_login')
-def event_proposal(request):
+def event_proposal_creation(request):
 	eventform = EventCreationForm()
 	if request.method == 'POST':
-		eventform = EditEventForm(request.POST)
+		eventform = EventCreationForm(request.POST)
 		if eventform.is_valid():
 			title = eventform.cleaned_data['title']
 			desc = eventform.cleaned_data['description']
 			event_type = eventform.cleaned_data['event_type']
-			return HttpResponseRedirect(reverse('event_list'))
+			Proposal.objects.create(title=title,description=desc,type=event_type)
+			return HttpResponseRedirect(reverse('home'))
 	context = {
 		"eventform": eventform,
 	}
-	return render(request, "event/proposal.html", context, context_instance=RequestContext(request))
+	return render(request, "proposal/creation.html", context, context_instance=RequestContext(request))
+
+@login_required(login_url='auth_login')
+def event_proposal_list(request):
+	challenge_proposals = Proposal.objects.filter(type='1')
+	workshop_proposals = Proposal.objects.filter(type='3')
+	issue_proposals = Proposal.objects.filter(type='2')
+	context = {
+		"challenge_proposals": challenge_proposals,
+		"workshop_proposals": workshop_proposals,
+		"issue_proposals": issue_proposals,
+	}
+	return render(request, "proposal/list.html", context, context_instance=RequestContext(request))
+
+@login_required(login_url='auth_login')
+def event_proposal_detail(request, id=None):
+	proposal = Proposal.objects.filter(id=id)[0]
+	context = {
+		"proposal": proposal,
+	}
+	return render(request, "proposal/detail.html", context, context_instance=RequestContext(request))
 
 @login_required(login_url='auth_login')
 @user_passes_test(lambda u:u.is_staff, login_url='/')
@@ -686,10 +712,34 @@ def challenge_edit(request, id=None):
 	schedule = Schedule_Event.objects.filter(event_schedule=challenge,schedule_event_parent=None).order_by('date')
 	relations = Event_Relation.objects.filter(event_associated__id=id)
 	if request.method == 'POST':
-		eventform = EditEventForm(request.POST, event=event)
+		eventform = EditEventForm(request.POST, request.FILES, event=event)
 		if eventform.is_valid():
 			title = eventform.cleaned_data["title"]
 			desc = eventform.cleaned_data["description"]
+			if eventform.cleaned_data["file"]:
+				Result.objects.filter(challenge=challenge).delete()
+				csv_file = csv.reader(eventform.cleaned_data["file"])
+				titles = True
+				names = None
+				for l in csv_file:
+					if len(l) > 1:
+						if titles:
+							names = l
+							titles = False
+						else:
+							username = l[0]
+							result = Result.objects.create(user=l[0], challenge=challenge)
+							i = 1
+							for item in l:
+								element = item.split()
+								if len(element) > 0:
+									element = element[0]
+									try:
+										digit = float(element)
+										Score.objects.create(name=names[i], result=result, score=digit)
+										i+=1
+									except ValueError:
+										continue
 			event.title = title
 			event.description = desc
 			event.save()
@@ -722,11 +772,13 @@ def challenge_associated_events(request, id=None):
 	tracks = Track.objects.filter(challenge__id=id)
 	news = News.objects.filter(event_id=id).order_by('-upload_date')
 	relations = Event_Relation.objects.filter(event_associated=challenge)
+	associated = Event_Relation.objects.filter(challenge_relation=challenge)
 	context = {
 		"challenge": challenge,
 		"news": news,
 		"tracks": tracks,
 		"relations": relations,
+		"associated": associated,
 	}
 	return render(request, "challenge/relations.html", context, context_instance=RequestContext(request))
 
@@ -737,7 +789,9 @@ def event_relation_creation(request, id=None, dataset_id=None):
 		events = Event.objects.all()
 	else:
 		events = Event.objects.exclude(id__in = [id])
-	datasets = Dataset.objects.exclude(id__in = [dataset_id])
+	datasets = Dataset.objects.all()
+	print datasets
+	print '--------'
 	choices = []
 	for x in events:
 		choices.append((x.id, x.title)) 
@@ -826,30 +880,6 @@ def event_relation_edit(request, id=None, relation_id=None):
 				relation = Dataset.objects.filter(id=event_id)[0]
 				relation.dataset_relation=relation
 			relation.save()
-			# relation = None
-			# if Challenge.objects.filter(id=event_id).count() > 0:
-			# 	relation = Challenge.objects.filter(id=event_id)[0]
-			# 	Event_Relation.objects.create(event=event_associated,challenge_relation=relation,description=desc)
-			# elif Workshop.objects.filter(id=event_id).count() > 0:
-			# 	relation = Workshop.objects.filter(id=event_id)[0]
-			# 	Event_Relation.objects.create(event=event_associated,workshop_relation=relation,description=desc)
-			# elif Special_Issue.objects.filter(id=event_id).count() > 0:
-			# 	relation = Special_Issue.objects.filter(id=event_id)[0]
-			# 	Event_Relation.objects.create(event=event_associated,issue_relation=relation,description=desc)
-			# elif Dataset.objects.filter(id=event_id).count() > 0:
-			# 	relation = Dataset.objects.filter(id=event_id)[0]
-			# 	Event_Relation.objects.create(event=event_associated,dataset_relation=relation,description=desc)
-
-			# if Challenge.objects.filter(id=id).count() > 0:
-			# 	return HttpResponseRedirect(reverse('challenge_edit', kwargs={'id':id}))
-			# elif Workshop.objects.filter(id=id).count() > 0:
-			# 	return HttpResponseRedirect(reverse('workshop_edit', kwargs={'id':id}))
-			# elif Special_Issue.objects.filter(id=id).count() > 0:
-			# 	return HttpResponseRedirect(reverse('special_issue_edit', kwargs={'id':id}))
-			# elif Dataset.objects.filter(id=id).count() > 0:
-			# 	return HttpResponseRedirect(reverse('dataset_edit', kwargs={'id':id}))
-			# else:
-			# 	return HttpResponseRedirect(reverse('home'))
 	context = {
 		"relationform": relationform,
 	}
@@ -1003,10 +1033,20 @@ def challenge_result(request, id=None):
 	challenge = Challenge.objects.filter(id=id)[0]
 	tracks = Track.objects.filter(challenge__id=id)
 	news = News.objects.filter(event_id=id).order_by('-upload_date')
+	scores = Score.objects.filter(result__challenge=challenge)
+	results = Result.objects.filter(challenge=challenge)
+	result = Result.objects.filter(challenge=challenge)[0]
+	qset = Score.objects.filter(result=result)
+	names = []
+	for n in qset:
+		names.append(n.name)
 	context = {
 		"challenge": challenge,
 		"news": news,
-		"tracks": tracks,		
+		"tracks": tracks,
+		"scores": scores,	
+		"names": names,	
+		"results": results,
 	}
 	return render(request, "challenge/result.html", context, context_instance=RequestContext(request))
 
@@ -1064,10 +1104,12 @@ def workshop_associated_events(request, id=None):
 	workshop = Workshop.objects.filter(id=id)[0]
 	news = News.objects.filter(event_id=id).order_by('-upload_date')
 	relations = Event_Relation.objects.filter(event_associated__id=id)
+	associated = Event_Relation.objects.filter(workshop_relation=workshop)
 	context = {
 		"workshop": workshop,
 		"news": news,
 		"relations": relations,
+		"associated": associated,
 	}
 	return render(request, "workshop/relation.html", context, context_instance=RequestContext(request))
 
@@ -1219,10 +1261,12 @@ def special_issue_associated_events(request, id=None):
 	issue = Special_Issue.objects.filter(id=id)[0]
 	news = News.objects.filter(event_id=id).order_by('-upload_date')
 	relations = Event_Relation.objects.filter(event_associated__id=id)
+	associated = Event_Relation.objects.filter(issue_relation=issue)
 	context = {
 		"issue": issue,
 		"news": news,
 		"relations": relations,
+		"associated": associated,
 	}
 	return render(request, "special_issue/relations.html", context, context_instance=RequestContext(request))
 	

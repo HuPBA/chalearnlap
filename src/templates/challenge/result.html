@@ -5,42 +5,30 @@
             <div class="panel-body"> 
                 <h3 class="thin text-center">Challenge results</h3> 
                 <hr> 
-                <table class="table-fill">
-                    <thead>
-                        <tr>
-                            <th class="text-left">Position</th>
-                            <th class="text-left">User</th>
-                            <th class="text-left">Error</th>
-                        </tr>
-                    </thead>
-                    <tbody class="table-hover">
-                        <tr>
-                            <td class="text-left">1</td>
-                            <td class="text-left">csmath</td>
-                            <td class="text-left">0.215327</td>
-                        </tr>
-                        <tr>
-                            <td class="text-left">2</td>
-                            <td class="text-left">xperzy</td>
-                            <td class="text-left">0.236426</td>
-                        </tr>
-                        <tr>
-                            <td class="text-left">1</td>
-                            <td class="text-left">uricamic</td>
-                            <td class="text-left">0.240429</td>
-                        </tr>
-                        <tr>
-                            <td class="text-left">1</td>
-                            <td class="text-left">OLE</td>
-                            <td class="text-left">0.265452</td>
-                        </tr>
-                        <tr>
-                            <td class="text-left">1</td>
-                            <td class="text-left">xbaro</td>
-                            <td class="text-left">0.272212</td>
-                        </tr>
-                    </tbody>
-                </table>
+                <div class="table-responsive">
+                    <table class="table table-condensed">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                {% for n in names %}
+                                    <th>{{ n }}</th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for r in results %}
+                                <tr>
+                                    <td>{{ r.user }}</td>
+                                    {% for s in scores %}
+                                        {% if s.result == r %}
+                                            <td>{{ s.score }}</td>
+                                        {% endif%}
+                                    {% endfor %}
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>                             
         </div>                         
     </div>

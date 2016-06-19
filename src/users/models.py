@@ -26,9 +26,6 @@ def user_registered_callback(sender, user, request, **kwargs):
 
 user_registered.connect(user_registered_callback)
 
-class Chalearn(models.Model):
-	name = models.CharField(max_length=50)
-
 class Affiliation(models.Model):
 	name = models.CharField(max_length=100)
 	country = models.CharField(max_length=50)
@@ -40,14 +37,20 @@ class Affiliation(models.Model):
 class Event(models.Model):
 	title = models.CharField(max_length=100)
 	description = RichTextField()
-	parent_event = models.ForeignKey("self", on_delete=models.CASCADE, null=True, blank=True)
-	chalearn = models.ForeignKey(Chalearn, on_delete=models.SET_NULL, null=True, blank=True)
+	# parent_event = models.ForeignKey("self", on_delete=models.CASCADE, null=True, blank=True)
 
 	def __str__(self):
 		return unicode(self.title).encode('utf-8')
 
 	def get_absolute_url(self):
-		return reverse("event_edit", kwargs={"id": self.id})
+		if Challenge.objects.filter(id=self.id).count() > 0:
+			return reverse("challenge_desc", kwargs={"id": self.id})
+		elif Workshop.objects.filter(id=self.id).count() > 0:
+			return reverse("workshop_desc", kwargs={"id": self.id})
+		elif Special_Issue.objects.filter(id=self.id).count() > 0:
+			return reverse("special_issue_desc", kwargs={"id": self.id})
+		else:
+			return reverse("event_edit", kwargs={"id": self.id})
 
 def user_avatar_path(instance, filename):
 	return 'userpics/%s-%s/%s' % (instance.first_name, instance.last_name, filename)
@@ -66,6 +69,14 @@ class Profile(models.Model):
 
 	def get_absolute_url(self):
 		return reverse("profile_edit", kwargs={"id": self.id})
+
+class Proposal(models.Model):
+	title = models.CharField(max_length=100)
+	type = models.CharField(max_length=2, null=True)
+	description = RichTextField()
+
+	def __str__(self):
+		return unicode(self.title).encode('utf-8')
 
 class Role(models.Model):
 	name = models.CharField(max_length=50)
@@ -164,7 +175,6 @@ class Challenge(Event):
 class Dataset(models.Model):
 	title = models.CharField(max_length=100, null=True)
 	description = RichTextField()
-	chalearn = models.ForeignKey(Chalearn, on_delete=models.SET_NULL, null=True)
 	tracks = models.ManyToManyField(Challenge, through='Track')
 
 	def __str__(self):
@@ -206,13 +216,23 @@ class Track(models.Model):
 	dataset = models.ForeignKey(Dataset, on_delete=models.SET_NULL, null=True)
 
 class Result(models.Model):
-	title = models.CharField(max_length=100)
-	score = models.DecimalField(null=True, max_digits=15, decimal_places=10)
-	user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-	dataset = models.ForeignKey(Dataset, on_delete=models.SET_NULL, null=True)
+	# title = models.CharField(max_length=100)
+	# score = models.DecimalField(null=True, max_digits=15, decimal_places=10)
+	# user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+	user = models.CharField(null=True, max_length=100)
+	# dataset = models.ForeignKey(Dataset, on_delete=models.SET_NULL, null=True)
+	challenge = models.ForeignKey(Challenge, on_delete=models.SET_NULL, null=True)
 
 	def __str__(self):
-		return unicode(self.title).encode('utf-8')
+		return unicode(self.user).encode('utf-8')
+
+class Score(models.Model):
+	name = models.CharField(null=True, max_length=100)
+	score = models.FloatField(null=True)
+	result = models.ForeignKey(Result, on_delete=models.CASCADE, null=True)
+
+	def __str__(self):
+		return unicode(self.name).encode('utf-8')
 
 class Data(models.Model):
 	title = models.CharField(max_length=100)
@@ -243,6 +263,6 @@ class File(models.Model):
 		basename, extension = os.path.splitext(os.path.basename(self.file.name))
 		return basename
 
-class Publication(models.Model):
-	publicated = models.BooleanField()
-	result = models.ForeignKey(Result, on_delete=models.CASCADE)
+# class Publication(models.Model):
+# 	publicated = models.BooleanField()
+# 	result = models.ForeignKey(Result, on_delete=models.CASCADE)

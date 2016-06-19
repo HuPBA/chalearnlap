@@ -45,6 +45,8 @@ INSTALLED_APPS = [
     'datetimewidget',
     'watson',
     'jfu',
+    'sorl.thumbnail',
+    'django_extensions',
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -158,7 +160,7 @@ MESSAGE_TAGS = {
 
 ACCOUNT_ACTIVATION_DAYS = 7 # One-week activation window; you may, of course, use a different value.
 REGISTRATION_EMAIL_HTML = False
-SITE_ID = 1
+SITE_ID = 2
 
 # GMAIL SMTP settings
 

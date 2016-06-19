@@ -1,4 +1,5 @@
 {% extends "workshop/base.html" %}
+{% load thumbnail %}
 {% block content %}
     <div class="col-md-7"> 
         <div class="panel panel-default"> 
@@ -6,15 +7,16 @@
                 <h3 class="thin text-center">Workshop gallery</h3> 
                 <hr>
                 {% if images.count > 0 %}
-                    {% for i in images %} 
-                        <br><br>
-                        <div class="row">
-                            <div class="col-sm-12">
-                                <img class="img-responsive img-center" src="{{ i.image.url }}" />
-                                <h4 class="thin text-center">{{ i.description|safe }}</h4>
+                    <div class="row">
+                        {% for i in images %} 
+                            <div class="col-sm-4 thumbnail-gallery">
+                                    {% thumbnail i.image "120x120" crop="noop" as small %}
+                                        <a href="{{ i.image.url }}" title="zoom"><img class="img-responsive" src="{{ small.url }}" width="{{ small.width }}" height="{{ small.height }}"></a>
+                                    {% endthumbnail %}
+                                    <p>{{ i.description|safe|truncatechars:90 }}</p>
                             </div>
-                        </div>
-                    {% endfor %}
+                        {% endfor %}
+                    </div>
                 {% else %}
                     <div class="row">
                         <div class="col-sm-12"> 

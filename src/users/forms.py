@@ -183,10 +183,14 @@ class UserRegisterForm(RegistrationForm):
 		self.fields['city'] = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}))
 
 	def clean(self):
-		username = self.cleaned_data.get('email')
+		username = self.cleaned_data.get('username')
+		email = self.cleaned_data.get('email')
+		if email:
+			if User.objects.filter(email=email).exists():
+				raise forms.ValidationError('Your email is not unique.')
 		if username:
 			if User.objects.filter(username=username).exists():
-				raise forms.ValidationError('Your username is not unique.')
+				raise forms.ValidationError('Your usrename is not unique.')
 		return self.cleaned_data
 
 class EditProfileForm(forms.Form):
@@ -257,6 +261,15 @@ class ChangePassForm(PasswordChangeForm):
 class ResetPassForm(PasswordResetForm):
 	email = forms.CharField(required=True, widget=forms.EmailInput(attrs={'class': "form-control"}))
 
+	def clean(self):	
+		email = self.cleaned_data.get('email')
+		if email:
+			if User.objects.filter(email=email).exists():
+				return self.cleaned_data
+			else:
+				raise forms.ValidationError('This email is not registered.')
+		
+
 class SetPassForm(SetPasswordForm):
 	new_password1 = forms.CharField(required=True, widget=forms.PasswordInput(attrs={'class': "form-control"}))
 	new_password2 = forms.CharField(required=True, widget=forms.PasswordInput(attrs={'class': "form-control"}))
@@ -276,6 +289,7 @@ class DatasetEditForm(forms.Form):
 		super(DatasetEditForm, self).__init__(*args, **kwargs)
 		self.fields['dataset_title'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}), initial=dataset.title)
 		self.fields['description'] = forms.CharField(required=True, widget=CKEditorWidget(), initial=dataset.description)
+		# self.fields['file'] = forms.FileField()
 
 	def clean(self):
 		return self.cleaned_data
@@ -297,8 +311,8 @@ class DataEditForm(forms.Form):
 		super(DataEditForm, self).__init__(*args, **kwargs)
 		self.fields['data_title'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}), initial=data.title)
 		self.fields['data_desc'] = forms.CharField(required=True, widget=CKEditorWidget(), initial=data.description)
-		self.fields['data_software'] = forms.CharField(required=True, widget=CKEditorWidget(), initial=data.description)
-		self.fields['data_metric'] = forms.CharField(required=True, widget=CKEditorWidget(), initial=data.description)
+		self.fields['data_software'] = forms.CharField(required=True, widget=CKEditorWidget(), initial=data.software)
+		self.fields['data_metric'] = forms.CharField(required=True, widget=CKEditorWidget(), initial=data.metric)
 
 	def clean(self):
 		return self.cleaned_data
@@ -329,6 +343,7 @@ class EditEventForm(forms.Form):
 		super(EditEventForm, self).__init__(*args, **kwargs)
 		self.fields['title'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}), initial=event.title)
 		self.fields['description'] = forms.CharField(required=True, widget=CKEditorWidget(), initial=event.description)
+		self.fields['file'] = forms.FileField(required=False)
 
 	def clean(self):
 		return self.cleaned_data

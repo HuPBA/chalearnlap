@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% block container %}
+    <ol class="breadcrumb"> 
+        <li> <a href="{% url "home" %}">Home</a> </li>
+        <li> <a href="{% url "event_list" %}">Events list</a> </li>                 
+        <li class="active"> Event proposal </li>                 
+    </ol>             
+    <div class="row"> 
+        <article class="col-xs-12 maincontent"> 
+            <header class="page-header"> 
+                <h1 class="page-title">Event proposal</h1> 
+            </header>  
+            <div class="row">                   
+                <div class="col-md-10 col-md-offset-1"> 
+                    <div class="panel panel-default"> 
+                        <div class="panel-body"> 
+                            <div class="top-margin"> 
+                                <label>Title: </label>  
+                                <p>{{ proposal.title }}</p>
+                            </div>   
+                            <div class="top-margin"> 
+                                <label>Type: </label>  
+                                {% if proposal.type == '1' %}
+                                    <p>Challenge</p>  
+                                {% elif proposal.type == '2' %}
+                                    <p>Special issue</p>  
+                                {% elif proposal.type == '3' %}
+                                    <p>Workshop</p>  
+                                {% endif %}
+                            </div>                            
+                            <div class="top-margin"> 
+                                <label>Description: </label>   
+                                <p>{{ proposal.description|safe }}</p>  
+                            </div>                                     
+                        </div>                             
+                    </div>                         
+                </div>
+            </div>
+        </article>
+    </div>
+{% endblock container %}  
