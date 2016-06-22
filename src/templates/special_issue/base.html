@@ -15,21 +15,35 @@
                     <li><a href='{% url 'special_issue_members' id=issue.id %}'>People</a></li>
                     <li><a href='{% url 'special_issue_schedule' id=issue.id %}'>Schedule</a></li>
                     <li><a href='{% url 'special_issue_associated_events' id=issue.id %}'>Associated events</a></li>
+                    {% if profile %}
+                        <li><a href='{% url 'special_issue_edit' id=issue.id %}'>Edit Special issue</a></li>  
+                    {% endif %}
                 </ul>
             </div>
             {% block content %}
             {% endblock content %}
             <div class="col-sm-3"> 
-            <div class="thumbnail">
-                <h2 class="text-center top-space">News</h2> 
-                <div class="caption">
-                    {% for n in news %}
-                        <h3>{{ n.title }}</h3> 
-                        <p>{{ n.description|safe }}</p>
-                    {% endfor %}
-                </div>
+                <div class="thumbnail">
+                    <h2 class="text-center top-space">News</h2>
+                    <hr> 
+                    <div class="caption">
+                        {% if news.count > 0 %}
+                            {% for n in news %}
+                                <h3>{{ n.title }}</h3> 
+                                <p>{{ n.description|safe }}</p>
+                                <hr>  
+                            {% endfor %}
+                        {% else %}
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <p class="text-center"> There are no news registered in {{ dataset.title }}</p>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div> 
             </div> 
-        </div> 
+
         </article>
     </div>
 {% endblock container %}  

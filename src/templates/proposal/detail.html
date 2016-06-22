@@ -11,10 +11,11 @@
             <header class="page-header"> 
                 <h1 class="page-title">Event proposal</h1> 
             </header>  
-            <div class="row">                   
-                <div class="col-md-10 col-md-offset-1"> 
-                    <div class="panel panel-default"> 
-                        <div class="panel-body"> 
+            <div class="row">   
+                <div class="panel panel-default"> 
+                    <div class="panel-body">   
+                    <div class="row">              
+                        <div class="col-md-8"> 
                             <div class="top-margin"> 
                                 <label>Title: </label>  
                                 <p>{{ proposal.title }}</p>
@@ -33,9 +34,22 @@
                                 <label>Description: </label>   
                                 <p>{{ proposal.description|safe }}</p>  
                             </div>                                     
-                        </div>                             
-                    </div>                         
-                </div>
+                        </div>
+                        <div class="col-md-4"> 
+                            <div class="top-margin"> 
+                                <label>User: </label>  
+                                <a href='{% url 'profile_edit' id=user.id %}'>{{ user.username }} {{ user.last_name }}</a>
+                            </div>
+                        </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-lg-2  col-lg-offset-10"> 
+                                <a class="btn btn-action" href="{% url "event_proposal_confirm" id=proposal.id %}">Create event</a>
+                            </div>
+                        </div>  
+                    </div>                             
+                </div>  
             </div>
         </article>
     </div>

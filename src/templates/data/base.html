@@ -15,7 +15,6 @@
                     <li><a href='{% url 'data_software' id=data.id dataset_id=dataset.id %}'>Software</a></li>
                     <li><a href='{% url 'data_files' id=data.id dataset_id=dataset.id %}'>Files</a></li>
                     <li><a href='{% url 'data_metric' id=data.id dataset_id=dataset.id %}'>Evaluation metrics</a></li>
-                    <!-- <li><a href='{% url 'data_results' id=data.id dataset_id=dataset.id %}'>Results</a></li> -->
                 </ul>
             </div>                   
             {% block content %}

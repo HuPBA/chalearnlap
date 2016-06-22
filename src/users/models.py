@@ -37,6 +37,7 @@ class Affiliation(models.Model):
 class Event(models.Model):
 	title = models.CharField(max_length=100)
 	description = RichTextField()
+	is_public = models.BooleanField(default=False)
 	# parent_event = models.ForeignKey("self", on_delete=models.CASCADE, null=True, blank=True)
 
 	def __str__(self):
@@ -61,7 +62,7 @@ class Profile(models.Model):
 	last_name = models.CharField(max_length=30, null=True)
 	affiliation = models.OneToOneField(Affiliation, on_delete=models.CASCADE, null=True)
 	bio = models.TextField(max_length=3000)
-	avatar = models.ImageField(upload_to=user_avatar_path, null=True, default='/static/images/default.jpg')
+	avatar = models.ImageField(upload_to=user_avatar_path, null=True)
 	events = models.ManyToManyField(Event, through='Profile_Event')
 
 	def __str__(self):
@@ -72,6 +73,7 @@ class Profile(models.Model):
 
 class Proposal(models.Model):
 	title = models.CharField(max_length=100)
+	user = models.ForeignKey(Profile, on_delete=models.SET_NULL, null=True)
 	type = models.CharField(max_length=2, null=True)
 	description = RichTextField()
 
@@ -88,6 +90,32 @@ class Profile_Event(models.Model):
 	profile = models.ForeignKey(Profile, on_delete=models.SET_NULL, related_name='fk_profile', null=True)
 	event = models.ForeignKey(Event, on_delete=models.SET_NULL, related_name='fk_event', null=True)
 	role = models.ForeignKey(Role, on_delete=models.SET_NULL, null=True)
+
+	def is_admin(self):
+		if self.role.name.lower() == 'admin':
+			return True
+		else:
+			return False
+
+class Challenge(Event):
+
+	def __str__(self):
+		return unicode(self.title).encode('utf-8')
+
+	def get_absolute_url(self):
+		return reverse("challenge_desc", kwargs={"id": self.id})
+
+class Dataset(models.Model):
+	title = models.CharField(max_length=100, null=True)
+	description = RichTextField()
+	tracks = models.ManyToManyField(Challenge, through='Track')
+	is_public = models.BooleanField(default=False)
+
+	def __str__(self):
+		return unicode(self.title).encode('utf-8')
+
+	def get_absolute_url(self):
+		return reverse("dataset_desc", kwargs={"id": self.id})
 
 def partner_member_avatar_path(instance, filename):
 	return 'partner/members/%s-%s/%s' % (instance.first_name, instance.last_name, filename)
@@ -120,23 +148,6 @@ class Event_Partner(models.Model):
 	event = models.ForeignKey(Event, on_delete=models.SET_NULL, null=True)
 	role = models.ForeignKey(Role, on_delete=models.SET_NULL, null=True)
 
-class News(models.Model):
-	title = models.CharField(max_length=100)
-	description = RichTextField()
-	upload_date = models.DateTimeField()
-	event = models.ForeignKey(Event, on_delete=models.SET_NULL, null=True)
-
-	def save(self, *args, **kwargs):
-		if not self.id:
-			self.upload_date = timezone.now()
-		return super(News, self).save(*args, **kwargs)
-
-	def __str__(self):
-		return unicode(self.title).encode('utf-8')
-
-	def get_absolute_url(self):
-		return reverse("news_edit", kwargs={"id": self.id})
-
 class Special_Issue(Event):
 
 	def __str__(self):
@@ -164,24 +175,35 @@ class Gallery_Image(models.Model):
 	def __str__(self):
 		return unicode(self.id).encode('utf-8')
 
-class Challenge(Event):
-
-	def __str__(self):
-		return unicode(self.title).encode('utf-8')
-
-	def get_absolute_url(self):
-		return reverse("challenge_desc", kwargs={"id": self.id})
-
 class Dataset(models.Model):
 	title = models.CharField(max_length=100, null=True)
 	description = RichTextField()
 	tracks = models.ManyToManyField(Challenge, through='Track')
+	is_public = models.BooleanField(default=False)
 
 	def __str__(self):
 		return unicode(self.title).encode('utf-8')
 
 	def get_absolute_url(self):
 		return reverse("dataset_desc", kwargs={"id": self.id})
+
+class News(models.Model):
+	title = models.CharField(max_length=100)
+	description = RichTextField()
+	upload_date = models.DateTimeField()
+	event = models.ForeignKey(Event, on_delete=models.SET_NULL, null=True)
+	dataset = models.ForeignKey(Dataset, on_delete=models.SET_NULL, null=True)
+
+	def save(self, *args, **kwargs):
+		if not self.id:
+			self.upload_date = timezone.now()
+		return super(News, self).save(*args, **kwargs)
+
+	def __str__(self):
+		return unicode(self.title).encode('utf-8')
+
+	def get_absolute_url(self):
+		return reverse("news_edit", kwargs={"id": self.id})
 
 class Schedule_Event(models.Model):
 	title = models.CharField(max_length=100, null=True)
@@ -263,6 +285,39 @@ class File(models.Model):
 		basename, extension = os.path.splitext(os.path.basename(self.file.name))
 		return basename
 
+def submission_path(instance, filename):
+	return 'submissions/%s/%s' % (instance.user.username, filename)
+
+class Submission(models.Model):
+	user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+	dataset = models.ForeignKey(Dataset, on_delete=models.SET_NULL, null=True)
+	source_code = models.URLField(null=True)
+	publication = models.URLField(null=True)
+	sub_file = models.FileField(upload_to=submission_path, null=True)
+
+	def __str__(self):
+		return unicode(self.user.username).encode('utf-8')
+
+class Result_col(models.Model):
+	submission = models.ForeignKey(Submission, on_delete=models.SET_NULL, null=True)
+	dataset = models.ForeignKey(Dataset, on_delete=models.SET_NULL, null=True)
+	name = models.CharField(null=True, max_length=100)
+	score = models.FloatField(null=True)
+
+	def __str__(self):
+		return unicode(self.name).encode('utf-8')
+
 # class Publication(models.Model):
 # 	publicated = models.BooleanField()
 # 	result = models.ForeignKey(Result, on_delete=models.CASCADE)
+
+class Profile_Dataset(models.Model):
+	profile = models.ForeignKey(Profile, on_delete=models.SET_NULL, related_name='fk_profile_dataset', null=True)
+	dataset = models.ForeignKey(Dataset, on_delete=models.SET_NULL, related_name='fk_dataset_profile', null=True)
+	role = models.ForeignKey(Role, on_delete=models.SET_NULL, null=True)
+
+	def is_admin(self):
+		if self.role.name.lower() == 'admin':
+			return True
+		else:
+			return False

@@ -126,7 +126,6 @@
                                                 </div>
                                             </div> 
                                         {% endif %}
-
                                         <h3 class="thin text-center">People &ensp;<a href="{% url "profile_select" id=event.id %}"><i class="fa fa-plus-circle" aria-hidden="true"></i></a></h3>
                                         <hr> 
                                         {% if members.count > 0 %}
@@ -188,7 +187,14 @@
                         </div>
                         <hr>
                         <div class="row">
-                            <div class="col-lg-2 col-lg-offset-10 text-right"> 
+                            <div class="col-lg-2 col-lg-offset-8 text-right">
+                                {% if event.is_public %}
+                                    <a class="btn btn-action" href="{% url "challenge_unpublish" id=event.id %}">Unpublish</a>
+                                {% else %}
+                                    <a class="btn btn-action" href="{% url "challenge_publish" id=event.id %}">Publish</a>
+                                {% endif %}
+                            </div>
+                            <div class="col-lg-2 text-right"> 
                                 <button class="btn btn-action" type="submit" name="signup-button">Save</button>
                             </div>
                         </div>  

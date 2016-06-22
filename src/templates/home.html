@@ -25,6 +25,7 @@
                         {% for n in news %}
                             <h3>{{ n.title }}</h3> 
                             <p>{{ n.description|safe }}</p>
+                            <hr>
                         {% endfor %}
                     {% else %}
                         <div class="row">

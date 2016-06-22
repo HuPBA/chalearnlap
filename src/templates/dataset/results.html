@@ -1,11 +1,17 @@
-{% extends "challenge/base.html" %}
+{% extends "dataset/base.html" %}
 {% block content %}
     <div class="col-md-7"> 
         <div class="panel panel-default"> 
             <div class="panel-body"> 
-                <h3 class="thin text-center">Challenge results</h3> 
+                <h3 class="thin text-center">Dataset results</h3> 
                 <hr> 
-                {% if results %}
+                <div class="row">
+                    <div class="col-sm-4 col-sm-offset-4"> 
+                        <a class="btn btn-action" href="{% url "submission_creation" dataset_id=dataset.id %}">Create submission</a>
+                    </div>
+                </div> 
+                <br>
+                {% if names %}
                     <div class="table-responsive">
                         <table class="table table-condensed">
                             <thead>
@@ -17,15 +23,13 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for r in results %}
-                                    <tr>
-                                        <td>{{ r.user }}</td>
-                                        {% for s in scores %}
-                                            {% if s.result == r %}
-                                                <td>{{ s.score }}</td>
-                                            {% endif%}
-                                        {% endfor %}
-                                    </tr>
+                            {% for user, score in scores %}
+                                <tr>
+                                    <td>{{ user.user.username }}<br><a href="{{ user.source_code }}"><i class="fa fa-code-fork fa-lg" aria-hidden="true"></i></a>&ensp;<a href="{{ user.publication }}"><i class="fa fa-paperclip fa-lg" aria-hidden="true"></i></a></td>
+                                    {% for s in score %}
+                                            <td>{{ s.score }}</td>
+                                    {% endfor %}
+                                </tr>
                                 {% endfor %}
                             </tbody>
                         </table>

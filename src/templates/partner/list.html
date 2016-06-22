@@ -12,32 +12,10 @@
             {% if partners.count > 0 %}
                 <div class="row">
                     {% for p in partners %} 
-                        <div class="panel panel-default"> 
-                            <div class="panel-body">
-                                {% if p.banner %}
-                                    <div class="col-sm-3">
-                                        <h3 class="thin text-center">{{ p.name }}</h3>
-                                        <br>
-                                        <a href="{{ p.url }}"><img id="partner-logo" class="img-responsive img-center" src="{{ p.banner.url }}"></a>
-                                    </div>
-                                    <div class="col-sm-9">
-                                        <p><b>Contact:</b> </p>
-                                        <p>{{ p.contact.first_name }} {{ p.contact.last_name }}</p>
-                                        <p>{{ p.contact.email }}</p>
-                                        <p>{{ p.contact.bio }}</p>
-                                    </div>
-                                {% else %}
-                                    <div class="col-sm-2">
-                                        <h3>{{ p.name }}</h3>
-                                    </div>
-                                    <div class="col-sm-10">
-                                        <p><b>Contact:</b> </p>
-                                        <p>{{ p.contact.first_name }} {{ p.contact.last_name }}</p>
-                                        <p>{{ p.contact.email }}</p>
-                                        <p>{{ p.contact.bio }}</p>
-                                    </div>
-                                {% endif %}
-                            </div>
+                        <div class="col-sm-4 sponsor-cell">
+                            <h3 class="thin text-center">{{ p.name }}</h3>
+                            <br>
+                            <a href="{{ p.url }}"><img id="partner-logo" class="img-responsive img-center" src="{{ p.banner.url }}"></a>
                         </div>
                     {% endfor %}  
                 </div>

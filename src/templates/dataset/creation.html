@@ -10,15 +10,6 @@
             </div>
         {% endfor %} 
     {% endif %}
-    {% if dataform.non_field_errors  %}
-        {% for e in dataform.non_field_errors %} 
-            <div class="row"> 
-                <div class="col-md-6 widget col-md-offset-3"> 
-                    <div class="alert alert-danger" role="alert">{{ e }}</div>
-                </div>
-            </div>
-        {% endfor %} 
-    {% endif %}
     <ol class="breadcrumb"> 
         <li> <a href="{% url "home" %}">Home</a> </li>
         <li> <a href="{% url "dataset_list" %}">Dataset list</a> </li>                 
@@ -51,6 +42,21 @@
                                             {{ datasetform.dataset_title }} 
                                         </div>  
                                     </div>
+                                    <div class="col-md-7">
+                                        <div class="top-margin"> 
+                                            <label>Result columns
+                                                {% if datasetform.results_cols.field.required %}
+                                                <span class="text-danger">*</span>
+                                                {% endif %}
+                                            </label>  
+                                            <br>
+                                            <span>Introduce the name of the columns of the result separated by semi-colons</span>
+                                            {% if datasetform.errors.results_cols %}
+                                                <div class="alert alert-danger" role="alert">{{ datasetform.errors.results_cols }}</div>
+                                            {% endif %}
+                                            {{ datasetform.results_cols }} 
+                                        </div> 
+                                    </div> 
                                 </div>                                   
                                 <div class="top-margin"> 
                                     <label>Description 

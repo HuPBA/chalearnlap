@@ -8,30 +8,12 @@
                 {% if sponsors.count > 0 %}
                     <div class="row">
                         {% for s in sponsors %} 
-                            <div class="col-sm-12">
+                            <div class="col-sm-6 sponsor-cell">
                             {% if s.partner.banner %}
-                                <div class="col-sm-4">
-                                    <h3>{{ s.partner.name }}</h3>
-                                    <a href="{{ s.partner.url }}"><img id="partner-logo" class="img-responsive" src="{{ s.partner.banner.url }}"></a>
-                                    <p>({{ s.role }})</p>
-                                </div>
-                                <div class="col-sm-8">
-                                    <p><b>Contact:</b> </p>
-                                    <p>{{ s.partner.contact.first_name }} {{ s.partner.contact.last_name }}</p>
-                                    <p>{{ s.partner.contact.email }}</p>
-                                    <p>{{ s.partner.contact.bio|truncatechars:300 }}</p>
-                                </div>
+                                <h3 class="thin text-center">{{ s.partner.name }}</h3>
+                                <a href="{{ s.partner.url }}"><img id="partner-logo" class="img-responsive img-center" src="{{ s.partner.banner.url }}"></a>
                             {% else %}
-                                <div class="col-sm-2">
-                                    <h3>{{ s.partner.name }}</h3>
-                                    <p>({{ s.role }})</p>
-                                </div>
-                                <div class="col-sm-10">
-                                    <p><b>Contact:</b> </p>
-                                    <p>{{ s.partner.contact.first_name }} {{ s.partner.contact.last_name }}</p>
-                                    <p>{{ s.partner.contact.email }}</p>
-                                    <p>{{ s.partner.contact.bio|truncatechars:300 }}</p>
-                                </div>
+                                <h3>{{ s.partner.name }}</h3>
                             {% endif %}
                             </div>
                         {% endfor %}  

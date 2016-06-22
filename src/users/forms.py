@@ -29,7 +29,7 @@ class UserEditForm(forms.ModelForm):
 
 class MemberSelectForm(forms.Form):
 	def __init__(self, *args, **kwargs):
-		qset = kwargs.pop('qset', User.objects.all())
+		qset = kwargs.pop('qset', Profile.objects.all())
 		super(MemberSelectForm, self).__init__(*args, **kwargs)
 		self.fields['email'] = forms.ModelMultipleChoiceField(required=True, widget=forms.SelectMultiple(attrs={'class': "js-example-basic-multiple", 'id': "input-addmembers"}), queryset=qset)
 
@@ -121,8 +121,8 @@ class TrackCreationForm(forms.Form):
 		super(TrackCreationForm, self).__init__(*args, **kwargs)
 		self.fields['title'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}))
 		self.fields['description'] = forms.CharField(required=True, widget=CKEditorWidget())
-		self.fields['metrics'] = forms.CharField(required=True, widget=CKEditorWidget())
-		self.fields['baseline'] = forms.CharField(required=True, widget=CKEditorWidget())
+		self.fields['metrics'] = forms.CharField(required=False, widget=CKEditorWidget())
+		self.fields['baseline'] = forms.CharField(required=False, widget=CKEditorWidget())
 		self.fields['dataset_select'] = forms.ChoiceField(widget=forms.Select(attrs={'class': "form-control"}), required=True, choices=choices)
 
 	def clean(self):
@@ -134,8 +134,8 @@ class TrackEditForm(forms.Form):
 		super(TrackEditForm, self).__init__(*args, **kwargs)
 		self.fields['title'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}), initial=track.title)
 		self.fields['description'] = forms.CharField(required=True, widget=CKEditorWidget(), initial=track.description)
-		self.fields['metrics'] = forms.CharField(required=True, widget=CKEditorWidget(), initial=track.metrics)
-		self.fields['baseline'] = forms.CharField(required=True, widget=CKEditorWidget(), initial=track.baseline)
+		self.fields['metrics'] = forms.CharField(required=False, widget=CKEditorWidget(), initial=track.metrics)
+		self.fields['baseline'] = forms.CharField(required=False, widget=CKEditorWidget(), initial=track.baseline)
 		self.fields['dataset_select'] = forms.ChoiceField(widget=forms.Select(attrs={'class': "form-control"}), required=True, choices=choices, initial=track.dataset.id)
 
 	def clean(self):
@@ -279,6 +279,7 @@ class DatasetCreationForm(forms.Form):
 		super(DatasetCreationForm, self).__init__(*args, **kwargs)
 		self.fields['dataset_title'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}))
 		self.fields['description'] = forms.CharField(required=True, widget=CKEditorWidget())
+		self.fields['results_cols'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}))
 
 	def clean(self):
 		return self.cleaned_data
@@ -299,8 +300,8 @@ class DataCreationForm(forms.Form):
 		super(DataCreationForm, self).__init__(*args, **kwargs)
 		self.fields['data_title'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}))
 		self.fields['data_desc'] = forms.CharField(required=True, widget=CKEditorWidget())
-		self.fields['data_software'] = forms.CharField(required=True, widget=CKEditorWidget())
-		self.fields['data_metric'] = forms.CharField(required=True, widget=CKEditorWidget())
+		self.fields['data_software'] = forms.CharField(required=False, widget=CKEditorWidget())
+		self.fields['data_metric'] = forms.CharField(required=False, widget=CKEditorWidget())
 
 	def clean(self):
 		return self.cleaned_data
@@ -311,8 +312,8 @@ class DataEditForm(forms.Form):
 		super(DataEditForm, self).__init__(*args, **kwargs)
 		self.fields['data_title'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}), initial=data.title)
 		self.fields['data_desc'] = forms.CharField(required=True, widget=CKEditorWidget(), initial=data.description)
-		self.fields['data_software'] = forms.CharField(required=True, widget=CKEditorWidget(), initial=data.software)
-		self.fields['data_metric'] = forms.CharField(required=True, widget=CKEditorWidget(), initial=data.metric)
+		self.fields['data_software'] = forms.CharField(required=False, widget=CKEditorWidget(), initial=data.software)
+		self.fields['data_metric'] = forms.CharField(required=False, widget=CKEditorWidget(), initial=data.metric)
 
 	def clean(self):
 		return self.cleaned_data
@@ -442,6 +443,26 @@ class RelationEditForm(forms.Form):
 		elif relation.dataset_relation:
 			self.fields['event'] = forms.ChoiceField(widget=forms.Select(attrs={'class': "form-control"}), required=True, choices=choices, initial=relation.dataset_relation.id)
 		self.fields['description'] = forms.CharField(required=True, widget=CKEditorUploadingWidget(), initial=relation)
+
+	def clean(self):
+		return self.cleaned_data
+
+class SubmissionCreationForm(forms.Form):
+	def __init__(self, *args, **kwargs):
+		super(SubmissionCreationForm, self).__init__(*args, **kwargs)
+		self.fields['source_code'] = forms.URLField(required=True, widget=forms.TextInput(attrs={'class': "form-control", 'placeholder': "URL"}))
+		self.fields['publication'] = forms.URLField(required=True, widget=forms.TextInput(attrs={'class': "form-control", 'placeholder': "DOI/URL"}))
+		self.fields['sub_file'] = forms.FileField(required=False)
+
+	def clean(self):
+		return self.cleaned_data
+
+class SubmissionScoresForm(forms.Form):
+	def __init__(self, *args, **kwargs):
+		results = kwargs.pop('results', None)
+		super(SubmissionScoresForm, self).__init__(*args, **kwargs)
+		for r in results:
+			self.fields[r.name] = forms.FloatField(required=True, widget=forms.NumberInput(attrs={'class': "form-control"}))
 
 	def clean(self):
 		return self.cleaned_data

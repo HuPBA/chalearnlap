@@ -9,7 +9,7 @@
                     {% for s in schedule %}
                         <div class="row">
                             <div class="col-sm-12"> 
-                                <p><b>{{ s.date }} {{ s.title }}</b></p>
+                                <p><b>{{ s.date|date:"SHORT_DATE_FORMAT" }} {{ s.title }}</b></p>
                                 <p>{{ s.description|safe }}</p>
                                 <br>
                             </div>

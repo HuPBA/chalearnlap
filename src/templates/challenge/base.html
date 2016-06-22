@@ -26,6 +26,9 @@
                     <li><a href='{% url 'challenge_members' id=challenge.id %}'>People</a></li>
                     <li><a href='{% url 'challenge_sponsors' id=challenge.id %}'>Sponsors</a></li>
                     <li><a href='{% url 'challenge_result' id=challenge.id %}'>Results</a></li>  
+                    {% if profile %}
+                        <li><a href='{% url 'challenge_edit' id=challenge.id %}'>Edit challenge</a></li>  
+                    {% endif %}
                 </ul>
             </div>
             {% block content %}
@@ -39,6 +42,7 @@
                             {% for n in news %}
                                 <h3>{{ n.title }}</h3> 
                                 <p>{{ n.description|safe }}</p>
+                                <hr>  
                             {% endfor %}
                         {% else %}
                             <div class="row">
