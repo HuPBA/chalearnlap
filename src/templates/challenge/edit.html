@@ -134,7 +134,7 @@
                                             <div class="row">
                                                 {% for m in members %} 
                                                     <div class="col-sm-12">
-                                                        <p class="text-center"><a href='{% url 'user_edit' id=m.profile.id %}'>{{ m.profile.first_name }} {{ m.profile.last_name }} ({{ m.role.name }})</a>&ensp;<a id="{{ m.id }}" class="delete-event" value="{% url 'event_member_remove' id=event.id member_id=m.id %}" href=""><i class="fa fa-minus-circle fa" aria-hidden="true"></i></a></p>
+                                                        <p class="text-center"><a href='{% url 'user_edit' id=m.profile.user.id %}'>{{ m.profile.first_name }} {{ m.profile.last_name }} ({{ m.role.name }})</a>&ensp;<a id="{{ m.id }}" class="delete-event" value="{% url 'event_member_remove' id=event.id member_id=m.id %}" href=""><i class="fa fa-minus-circle fa" aria-hidden="true"></i></a></p>
                                                     </div>
                                                 {% endfor %}  
                                             </div>
