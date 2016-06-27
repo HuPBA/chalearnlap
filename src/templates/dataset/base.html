@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 {% block container %}
     <ol class="breadcrumb"> 
-        <li> <a href="{% url "home" %}">Home</a> </li>
-        <li class="active"> Dataset detail </li>                 
+        {% block breadcrumb %} 
+        {% endblock breadcrumb %}                 
     </ol>            
     <div class="row"> 
         <article class="col-xs-12 maincontent"> 
@@ -14,15 +14,17 @@
                     <li><a href='{% url 'dataset_desc' id=dataset.id %}'>Description</a></li>
                     <li><a href='{% url 'dataset_schedule' id=dataset.id %}'>Schedule</a></li>
                     <li><a href='{% url 'dataset_associated_events' dataset_id=dataset.id %}'>Associated events</a></li>
-                    <li><a href="#" data-toggle="collapse" data-target="#drilldown-1">Data <b class="caret"></b></a>
-                        <div style="padding-left:0px;">
-                            <ul id="drilldown-1" class="nav nav-pills nav-stacked collapse">
-                                {% for d in datas %}
-                                    <li><a href='{% url 'data_desc' id=d.id dataset_id=dataset.id %}'>{{ d.title }}</a></li>
-                                {% endfor %}
-                            </ul>
-                        </div>
-                    </li>
+                    {% if datas %}
+                        <li><a href="#" data-toggle="collapse" data-target="#drilldown-1">Data <b class="caret"></b></a>
+                            <div style="padding-left:0px;">
+                                <ul id="drilldown-1" class="nav nav-pills nav-stacked collapse">
+                                    {% for d in datas %}
+                                        <li><a href='{% url 'data_desc' id=d.id dataset_id=dataset.id %}'>{{ d.title }}</a></li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </li>
+                    {% endif %}
                     <li><a href='{% url 'dataset_results' dataset_id=dataset.id %}'>Results</a></li>
                     {% if profile %}
                         <li><a href='{% url 'dataset_edit' id=dataset.id %}'>Edit dataset</a></li>  

@@ -12,7 +12,9 @@
     {% endif %}
     <ol class="breadcrumb"> 
         <li> <a href="{% url "home" %}">Home</a> </li>
-        <li> <a href="{% url "event_list" %}">Events list</a> </li>                 
+        {% if not profile %}
+            <li> <a href="{% url "event_list" %}">Events list</a> </li>    
+        {% endif %}             
         <li class="active"> Challenge edit </li>                 
     </ol>            
     <div class="row"> 
@@ -132,7 +134,7 @@
                                             <div class="row">
                                                 {% for m in members %} 
                                                     <div class="col-sm-12">
-                                                        <p class="text-center"><a href='{% url 'profile_edit' id=m.profile.id %}'>{{ m.profile.first_name }} {{ m.profile.last_name }}</a>&ensp;<a id="{{ m.id }}" class="delete-event" value="{% url 'event_member_remove' id=event.id member_id=m.id %}" href=""><i class="fa fa-minus-circle fa" aria-hidden="true"></i></a></p>
+                                                        <p class="text-center"><a href='{% url 'profile_edit' id=m.profile.id %}'>{{ m.profile.first_name }} {{ m.profile.last_name }} ({{ m.role.name }})</a>&ensp;<a id="{{ m.id }}" class="delete-event" value="{% url 'event_member_remove' id=event.id member_id=m.id %}" href=""><i class="fa fa-minus-circle fa" aria-hidden="true"></i></a></p>
                                                     </div>
                                                 {% endfor %}  
                                             </div>

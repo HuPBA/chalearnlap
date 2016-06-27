@@ -2,51 +2,53 @@
 {% load staticfiles %}
 {% block container %}
 	<ol class="breadcrumb"> 
-        <li>
-            <a href="{% url "home" %}">Home</a>
-        </li>                 
+        <li><a href="{% url "home" %}">Home</a></li>                 
         <li class="active">Users list</li>                 
     </ol> 
-    <h2 class="text-center top-space">Users</h2> 
-    <br> 
     <div class="row"> 
-        <div class="col-sm-4">
-            <div class="panel panel-default"> 
-                <div class="panel-body"> 
-                    <h3 class="thin text-center">All users (Without admins)</h3> 
-                    <hr>
-                    {% if users.count > 0 %}
-                        {% for u in users %}
-                            <p><a href='{% url 'user_edit' id=u.id %}'>{{ u.username }}</a></p>
-                        {% endfor %}
-                    {% else %}
-                        <div class="row">
-                            <div class="col-sm-12"> 
-                                <p class="text-center">There are no users registered</p>
-                            </div>  
-                        </div>
-                    {% endif %} 
-                </div>
-            </div>    
-        </div>                          
-        <div class="col-sm-4">
-            <div class="panel panel-default"> 
-                <div class="panel-body">
-                    <h3 class="thin text-center">Admin users</h3> 
-                    <hr>
-                    {% if admins.count > 0 %}
-                        {% for admin in admins %}
-                            <p>{{ admin.username }}</p>
-                        {% endfor %} 
-                    {% else %}
-                        <div class="row">
-                            <div class="col-sm-12"> 
-                                <p class="text-center">There are no admin users registered</p>
-                            </div>  
-                        </div>
-                    {% endif %} 
-                </div>
-            </div>            
-        </div>                 
-    </div>                         
+        <article class="col-xs-12 maincontent"> 
+            <header class="page-header"> 
+                <h1 class="page-title">Users</h1> 
+            </header>  
+            <div class="col-sm-4">
+                <div class="panel panel-default"> 
+                    <div class="panel-body"> 
+                        <h3 class="thin text-center">All users (Without admins)</h3> 
+                            <hr>
+                            {% if users.count > 0 %}
+                                {% for u in users %}
+                                    <p><a href='{% url 'user_edit' id=u.id %}'>{{ u.username }}</a></p>
+                                {% endfor %}
+                            {% else %}
+                                <div class="row">
+                                    <div class="col-sm-12"> 
+                                        <p class="text-center">There are no users registered</p>
+                                    </div>  
+                                </div>
+                            {% endif %} 
+                    </div>
+                </div>    
+            </div>                          
+            <div class="col-sm-4">
+                <div class="panel panel-default"> 
+                    <div class="panel-body">
+                        <h3 class="thin text-center">Admin users</h3> 
+                            <hr>
+                            {% if admins.count > 0 %}
+                                {% for admin in admins %}
+                                    <p>{{ admin.username }}</p>
+                                {% endfor %} 
+                            {% else %}
+                                <div class="row">
+                                    <div class="col-sm-12"> 
+                                        <p class="text-center">There are no admin users registered</p>
+                                    </div>  
+                                </div>
+                            {% endif %}   
+                    </div>
+                </div>            
+            </div>
+        </article>
+    </div>
+       
 {% endblock container %}            

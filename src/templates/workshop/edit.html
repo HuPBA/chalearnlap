@@ -12,7 +12,9 @@
     {% endif %}
     <ol class="breadcrumb"> 
         <li> <a href="{% url "home" %}">Home</a> </li>
-        <li> <a href="{% url "event_list" %}">Events list</a> </li>                 
+        {% if not profile %}
+            <li> <a href="{% url "event_list" %}">Events list</a> </li>   
+        {% endif %}              
         <li class="active">Workshop edit </li>                 
     </ol>            
     <div class="row"> 

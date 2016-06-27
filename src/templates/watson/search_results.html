@@ -7,16 +7,22 @@
                 <div class="panel-body"> 
                     <h3 class="thin text-center">Search results{% if query %} for &ldquo;{{query}}&rdquo;{% endif %}</h3>
                     <hr>
-                    {% if search_results %}
-                        {% search_results search_results %}
-                    {% else %}
-                        {% if query %}
-                            <p>There are no results to display.</p>
-                            <p>Try entering a less specific search term.</p>
-                        {% else %}
-                            <p>Please enter a query in the search form.</p>
-                        {% endif %}
-                    {% endif %}  
+                    <ul>
+                        {% for result in search_results %}
+                            <li>
+                                <article>
+                                    <h1>
+                                        {% if result.url %}<a href="{{result.url}}">{% endif %}
+                                        {{result.title}}
+                                        {% if result.url %}</a>{% endif %}
+                                    </h1>
+                                    {% if result.description %}
+                                        <p>{{result.description}}</p>
+                                    {% endif %}
+                                </article>
+                            </li>
+                        {% endfor %}
+                    </ul>
                 </div>
             </div>
         </div>

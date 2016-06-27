@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 {% block container %}
     <ol class="breadcrumb"> 
-        <li> <a href="{% url "home" %}">Home</a> </li>
-        <li class="active"> Event detail </li>                 
+        {% block breadcrumb %}
+        {% endblock breadcrumb %}            
     </ol>            
     <div class="row"> 
         <article class="col-xs-12 maincontent"> 
@@ -14,15 +14,17 @@
                     <li><a href='{% url 'challenge_desc' id=challenge.id %}'>Description</a></li>
                     <li><a href='{% url 'challenge_schedule' id=challenge.id %}'>Schedule</a></li>
                     <li><a href='{% url 'challenge_associated_events' id=challenge.id %}'>Associated events</a></li>
-                    <li><a href="#" data-toggle="collapse" data-target="#drilldown-1">Tracks <b class="caret"></b></a>
-                        <div style="padding-left:0px;">
-                            <ul id="drilldown-1" class="nav nav-pills nav-stacked collapse">
-                                {% for t in tracks %}
-                                    <li><a href='{% url 'track_desc' id=challenge.id track_id=t.id%}'>{{ t.title }}</a></li>
-                                {% endfor %}
-                            </ul>
-                        </div>
-                    </li>
+                    {% if tracks %}
+                        <li><a href="#" data-toggle="collapse" data-target="#drilldown-1">Tracks <b class="caret"></b></a>
+                            <div style="padding-left:0px;">
+                                <ul id="drilldown-1" class="nav nav-pills nav-stacked collapse">
+                                    {% for t in tracks %}
+                                        <li><a href='{% url 'track_desc' id=challenge.id track_id=t.id%}'>{{ t.title }}</a></li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </li>
+                    {% endif %}
                     <li><a href='{% url 'challenge_members' id=challenge.id %}'>People</a></li>
                     <li><a href='{% url 'challenge_sponsors' id=challenge.id %}'>Sponsors</a></li>
                     <li><a href='{% url 'challenge_result' id=challenge.id %}'>Results</a></li>  

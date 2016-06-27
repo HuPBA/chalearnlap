@@ -1,4 +1,10 @@
 {% extends "data/base.html" %}
+{% block breadcrumb %}
+    <li><a href="{% url "home" %}">Home</a></li>
+    <li><a href="{% url "dataset_desc" id=dataset.id %}">{{ dataset.title }}</a></li>  
+    <li>{{ data.title }}</li>  
+    <li class="active">Files</li>  
+{% endblock breadcrumb %} 
 {% block content %}
     <div class="col-md-7"> 
         <div class="panel panel-default"> 
@@ -8,9 +14,15 @@
                 {% if files.count > 0 %}
                     {% for f in files %} 
                         {% if f.file %}
-                            <div class="top-margin"> 
-                                <p class="text-center"><a href='{{ f.file.url }}'>{{ f.name }}</a></p>
-                            </div>
+                            {% if f.name%}
+                                <div class="top-margin"> 
+                                    <p class="text-center"><a href='{{ f.file.url }}'>{{ f.name }}</a></p>
+                                </div>
+                            {% else %}
+                                <div class="top-margin"> 
+                                    <p class="text-center"><a href='{{ f.file.url }}'>{{ f.filename }}</a></p>
+                                </div>
+                            {% endif %}
                         {% else %}
                             <div class="top-margin"> 
                                 <p class="text-center"><a href='{{ f.url }}'>{{ f.name }}</a></p>

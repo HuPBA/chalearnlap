@@ -1,4 +1,9 @@
 {% extends "dataset/base.html" %}
+{% block breadcrumb %}
+    <li><a href="{% url "home" %}">Home</a></li>
+    <li>{{ dataset.title }}</li>  
+    <li class="active">Schedule</li>  
+{% endblock breadcrumb %} 
 {% block content %}
     <div class="col-md-7"> 
         <div class="panel panel-default"> 
@@ -9,7 +14,7 @@
                         {% for s in schedule %}
                             <div class="row">
                                 <div class="col-sm-12"> 
-                                    <p><b>{{ s.date }} {{ s.title }}</b></p>
+                                    <p><b>{{ s.date|date:"SHORT_DATE_FORMAT" }} {{ s.title }}</b></p>
                                     <p>{{ s.description|safe }}</p>
                                     <br>
                                 </div>

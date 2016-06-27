@@ -12,7 +12,7 @@ def base_context(request):
         profile_event = Profile_Event.objects.filter(profile=profile)
         if len(profile_event) > 0:
             for p in profile_event:
-                if p.is_admin():
+                if p.is_admin() and p.event and p.profile:
                     if Challenge.objects.filter(id=p.event.id).count() > 0:
                         challenges = challenges | Challenge.objects.filter(id=p.event.id)
                     elif Workshop.objects.filter(id=p.event.id).count() > 0:
@@ -22,7 +22,7 @@ def base_context(request):
         profile_dataset = Profile_Dataset.objects.filter(profile=profile)
         if len(profile_dataset) > 0:
             for p in profile_dataset:
-                if p.is_admin():
+                if p.is_admin() and p.dataset and p.profile:
                     datasets = datasets | Dataset.objects.filter(id=p.dataset.id)
     return dict(
         challenges = challenges,

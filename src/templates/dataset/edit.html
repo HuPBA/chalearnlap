@@ -11,9 +11,12 @@
         {% endfor %} 
     {% endif %}
     <ol class="breadcrumb"> 
-        <li> <a href="{% url "home" %}">Home</a> </li>
-        <li> <a href="{% url "dataset_list" %}">Dataset list</a> </li>                 
-        <li class="active"> Dataset edit </li>                 
+        <li><a href="{% url "home" %}">Home</a></li>
+        {% if not profile_dataset %}
+            <li><a href="{% url "dataset_list" %}">Dataset list</a></li>
+        {% endif %}
+        <li>{{ dataset.title }}</li>                 
+        <li class="active">Edit</li>                 
     </ol>            
     <div class="row"> 
         <article class="col-xs-12 maincontent"> 

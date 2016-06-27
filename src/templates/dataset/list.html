@@ -12,16 +12,24 @@
             <header class="page-header"> 
                 <h1 class="page-title">Datasets &nbsp;<a href="{% url "dataset_creation" %}"><i class="fa fa-plus-circle" aria-hidden="true"></i></a> </h1> 
             </header>    
-            {% csrf_token %}                  
-            <div class="col-md-5"> 
-                <div class="panel panel-default"> 
-                    <div class="panel-body"> 
-                        {% for d in datasets %}
-                            <p><a href='{% url 'dataset_edit' id=d.id%}'>{{ d.title }}</a>&ensp;&ensp;<a id="{{ d.id }}" class="delete-event" value="{% url "dataset_remove" id=d.id %}" href=""><i class="fa fa-minus-circle fa" aria-hidden="true"></i></a></p>
-                        {% endfor %}
-                    </div>                             
-                </div>                         
-            </div>
+            {% csrf_token %}  
+            <div class="col-sm-4">
+                {% if datasets.count > 0 %}
+                    <div class="panel panel-default"> 
+                        <div class="panel-body"> 
+                            {% for d in datasets %}
+                                <p><a href='{% url 'dataset_edit' id=d.id%}'>{{ d.title }}</a>&ensp;&ensp;<a id="{{ d.id }}" class="delete-event" value="{% url "dataset_remove" id=d.id %}" href=""><i class="fa fa-minus-circle fa" aria-hidden="true"></i></a></p>
+                            {% endfor %}
+                        </div>
+                    </div>  
+                {% else %}
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <p class="text-center"> There are no datasets registered.</p>
+                        </div>
+                    </div>
+                {% endif %} 
+            </div>                
         </article>
-    </div>                      
+    </div>                    
 {% endblock container %}    
