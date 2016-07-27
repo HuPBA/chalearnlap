@@ -49,10 +49,22 @@
                                     {% if eventform.errors.description %}
                                         <div class="alert alert-danger" role="alert">{{ eventform.errors.description }}</div>
                                     {% endif %}
-                                    </div>
-                                    <div class="top-margin"> 
+                                </div>
+                                <div class="top-margin"> 
                                     {{ eventform.description }} 
                                 </div>  
+                                <div class="top-margin">
+                                    <div class="dropdown">
+                                        <button class="btn btn-action dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Export special issue members
+                                            <span class="caret"></span>
+                                        </button>
+                                        <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                            <li><a href="{% url 'export_members_csv' event_id=issue.id %}">CSV format</a></li>
+                                            <li><a href="{% url 'export_members_xls' event_id=issue.id %}">Excel Binary File format (XLS)</a></li>
+                                            <li><a href="{% url 'export_members_xlsx' event_id=issue.id %}">Office Open XML format (XLSX)</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
                             </div>
                             <div class="col-md-4"> 
                                 <div class="panel panel-default col-md-offset-1"> 

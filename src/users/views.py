@@ -20,6 +20,9 @@ from django.views.decorators.http import require_POST
 from jfu.http import upload_receive, UploadResponse, JFUResponse
 from django.conf import settings
 import csv
+import xlwt
+import xlsxwriter
+import StringIO
 from decimal import Decimal
 
 @require_POST
@@ -120,6 +123,250 @@ def user_edit(request, id=None):
 		"user_edit": user.id
 	}
 	return render(request, "user/edit.html", context, context_instance=RequestContext(request))
+
+@login_required(login_url='auth_login')
+@user_passes_test(lambda u:u.is_superuser, login_url='/')
+def export_user_csv(request):
+	users = Profile.objects.all()
+	response = HttpResponse(content_type='text/csv')
+	response['Content-Disposition'] = 'attachment; filename="users.csv"'
+	writer = csv.writer(response)
+	response.write(u'\ufeff'.encode('utf8'))
+	writer.writerow(['ID','Username','First name','Last name','Email','Affiliation','Events'])
+	for u in users:
+		events = ''
+		profile_events = Profile_Event.objects.filter(profile=u).exclude(event=None)
+		i=0
+		for p in profile_events:
+			if i==(len(profile_events)-1):
+				events += (p.event.title+'('+p.role.name+')')
+			else:
+				events += (p.event.title+'('+p.role.name+'), ')
+			i+=1
+		if u.affiliation.city and u.affiliation.country:
+			writer.writerow([u.pk,u.user.username,u.first_name,u.last_name,u.user.email,(u.affiliation.name+', '+u.affiliation.city+', '+u.affiliation.country),events])
+		else:
+			writer.writerow([u.pk,u.user.username,u.first_name,u.last_name,u.user.email,(u.affiliation.name),events])
+	return response
+
+def export_members_csv(request, event_id=None):
+	event = Event.objects.filter(id=event_id)[0]
+	profile_events = Profile_Event.objects.filter(event__id=event_id)
+	response = HttpResponse(content_type='text/csv')
+	filename = event.title+'_members.csv'
+	response['Content-Disposition'] = 'attachment; filename=%s' % filename
+	writer = csv.writer(response)
+	response.write(u'\ufeff'.encode('utf8'))
+	writer.writerow(['ID','Username','First name','Last name','Email','Affiliation','Role'])
+	for u in profile_events:
+		role_name = u.role.name
+		u = u.profile
+		if u.affiliation.city and u.affiliation.country:
+			writer.writerow([u.pk,u.user.username,u.first_name,u.last_name,u.user.email,(u.affiliation.name+', '+u.affiliation.city+', '+u.affiliation.country),role_name])
+		else:
+			writer.writerow([u.pk,u.user.username,u.first_name,u.last_name,u.user.email,(u.affiliation.name),role_name])
+	return response
+
+def export_participants_csv(request, dataset_id=None):
+	dataset = Dataset.objects.filter(id=dataset_id)[0]
+	submissions = Submission.objects.filter(dataset__id=dataset_id)
+	response = HttpResponse(content_type='text/csv')
+	filename = dataset.title+'_participants.csv'
+	response['Content-Disposition'] = 'attachment; filename=%s' % filename
+	writer = csv.writer(response)
+	response.write(u'\ufeff'.encode('utf8'))
+	writer.writerow(['ID','Username','First name','Last name','Email','Affiliation'])
+	for u in submissions:
+		u = Profile.objects.filter(user=u.user)[0]
+		if u.affiliation.city and u.affiliation.country:
+			writer.writerow([u.pk,u.user.username,u.first_name,u.last_name,u.user.email,(u.affiliation.name+', '+u.affiliation.city+', '+u.affiliation.country)])
+		else:
+			writer.writerow([u.pk,u.user.username,u.first_name,u.last_name,u.user.email,(u.affiliation.name)])
+	return response
+
+@login_required(login_url='auth_login')
+@user_passes_test(lambda u:u.is_superuser, login_url='/')
+def export_user_xls(request):
+	users = Profile.objects.all()
+	response = HttpResponse(content_type='application/vnd.ms-excel')
+	response['Content-Disposition'] = 'attachment; filename="users.xls"'
+
+	workbook = xlwt.Workbook()
+	worksheet = workbook.add_sheet("Users")
+	row_num = 0
+	columns = ['ID','Username','First name','Last name','Email','Affiliation','Events']
+	for col_num in range(len(columns)):
+		worksheet.write(row_num, col_num, columns[col_num])  
+
+	for u in users:
+		row_num += 1
+		events = ''
+		profile_events = Profile_Event.objects.filter(profile=u).exclude(event=None)
+		i=0
+		for p in profile_events:
+			if i==(len(profile_events)-1):
+				events += (p.event.title+'('+p.role.name+')')
+			else:
+				events += (p.event.title+'('+p.role.name+'), ')
+			i+=1
+		if u.affiliation.city and u.affiliation.country:
+			row=[u.pk,u.user.username,u.first_name,u.last_name,u.user.email,(u.affiliation.name+', '+u.affiliation.city+', '+u.affiliation.country),events]
+		else:
+			row=[u.pk,u.user.username,u.first_name,u.last_name,u.user.email,(u.affiliation.name),events]
+		for col_num in range(len(row)):
+			worksheet.write(row_num, col_num, row[col_num])
+
+	workbook.save(response)
+	return response
+
+def export_members_xls(request, event_id=None):
+	event = Event.objects.filter(id=event_id)[0]
+	profile_events = Profile_Event.objects.filter(event__id=event_id)
+	response = HttpResponse(content_type='application/vnd.ms-excel')
+	filename = event.title+'_members.xls'
+	response['Content-Disposition'] = 'attachment; filename=%s' % filename
+
+	workbook = xlwt.Workbook()
+	worksheet = workbook.add_sheet("Event members")
+	row_num = 0
+	columns = ['ID','Username','First name','Last name','Email','Affiliation','Role']
+	for col_num in range(len(columns)):
+		worksheet.write(row_num, col_num, columns[col_num])  
+
+	for u in profile_events:
+		role_name = u.role.name
+		u = u.profile
+		row_num += 1
+		if u.affiliation.city and u.affiliation.country:
+			row=[u.pk,u.user.username,u.first_name,u.last_name,u.user.email,(u.affiliation.name+', '+u.affiliation.city+', '+u.affiliation.country),role_name]
+		else:
+			row=[u.pk,u.user.username,u.first_name,u.last_name,u.user.email,(u.affiliation.name),role_name]
+		for col_num in range(len(row)):
+			worksheet.write(row_num, col_num, row[col_num])
+
+	workbook.save(response)
+	return response
+
+def export_participants_xls(request, dataset_id=None):
+	dataset = Dataset.objects.filter(id=dataset_id)[0]
+	submissions = Submission.objects.filter(dataset__id=dataset_id)
+	response = HttpResponse(content_type='application/vnd.ms-excel')
+	filename = dataset.title+'_participants.xls'
+	response['Content-Disposition'] = 'attachment; filename=%s' % filename
+
+	workbook = xlwt.Workbook()
+	worksheet = workbook.add_sheet("Dataset participants")
+	row_num = 0
+	columns = ['ID','Username','First name','Last name','Email','Affiliation']
+	for col_num in range(len(columns)):
+		worksheet.write(row_num, col_num, columns[col_num])  
+
+	for u in submissions:
+		u = Profile.objects.filter(user=u.user)[0]
+		row_num += 1
+		if u.affiliation.city and u.affiliation.country:
+			row=[u.pk,u.user.username,u.first_name,u.last_name,u.user.email,(u.affiliation.name+', '+u.affiliation.city+', '+u.affiliation.country)]
+		else:
+			row=[u.pk,u.user.username,u.first_name,u.last_name,u.user.email,(u.affiliation.name)]
+		for col_num in range(len(row)):
+			worksheet.write(row_num, col_num, row[col_num])
+
+	workbook.save(response)
+	return response
+
+@login_required(login_url='auth_login')
+@user_passes_test(lambda u:u.is_superuser, login_url='/')
+def export_user_xlsx(request):
+	users = Profile.objects.all()	
+	output = StringIO.StringIO()
+	workbook = xlsxwriter.Workbook(output)
+	worksheet = workbook.add_worksheet('Users')
+	row_num = 0
+	columns = ['ID','Username','First name','Last name','Email','Affiliation','Events']
+	for col_num in range(len(columns)):
+		worksheet.write(row_num, col_num, columns[col_num])  
+
+	for u in users:
+		row_num += 1
+		events = ''
+		profile_events = Profile_Event.objects.filter(profile=u).exclude(event=None)
+		i=0
+		for p in profile_events:
+			if i==(len(profile_events)-1):
+				events += (p.event.title+'('+p.role.name+')')
+			else:
+				events += (p.event.title+'('+p.role.name+'), ')
+			i+=1
+		if u.affiliation.city and u.affiliation.country:
+			row=[u.pk,u.user.username,u.first_name,u.last_name,u.user.email,(u.affiliation.name+', '+u.affiliation.city+', '+u.affiliation.country),events]
+		else:
+			row=[u.pk,u.user.username,u.first_name,u.last_name,u.user.email,(u.affiliation.name),events]
+		for col_num in range(len(row)):
+			worksheet.write(row_num, col_num, row[col_num])
+
+	workbook.close()
+	output.seek(0)
+	response = HttpResponse(output.read(), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')  
+	response['Content-Disposition'] = 'attachment; filename="users.xlsx"'
+	return response
+
+def export_members_xlsx(request, event_id=None):
+	event = Event.objects.filter(id=event_id)[0]
+	profile_events = Profile_Event.objects.filter(event__id=event_id)
+	output = StringIO.StringIO()
+	workbook = xlsxwriter.Workbook(output)
+	worksheet = workbook.add_worksheet('Event members')
+	row_num = 0
+	columns = ['ID','Username','First name','Last name','Email','Affiliation','Role']
+	for col_num in range(len(columns)):
+		worksheet.write(row_num, col_num, columns[col_num])  
+
+	for u in profile_events:
+		role_name = u.role.name
+		u = u.profile		
+		row_num += 1
+		if u.affiliation.city and u.affiliation.country:
+			row=[u.pk,u.user.username,u.first_name,u.last_name,u.user.email,(u.affiliation.name+', '+u.affiliation.city+', '+u.affiliation.country),role_name]
+		else:
+			row=[u.pk,u.user.username,u.first_name,u.last_name,u.user.email,(u.affiliation.name),role_name]
+		for col_num in range(len(row)):
+			worksheet.write(row_num, col_num, row[col_num])
+
+	workbook.close()
+	output.seek(0)
+	filename = event.title+'_members.xlsx'
+	response = HttpResponse(output.read(), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')  
+	response['Content-Disposition'] = 'attachment; filename=%s' % filename
+	return response
+
+def export_participants_xlsx(request, dataset_id=None):
+	dataset = Dataset.objects.filter(id=dataset_id)[0]
+	submissions = Submission.objects.filter(dataset__id=dataset_id)
+	output = StringIO.StringIO()
+	workbook = xlsxwriter.Workbook(output)
+	worksheet = workbook.add_worksheet('Dataset participants')
+	row_num = 0
+	columns = ['ID','Username','First name','Last name','Email','Affiliation']
+	for col_num in range(len(columns)):
+		worksheet.write(row_num, col_num, columns[col_num])  
+
+	for u in submissions:
+		u = Profile.objects.filter(user=u.user)[0]	
+		row_num += 1
+		if u.affiliation.city and u.affiliation.country:
+			row=[u.pk,u.user.username,u.first_name,u.last_name,u.user.email,(u.affiliation.name+', '+u.affiliation.city+', '+u.affiliation.country)]
+		else:
+			row=[u.pk,u.user.username,u.first_name,u.last_name,u.user.email,(u.affiliation.name)]
+		for col_num in range(len(row)):
+			worksheet.write(row_num, col_num, row[col_num])
+
+	workbook.close()
+	output.seek(0)
+	filename = dataset.title+'_participants.xlsx'
+	response = HttpResponse(output.read(), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')  
+	response['Content-Disposition'] = 'attachment; filename=%s' % filename
+
+	return response
 
 @login_required(login_url='auth_login')
 @user_passes_test(lambda u:u.is_staff, login_url='/')
@@ -504,7 +751,7 @@ def data_edit(request, id=None, dataset_id=None):
 			data.software = software
 			data.metric = metric
 			data.save()
-			return HttpResponseRedirect(reverse('dataset_edit', kwargs={'id':id}))
+			return HttpResponseRedirect(reverse('dataset_edit', kwargs={'id':dataset_id}))
 	context = {
 		"dataform": dataform,
 		"data": data,

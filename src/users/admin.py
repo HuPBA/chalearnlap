@@ -2,6 +2,7 @@ from django.contrib import admin
 from .models import Proposal, Role, Profile_Dataset, Result_col, Submission, Result, Score, Event_Relation, Profile, Track, Gallery_Image, Affiliation, Event, File, Partner, Event_Partner, Profile_Event, Schedule_Event, News, Workshop, Challenge, Special_Issue, Result, Data, Dataset, Contact
 # Register your models here.
 
+
 admin.site.register(Profile)
 admin.site.register(Proposal)
 admin.site.register(Affiliation)

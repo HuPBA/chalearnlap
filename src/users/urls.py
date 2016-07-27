@@ -24,6 +24,9 @@ urlpatterns = [
     # User urls
     url(r'^user/list/$', views.user_list, name="user_list"),
     url(r'^user/edit/(?P<id>\d+)/$', views.user_edit, name="user_edit"),
+    url(r'^user/export-csv/$', views.export_user_csv, name="export_user_csv"),
+    url(r'^user/export-xls/$', views.export_user_xls, name="export_user_xls"),
+    url(r'^user/export-xlsx/$', views.export_user_xlsx, name="export_user_xlsx"),
     # Profile urls (Editors, Organizers...)
     url(r'^profile/edit/(?P<id>\d+)/$', views.profile_edit, name="profile_edit"),
     url(r'^profile/creation/$', views.Backend.as_view(form_class = MemberCreationForm,template_name='registration/registration_form_email.html'), name="profile_creation"),
@@ -59,6 +62,9 @@ urlpatterns = [
     url(r'^dataset/(?P<dataset_id>\d+)/submission/creation$', views.submission_creation, name="submission_creation"),
     url(r'^dataset/(?P<dataset_id>\d+)/member/select/$', views.dataset_profile_select, name="dataset_profile_select"),
     url(r'^dataset/(?P<dataset_id>\d+)/member/(?P<member_id>\d+)/remove$', views.dataset_member_remove, name="dataset_member_remove"),
+    url(r'^dataset/(?P<dataset_id>\d+)/export-participants-csv/$', views.export_participants_csv, name="export_participants_csv"),
+    url(r'^dataset/(?P<dataset_id>\d+)/export-submitted-xls/$', views.export_participants_xls, name="export_participants_xls"),
+    url(r'^dataset/(?P<dataset_id>\d+)/export-submitted-xlsx/$', views.export_participants_xlsx, name="export_participants_xlsx"),
     # Partner urls
     url(r'^partner/list/$', views.partner_list, name="partners_list"),
     url(r'^partner/creation/$', views.partner_creation, name="partner_creation"),
@@ -82,6 +88,9 @@ urlpatterns = [
     url(r'^event/(?P<event_id>\d+)/schedule/(?P<schedule_id>\d+)/edit/$', views.schedule_edit, name="schedule_edit"),
     url(r'^event/(?P<event_id>\d+)/program/(?P<program_id>\d+)/subevent/creation/$', views.subevent_creation, name="subevent_creation"),
     url(r'^event/(?P<event_id>\d+)/schedule/creation$', views.schedule_creation, name="schedule_creation"),
+    url(r'^event/(?P<event_id>\d+)/export-members-csv/$', views.export_members_csv, name="export_members_csv"),
+    url(r'^event/(?P<event_id>\d+)/export-members-xls/$', views.export_members_xls, name="export_members_xls"),
+    url(r'^event/(?P<event_id>\d+)/export-members-xlsx/$', views.export_members_xlsx, name="export_members_xlsx"),
     # url(r'^event/edit/(?P<id>\d+)/$', views.event_edit, name="event_edit"),
     # url(r'^event/proposal/$', views.event_proposal, name="event_proposal"),
     url(r'^challenge/(?P<id>\d+)/publish/$', views.challenge_publish, name="challenge_publish"),
