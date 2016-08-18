@@ -14,13 +14,13 @@
     <ol class="breadcrumb"> 
         <li> <a href="{% url "home" %}">Home</a> </li>
         {% if c %}
-            <li><a href="{% url "challenge_edit" id=c.id%}">{{ c.title }}</a></li> 
+            <li><a href="{% url "challenge_edit_desc" id=c.id%}">{{ c.title }}</a></li> 
         {% elif w %}
-            <li><a href="{% url "workshop_edit" id=w.id%}">{{ w.title }}</a></li> 
+            <li><a href="{% url "workshop_edit_desc" id=w.id%}">{{ w.title }}</a></li> 
         {% elif s %}
-            <li><a href="{% url "special_issue_edit" id=s.id%}">{{ s.title }}</a></li>
+            <li><a href="{% url "special_issue_edit_desc" id=s.id%}">{{ s.title }}</a></li>
         {% elif d %}
-            <li><a href="{% url "dataset_edit" id=d.id%}">{{ d.title }}</a></li>
+            <li><a href="{% url "dataset_edit_desc" id=d.id%}">{{ d.title }}</a></li>
         {% endif %}                     
         <li class="active">Schedule event creation</li>                 
     </ol>           

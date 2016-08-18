@@ -1,0 +1,42 @@
+{% extends "workshop/edit/base.html" %}
+{% load thumbnail %}
+{% block breadcrumb %}
+	<li><a href="{% url "home" %}">Home</a></li>
+    <li>{{ workshop.title }}</li>  
+    <li class="active">Description</li>  
+{% endblock breadcrumb %} 
+{% block content %}
+    <div class="col-md-10"> 
+        <form method="POST" action=""> {% csrf_token %}              
+            <div class="panel panel-default"> 
+                <div class="panel-body"> 
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <h3 class="thin text-center">Gallery pictures &ensp;<a href="{% url "add_gallery_picture" id=workshop.id %}"><i class="fa fa-plus-circle" aria-hidden="true"></i></a></h3>
+                            <hr>
+                            {% if images.count > 0 %}
+                                <div class="row">
+                                    {% for i in images %} 
+                                        <div class="col-sm-4 thumbnail-gallery">
+                                        <a id="{{ m.id }}" class="delete-event" value="{% url 'remove_gallery_picture' id=workshop.id pic_id=i.id %}" href=""><i class="fa fa-minus-circle fa" aria-hidden="true"></i></a>
+                                            {% thumbnail i.image "120x120" crop="noop" as small %}
+                                                <a href="{{ i.image.url }}" title="zoom"><img class="img-responsive" src="{{ small.url }}" width="{{ small.width }}" height="{{ small.height }}"></a>
+                                            {% endthumbnail %}
+                                            <p>{{ i.description|safe|truncatechars:90 }}</p>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <div class="row">
+                                    <div class="col-sm-12"> 
+                                        <p class="text-center"> There is no pictures registered in this workshop</p>
+                                    </div>  
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div> 
+                </div>
+            </div>  
+        </form>                           
+    </div>                         
+{% endblock content %}  

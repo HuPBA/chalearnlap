@@ -14,10 +14,10 @@
                     {% if members|length > 0 %}
                         {% for role, member in members %}
                             <div class="row">
-                                <div class="top-margin">
-                                    <h3 class="thin text-center">{{ role }}</h3>
-                                    <br>
-                                    {% for m in member %} 
+                                <h3 class="thin text-center">{{ role }}</h3>
+                                {% for m in member %} 
+                                <div class="row">
+                                    <div class="all-margin">
                                         {% if m.profile.avatar %}
                                             <div class="col-sm-2">
                                                 <img class="img-responsive" src="{{ m.profile.avatar.url }}">
@@ -29,7 +29,7 @@
                                                     <p>{{ m.profile.first_name }} {{ m.profile.last_name }}</p> 
                                                 {% endif %}
                                                 <p>{{ m.profile.user.email }}</p>
-                                                <p>{{ m.profile.bio }}</p>
+                                                <p>{{ m.profile.bio|truncatechars:400 }}</p>
                                             </div>
                                         {% else %}
                                             <div class="col-sm-12">
@@ -39,13 +39,14 @@
                                                     <p>{{ m.profile.first_name }} {{ m.profile.last_name }}</p> 
                                                 {% endif %}
                                                 <p>{{ m.profile.user.email }}</p>
-                                                <p>{{ m.profile.bio }}</p>
+                                                <p>{{ m.profile.bio|truncatechars:400 }}</p>
                                             </div>
                                         {% endif %}
-                                    {% endfor %} 
+                                    </div>
                                 </div>
+                                {% endfor %} 
                             </div>
-                        {% endfor %}  
+                        {% endfor %}
                     {% else %}
                         <div class="row">
                             <div class="col-sm-12"> 

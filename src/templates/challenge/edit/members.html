@@ -1,0 +1,80 @@
+{% extends "challenge/edit/base.html" %}
+{% block breadcrumb %}
+    {% if eventform.non_field_errors  %}
+        {% for e in eventform.non_field_errors %} 
+            <div class="row"> 
+                <div class="col-md-6 widget col-md-offset-3"> 
+                    <div class="alert alert-danger" role="alert">{{ e }}</div>
+                </div>
+            </div>
+        {% endfor %} 
+    {% endif %}
+	<li><a href="{% url "home" %}">Home</a></li>
+    <li>{{ challenge.title }}</li>  
+    <li class="active">People</li>  
+{% endblock breadcrumb %} 
+{% block content %}
+    <div class="col-md-10"> 
+        <form method="POST" action="" enctype="multipart/form-data"> {% csrf_token %}              
+            <div class="panel panel-default"> 
+                <div class="panel-body"> 
+                    <div class="row">
+                        <div class="col-sm-12"> 
+                            <h3 class="thin text-center">People &ensp;<a href="{% url "profile_select" id=challenge.id %}"><i class="fa fa-plus-circle" aria-hidden="true"></i></a></h3>
+                            <hr> 
+                            {% if members|length > 0 %}
+                                {% for role, member in members %}
+                                    <div class="row">
+                                        <h3 class="thin text-center">{{ role }}</h3>
+                                        {% for m in member %} 
+                                        <div class="row">
+                                            <div class="all-margin">
+                                                {% if m.profile.avatar %}
+                                                    <div class="col-sm-2">
+                                                        <img class="img-responsive" src="{{ m.profile.avatar.url }}">
+                                                    </div>
+                                                    <div class="col-sm-3">
+                                                        {% if m.profile.affiliation.name and m.profile.affiliation.city and m.profile.affiliation.country %}
+                                                            <p>{{ m.profile.first_name }} {{ m.profile.last_name }}&ensp;<a href="{% url 'user_edit' id=m.profile.user.id %}"><i class="fa fa-pencil" aria-hidden="true"></i></a>&ensp;<a id="{{ m.id }}" class="delete-event" value="{% url 'event_member_remove' id=challenge.id member_id=m.id %}" href=""><i class="fa fa-minus-circle fa" aria-hidden="true"></i></a></p>
+                                                            <p>{{ m.profile.affiliation.name }}, {{ m.profile.affiliation.city }}, {{ m.profile.affiliation.country }}</p>
+                                                        {% else %}
+                                                            <p>{{ m.profile.first_name }} {{ m.profile.last_name }} <a href="{% url 'user_edit' id=m.profile.user.id %}"><i class="fa fa-pencil" aria-hidden="true"></i></a>&ensp;<a id="{{ m.id }}" class="delete-event" value="{% url 'event_member_remove' id=challenge.id member_id=m.id %}" href=""><i class="fa fa-minus-circle fa" aria-hidden="true"></i></a></p>
+                                                        {% endif %}
+                                                        <p>{{ m.profile.user.email }}</p>
+                                                    </div>
+                                                    <div class="col-sm-7">
+                                                        <p>{{ m.profile.bio|truncatechars:400 }}</p>
+                                                    </div>
+                                                {% else %}
+                                                    <div class="col-sm-3">
+                                                        {% if m.profile.affiliation.name and m.profile.affiliation.city and m.profile.affiliation.country %}
+                                                            <p>{{ m.profile.first_name }} {{ m.profile.last_name }}&ensp;<a href="{% url 'user_edit' id=m.profile.user.id %}"><i class="fa fa-pencil" aria-hidden="true"></i></a>&ensp;<a id="{{ m.id }}" class="delete-event" value="{% url 'event_member_remove' id=challenge.id member_id=m.id %}" href=""><i class="fa fa-minus-circle fa" aria-hidden="true"></i></a></p>
+                                                            <p>{{ m.profile.affiliation.name }}, {{ m.profile.affiliation.city }}, {{ m.profile.affiliation.country }}</p>
+                                                        {% else %}
+                                                            <p>{{ m.profile.first_name }} {{ m.profile.last_name }} <a href="{% url 'user_edit' id=m.profile.user.id %}"><i class="fa fa-pencil" aria-hidden="true"></i></a>&ensp;<a id="{{ m.id }}" class="delete-event" value="{% url 'event_member_remove' id=challenge.id member_id=m.id %}" href=""><i class="fa fa-minus-circle fa" aria-hidden="true"></i></a> </p>
+                                                        {% endif %}
+                                                        <p>{{ m.profile.user.email }}</p>
+                                                    </div>
+                                                    <div class="col-sm-9">
+                                                        <p>{{ m.profile.bio|truncatechars:400 }}</p>
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        {% endfor %} 
+                                    </div>
+                                {% endfor %}  
+                            {% else %}
+                                <div class="row">
+                                    <div class="col-sm-12"> 
+                                        <p class="text-center">There are no members registered in {{ challenge.title }}</p>
+                                    </div>  
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>  
+        </form>                           
+    </div>                         
+{% endblock content %}  

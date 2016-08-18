@@ -13,14 +13,14 @@
     <ol class="breadcrumb"> 
         <li> <a href="{% url "home" %}">Home</a> </li>
         {% if c %}
-            <li><a href="{% url "challenge_edit" id=c.id%}">{{ c.title }}</a></li> 
+            <li><a href="{% url "challenge_edit_desc" id=c.id%}">{{ c.title }}</a></li> 
         {% endif %}                
-        <li class="active"> Data detail </li>                 
+        <li class="active">Track edit</li>                 
     </ol>            
     <div class="row"> 
         <article class="col-xs-12 maincontent"> 
             <header class="page-header"> 
-                <h1 class="page-title">Data detail</h1> 
+                <h1 class="page-title">Track edit</h1> 
             </header>  
             <form method="POST" action="" enctype="multipart/form-data"> {% csrf_token %}            
                 <div class="panel panel-default"> 

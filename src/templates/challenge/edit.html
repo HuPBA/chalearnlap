@@ -54,14 +54,51 @@
                                     {{ eventform.description }} 
                                 </div> 
                                 <div class="top-margin"> 
-                                    <label>Results File </label> <br>
-                                    <span>Import CSV file with the challenge results</span>  
-                                    {% if eventform.errors.file %}
-                                        <div class="alert alert-danger" role="alert">{{ eventform.errors.file }}</div>
-                                    {% endif %}
+                                    <label>Actual results</label> <br>
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            {% if results %}
+                                                <div class="table-responsive">
+                                                    <table class="table table-striped table-bordered">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>User</th>
+                                                                {% for n in names %}
+                                                                    <th>{{ n }}</th>
+                                                                {% endfor %}
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            {% for r in results %}
+                                                                <tr>
+                                                                    <td>{{ r.user }} <a href="{% url "result_edit" id=event.id result_id=r.id %}"><i class="fa fa-pencil" aria-hidden="true"></i></a>
+                                                                    &ensp;<a id="{{ e.id }}" class="delete-event" value="{% url "result_remove" id=event.id result_id=r.id %}" href=""><i class="fa fa-minus-circle fa" aria-hidden="true"></i></a></td>
+                                                                    {% for s in scores %}
+                                                                        {% if s.result == r %}
+                                                                            <td>{{ s.score }}</td>
+                                                                        {% endif%}
+                                                                    {% endfor %}
+                                                                </tr>
+                                                            {% endfor %}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            {% else %}
+                                                <div class="row">
+                                                    <div class="col-sm-12">
+                                                        <p class="text-center">There are no results</p>
+                                                    </div>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    <div class="col-sm-5">
+                                        <span>Import CSV file with the challenge results</span> 
+                                        {% if eventform.errors.file %}
+                                            <div class="alert alert-danger" role="alert">{{ eventform.errors.file }}</div>
+                                        {% endif %}
+                                        {{ eventform.file }} 
                                     </div>
-                                    <div class="top-margin"> 
-                                    {{ eventform.file }} 
+                                    </div>
                                 </div> 
                                 <div class="top-margin">
                                     <div class="dropdown">

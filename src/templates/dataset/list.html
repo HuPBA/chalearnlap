@@ -18,7 +18,7 @@
                     <div class="panel panel-default"> 
                         <div class="panel-body"> 
                             {% for d in datasets %}
-                                <p><a href='{% url 'dataset_edit' id=d.id%}'>{{ d.title }}</a>&ensp;&ensp;<a id="{{ d.id }}" class="delete-event" value="{% url "dataset_remove" id=d.id %}" href=""><i class="fa fa-minus-circle fa" aria-hidden="true"></i></a></p>
+                                <p>{{ d.title }}&ensp;<a href="{% url 'dataset_edit_desc' id=d.id%}"><i class="fa fa-pencil" aria-hidden="true"></i></a>&ensp;<a id="{{ d.id }}" class="delete-event" value="{% url "dataset_remove" id=d.id %}" href=""><i class="fa fa-minus-circle fa" aria-hidden="true"></i></a></p>
                             {% endfor %}
                         </div>
                     </div>  

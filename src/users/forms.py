@@ -279,7 +279,7 @@ class DatasetCreationForm(forms.Form):
 		super(DatasetCreationForm, self).__init__(*args, **kwargs)
 		self.fields['dataset_title'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}))
 		self.fields['description'] = forms.CharField(required=True, widget=CKEditorWidget())
-		self.fields['results_cols'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}))
+		self.fields['cols'] = forms.IntegerField(required=True, min_value=1, max_value=10, widget=forms.TextInput(attrs={'class': "form-control"}))
 
 	def clean(self):
 		return self.cleaned_data
@@ -344,6 +344,14 @@ class EditEventForm(forms.Form):
 		super(EditEventForm, self).__init__(*args, **kwargs)
 		self.fields['title'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}), initial=event.title)
 		self.fields['description'] = forms.CharField(required=True, widget=CKEditorWidget(), initial=event.description)
+		# self.fields['file'] = forms.FileField(required=False)
+
+	def clean(self):
+		return self.cleaned_data
+
+class EditChallengeResult(forms.Form):
+	def __init__(self, *args, **kwargs):
+		super(EditChallengeResult, self).__init__(*args, **kwargs)
 		self.fields['file'] = forms.FileField(required=False)
 
 	def clean(self):
@@ -466,3 +474,93 @@ class SubmissionScoresForm(forms.Form):
 
 	def clean(self):
 		return self.cleaned_data
+
+class ResultEditForm(forms.Form):
+	def __init__(self, *args, **kwargs):
+		result = kwargs.pop('result', None)
+		super(ResultEditForm, self).__init__(*args, **kwargs)
+		self.fields['name'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}), initial=result.user)
+		if result and result.sheets:
+			self.fields['sheets'] = forms.URLField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}), initial=result.sheets)
+		else:
+			self.fields['sheets'] = forms.URLField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}))
+		if result and result.code:
+			self.fields['code'] = forms.URLField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}), initial=result.code)
+		else:
+			self.fields['code'] = forms.URLField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}))
+		if result and result.website:
+			self.fields['website'] = forms.URLField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}), initial=result.website)
+		else:
+			self.fields['website'] = forms.URLField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}))
+		if result and result.article:
+			self.fields['article'] = forms.URLField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}), initial=result.article)
+		else:
+			self.fields['article'] = forms.URLField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}))
+		if result and result.other:
+			self.fields['other'] = forms.URLField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}), initial=result.other)
+		else:
+			self.fields['other'] = forms.URLField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}))
+
+	def clean(self):
+		return self.cleaned_data
+
+class ColEditForm(forms.Form):
+	def __init__(self, *args, **kwargs):
+		col = kwargs.pop('col', None)
+		super(ColEditForm, self).__init__(*args, **kwargs)
+		self.fields['name'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}), initial=col.name)
+
+	def clean(self):
+		return self.cleaned_data
+
+class SubmissionEditForm(forms.Form):
+	def __init__(self, *args, **kwargs):
+		submission = kwargs.pop('submission', None)
+		super(SubmissionEditForm, self).__init__(*args, **kwargs)
+		if submission and submission.source_code:
+			self.fields['source_code'] = forms.URLField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}), initial=submission.source_code)
+		else:
+			self.fields['source_code'] = forms.URLField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}))
+		if submission and submission.publication:
+			self.fields['publication'] = forms.URLField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}), initial=submission.publication)
+		else:
+			self.fields['publication'] = forms.URLField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}))
+		if submission and submission.publication:
+			self.fields['sub_file'] = forms.FileField(required=False, initial=submission.sub_file)
+		else:
+			self.fields['sub_file'] = forms.FileField(required=False)
+
+	def clean(self):
+		return self.cleaned_data
+
+class PublicationCreationForm(forms.Form):
+	def __init__(self, choices, *args, **kwargs):
+		super(PublicationCreationForm, self).__init__(*args, **kwargs)
+		self.fields['title'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}))
+		self.fields['content'] = forms.CharField(required=True, widget=CKEditorWidget())
+		self.fields['url'] = forms.URLField(required=False, widget=forms.TextInput(attrs={'class': "form-control", 'placeholder': "URL"}))
+		self.fields['event'] = forms.ChoiceField(widget=forms.Select(attrs={'class': "form-control"}), required=True, choices=choices)
+
+	def clean(self):
+		return self.cleaned_data
+
+class PublicationEventCreationForm(forms.Form):
+	def __init__(self, *args, **kwargs):
+		super(PublicationEventCreationForm, self).__init__(*args, **kwargs)
+		self.fields['title'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}))
+		self.fields['content'] = forms.CharField(required=True, widget=CKEditorWidget())
+		self.fields['url'] = forms.URLField(required=False, widget=forms.TextInput(attrs={'class': "form-control", 'placeholder': "URL"}))
+
+	def clean(self):
+		return self.cleaned_data
+
+class PublicationEditForm(forms.Form):
+	def __init__(self, publication, *args, **kwargs):
+		super(PublicationEditForm, self).__init__(*args, **kwargs)
+		self.fields['title'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}), initial=publication.title)
+		self.fields['content'] = forms.CharField(required=True, widget=CKEditorWidget(), initial=publication.content)
+		self.fields['url'] = forms.URLField(required=False, widget=forms.TextInput(attrs={'class': "form-control", 'placeholder': "URL"}), initial=publication.url)
+
+	def clean(self):
+		return self.cleaned_data
+

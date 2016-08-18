@@ -1,0 +1,54 @@
+{% extends "dataset/edit/base.html" %}
+{% block breadcrumb %}
+    {% if colform.non_field_errors  %}
+        {% for e in colform.non_field_errors %} 
+            <div class="row"> 
+                <div class="col-md-6 widget col-md-offset-3"> 
+                    <div class="alert alert-danger" role="alert">{{ e }}</div>
+                </div>
+            </div>
+        {% endfor %} 
+    {% endif %}
+	<li><a href="{% url "home" %}">Home</a></li>
+    <li>{{ dataset.title }}</li>  
+    <li class="active">Description</li>  
+{% endblock breadcrumb %} 
+{% block content %}
+<form method="POST" action=""> {% csrf_token %}  
+    <div class="col-md-10"> 
+        <div class="panel panel-default"> 
+            <div class="panel-body"> 
+                <div class="row">
+                    <div class="col-sm-12"> 
+                        <h3 class="thin text-center">Column edit</h3> 
+                        <hr>
+                        <div class="col-sm-4">
+                            <div class="top-margin"> 
+                                <label>Name 
+                                    {% if colform.name.field.required %}
+                                    <span class="text-danger">*</span>
+                                    {% endif %}
+                                </label>  
+                                {% if colform.errors.name %}
+                                    <div class="alert alert-danger" role="alert">{{ colform.errors.name }}</div>
+                                {% endif %}
+                                {{ colform.name }} 
+                            </div> 
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12"> 
+                        <hr>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-2 col-lg-offset-10 text-right"> 
+                        <button class="btn btn-action" type="submit" name="signup-button">Save</button>
+                    </div>
+                </div>  
+            </div>
+        </div>  
+    </div>   
+</form>                      
+{% endblock content %}  

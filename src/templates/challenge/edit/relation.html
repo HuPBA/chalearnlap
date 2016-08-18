@@ -1,0 +1,73 @@
+{% extends "challenge/edit/base.html" %}
+{% block breadcrumb %}
+    {% if eventform.non_field_errors  %}
+        {% for e in eventform.non_field_errors %} 
+            <div class="row"> 
+                <div class="col-md-6 widget col-md-offset-3"> 
+                    <div class="alert alert-danger" role="alert">{{ e }}</div>
+                </div>
+            </div>
+        {% endfor %} 
+    {% endif %}
+	<li><a href="{% url "home" %}">Home</a></li>
+    <li>{{ challenge.title }}</li>  
+    <li class="active">Associated events</li>  
+{% endblock breadcrumb %} 
+{% block content %}
+    <div class="col-md-10"> 
+        <form method="POST" action="" enctype="multipart/form-data"> {% csrf_token %}              
+            <div class="panel panel-default"> 
+                <div class="panel-body"> 
+                    <div class="row">
+                        <div class="col-sm-12"> 
+                            <h3 class="thin text-center">Associated events&ensp;<a href="{% url "event_relation_creation" id=challenge.id %}"><i class="fa fa-plus-circle" aria-hidden="true"></i></a></h3>
+                            <hr> 
+                            <div class="row">
+                                {% if associated.count < 1 and relations.count < 1 %}
+                                    <div class="col-sm-12"> 
+                                        <p class="text-center">There are no associated events in {{ challenge.title }}</p>
+                                    </div>  
+                                {% else %}
+                                    {% if relations.count > 0 %}
+                                        {% for r in relations %} 
+                                            <div class="top-margin"> 
+                                                <div class="col-sm-12">
+                                                    {% if r.challenge_relation %} 
+                                                        <h4><a href="{{ r.challenge_relation.get_absolute_url }}">{{ r.challenge_relation.title }}</a>&ensp;<a id="{{ r.id }}" class="delete-event" value="{% url 'event_relation_remove' id=challenge.id relation_id=r.id %}" href=""><i class="fa fa-minus-circle fa" aria-hidden="true"></i></a></h4>
+                                                    {% elif r.issue_relation %} 
+                                                        <h4><a href="{{ r.issue_relation.get_absolute_url }}">{{ r.issue_relation.title }}</a>&ensp;<a id="{{ r.id }}" class="delete-event" value="{% url 'event_relation_remove' id=challenge.id relation_id=r.id %}" href=""><i class="fa fa-minus-circle fa" aria-hidden="true"></i></a></h4>
+                                                    {% elif r.workshop_relation %}
+                                                        <h4><a href="{{ r.workshop_relation.get_absolute_url }}">{{ r.workshop_relation.title }}</a>&ensp;<a id="{{ r.id }}" class="delete-event" value="{% url 'event_relation_remove' id=challenge.id relation_id=r.id %}" href=""><i class="fa fa-minus-circle fa" aria-hidden="true"></i></a></h4>
+                                                    {% elif r.dataset_relation %}
+                                                        <h4><a href="{{ r.dataset_relation.get_absolute_url }}">{{ r.dataset_relation.title }}</a>&ensp;<a id="{{ r.id }}" class="delete-event" value="{% url 'event_relation_remove' id=challenge.id relation_id=r.id %}" href=""><i class="fa fa-minus-circle fa" aria-hidden="true"></i></a></h4>
+                                                    {% endif %}
+                                                    <p>{{ r.description|safe }}</p>
+                                                    <br>
+                                                </div>
+                                            </div>
+                                        {% endfor %}  
+                                    {% endif %}
+                                    {% if associated.count > 0 %}
+                                        {% for a in associated %} 
+                                            <div class="top-margin"> 
+                                                <div class="col-sm-12">
+                                                    {% if a.event_associated %} 
+                                                        <h4><a href="{{ a.event_associated.get_absolute_url }}">{{ a.event_associated.title }}</a>&ensp;<a id="{{ r.id }}" class="delete-event" value="{% url 'event_relation_remove' id=challenge.id relation_id=a.id %}" href=""><i class="fa fa-minus-circle fa" aria-hidden="true"></i></a></h4>
+                                                    {% elif a.dataset_associated %} 
+                                                        <h4><a href="{{ a.dataset_associated.get_absolute_url }}">{{ a.dataset_associated.title }}</a>&ensp;<a id="{{ r.id }}" class="delete-event" value="{% url 'event_relation_remove' id=challenge.id relation_id=a.id %}" href=""><i class="fa fa-minus-circle fa" aria-hidden="true"></i></a></h4>
+                                                    {% endif %}
+                                                    <p>{{ a.description|safe }}</p>
+                                                    <br>
+                                                </div>
+                                            </div>
+                                        {% endfor %}  
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>  
+        </form>                           
+    </div>                         
+{% endblock content %}  

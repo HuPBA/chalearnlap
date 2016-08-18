@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block container %}
+    <ol class="breadcrumb"> 
+        {% block breadcrumb %}
+        {% endblock breadcrumb %}            
+    </ol>            
+    <div class="row"> 
+        <article class="col-xs-12 maincontent"> 
+            <header class="page-header"> 
+                <h1 class="page-title">{{ issue.title }} 
+                    {% if issue.is_public %}
+                        <a title="Unpublish" href="{% url "special_issue_unpublish" id=issue.id %}"><i class="fa fa-cloud-download" aria-hidden="true"></i></a>
+                    {% else %}
+                        <a title="Publish" href="{% url "special_issue_publish" id=issue.id %}"><i class="fa fa-cloud-upload" aria-hidden="true"></i></a>
+                    {% endif %}
+                    <div class="top-margin">
+                        <div class="dropdown">
+                            <button class="btn btn-action dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Export special issue members
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                <li><a href="{% url 'export_members_csv' event_id=issue.id %}">CSV format</a></li>
+                                <li><a href="{% url 'export_members_xls' event_id=issue.id %}">Excel Binary File format (XLS)</a></li>
+                                <li><a href="{% url 'export_members_xlsx' event_id=issue.id %}">Office Open XML format (XLSX)</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </h1>
+            </header> 
+            <div class="col-md-2" id="leftCol">
+                <ul class="nav nav-stacked" id="sidebar">
+                    <li><a href='{% url 'special_issue_edit_desc' id=issue.id %}'>Description</a></li>
+                    <li><a href='{% url 'special_issue_edit_members' id=issue.id %}'>People</a></li>
+                    <li><a href='{% url 'special_issue_edit_schedule' id=issue.id %}'>Schedule</a></li>
+                    <li><a href='{% url 'special_issue_edit_relations' id=issue.id %}'>Associated events</a></li>
+                    <li><a href='{% url 'special_issue_edit_news' id=issue.id %}'>News</a></li>
+                    <li><a href='{% url 'special_issue_edit_publications' id=issue.id %}'>Publications</a></li>
+                </ul>
+            </div>
+            {% block content %}
+            {% endblock content %}
+        </article>
+    </div>
+{% endblock container %}  

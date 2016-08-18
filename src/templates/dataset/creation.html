@@ -42,19 +42,17 @@
                                             {{ datasetform.dataset_title }} 
                                         </div>  
                                     </div>
-                                    <div class="col-md-7">
+                                    <div class="col-md-3">
                                         <div class="top-margin"> 
-                                            <label>Result columns
-                                                {% if datasetform.results_cols.field.required %}
+                                            <label>Number of result columns
+                                                {% if datasetform.cols.field.required %}
                                                 <span class="text-danger">*</span>
                                                 {% endif %}
                                             </label>  
-                                            <br>
-                                            <span>Introduce the name of the columns of the result separated by semi-colons</span>
-                                            {% if datasetform.errors.results_cols %}
-                                                <div class="alert alert-danger" role="alert">{{ datasetform.errors.results_cols }}</div>
+                                            {% if datasetform.errors.cols %}
+                                                <div class="alert alert-danger" role="alert">{{ datasetform.errors.cols }}</div>
                                             {% endif %}
-                                            {{ datasetform.results_cols }} 
+                                            {{ datasetform.cols }} 
                                         </div> 
                                     </div> 
                                 </div>                                   

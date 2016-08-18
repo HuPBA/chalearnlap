@@ -1,0 +1,83 @@
+{% extends "data/edit/base.html" %}
+{% block breadcrumb %}
+    {% if dataform.non_field_errors  %}
+        {% for e in dataform.non_field_errors %} 
+            <div class="row"> 
+                <div class="col-md-6 widget col-md-offset-3"> 
+                    <div class="alert alert-danger" role="alert">{{ e }}</div>
+                </div>
+            </div>
+        {% endfor %} 
+    {% endif %}
+	<li><a href="{% url "home" %}">Home</a></li>
+    <li>{{ dataset.title }}</li>  
+    <li class="active">Description</li>  
+{% endblock breadcrumb %} 
+{% block content %}
+    <div class="col-md-10"> 
+        <form method="POST" action="" enctype="multipart/form-data"> {% csrf_token %}              
+            <div class="panel panel-default"> 
+                <div class="panel-body"> 
+                    <div class="row">
+                        <div class="col-sm-12"> 
+                            <div class="top-margin"> 
+                                <label>Title 
+                                    {% if dataform.data_title.field.required %}
+                                    <span class="text-danger">*</span>
+                                    {% endif %}
+                                </label>  
+                                {% if dataform.errors.data_title %}
+                                    <div class="alert alert-danger" role="alert">{{ dataform.errors.data_title }}</div>
+                                {% endif %}
+                                {{ dataform.data_title }} 
+                            </div> 
+                            <div class="top-margin"> 
+                                <label>Description 
+                                    {% if dataform.data_desc.field.required %}
+                                    <span class="text-danger">*</span>
+                                    {% endif %}
+                                </label>  
+                                {% if dataform.errors.data_desc %}
+                                    <div class="alert alert-danger" role="alert">{{ dataform.errors.data_desc }}</div>
+                                {% endif %}
+                                {{ dataform.data_desc }} 
+                            </div> 
+                            <div class="top-margin"> 
+                                <label>Software and tools 
+                                    {% if dataform.data_software.field.required %}
+                                    <span class="text-danger">*</span>
+                                    {% endif %}
+                                </label>  
+                                {% if dataform.errors.data_software %}
+                                    <div class="alert alert-danger" role="alert">{{ dataform.errors.data_software }}</div>
+                                {% endif %}
+                                {{ dataform.data_software }} 
+                            </div>
+                            <div class="top-margin"> 
+                                <label>Evaluation metrics 
+                                    {% if dataform.data_metric.field.required %}
+                                    <span class="text-danger">*</span>
+                                    {% endif %}
+                                </label>  
+                                {% if dataform.errors.data_metric %}
+                                    <div class="alert alert-danger" role="alert">{{ dataform.errors.data_metric }}</div>
+                                {% endif %}
+                                {{ dataform.data_metric }} 
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12"> 
+                            <hr>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-2 col-lg-offset-10 text-right"> 
+                            <button class="btn btn-action" type="submit" name="signup-button">Save</button>
+                        </div>
+                    </div>  
+                </div>
+            </div>  
+        </form>                           
+    </div>                         
+{% endblock content %}  

@@ -1,0 +1,74 @@
+{% extends "dataset/edit/base.html" %}
+{% block breadcrumb %}
+    {% if subform.non_field_errors  %}
+        {% for e in subform.non_field_errors %} 
+            <div class="row"> 
+                <div class="col-md-6 widget col-md-offset-3"> 
+                    <div class="alert alert-danger" role="alert">{{ e }}</div>
+                </div>
+            </div>
+        {% endfor %} 
+    {% endif %}
+	<li><a href="{% url "home" %}">Home</a></li>
+    <li>{{ dataset.title }}</li>  
+    <li class="active">Description</li>  
+{% endblock breadcrumb %} 
+{% block content %}
+    <div class="col-md-10"> 
+        <form method="POST" action="" enctype="multipart/form-data"> {% csrf_token %}              
+            <div class="panel panel-default"> 
+                <div class="panel-body"> 
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="top-margin"> 
+                                <label>Source Code
+                                    {% if subform.sheets.source_code.required %}
+                                    <span class="text-danger">*</span>
+                                    {% endif %}
+                                </label>   
+                                {% if subform.errors.source_code %}
+                                    <div class="alert alert-danger" role="alert">{{ subform.errors.source_code }}</div>
+                                {% endif %}
+                                {{ subform.source_code }}                                      
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="top-margin"> 
+                                <label>Publication
+                                    {% if subform.publication.field.required %}
+                                    <span class="text-danger">*</span>
+                                    {% endif %}
+                                </label>   
+                                {% if subform.errors.publication %}
+                                    <div class="alert alert-danger" role="alert">{{ subform.errors.publication }}</div>
+                                {% endif %}
+                                {{ subform.publication }}                                      
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="top-margin"> 
+                                <label>Submission file
+                                    {% if subform.sub_file.field.required %}
+                                    <span class="text-danger">*</span>
+                                    {% endif %}
+                                </label>   
+                                {% if subform.errors.sub_file %}
+                                    <div class="alert alert-danger" role="alert">{{ subform.errors.sub_file }}</div>
+                                {% endif %}
+                                {{ subform.sub_file }}                                      
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <hr>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-2 col-lg-offset-10 text-right"> 
+                            <button class="btn btn-action" name="save" type="submit">Save</button>
+                        </div>
+                    </div>
+                </div>
+            </div>  
+        </form>                           
+    </div>                         
+{% endblock content %}  

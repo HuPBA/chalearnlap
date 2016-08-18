@@ -12,7 +12,7 @@
                 <hr> 
                 {% if results %}
                     <div class="table-responsive">
-                        <table class="table table-condensed">
+                        <table id="table-order" class="table table-bordered">
                             <thead>
                                 <tr>
                                     <th>User</th>
@@ -24,7 +24,38 @@
                             <tbody>
                                 {% for r in results %}
                                     <tr>
-                                        <td>{{ r.user }}</td>
+                                        <td>
+                                            <div class="btn-group">
+                                                <a class="btn dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{ r.user }} <span class="caret"></span></a>
+                                                <ul id="contextMenu" class="dropdown-menu" role="menu">
+                                                    {% if r.sheets == None or r.sheets == "" %}
+                                                        <li class="disabled"><a>Fact sheets</a></li>
+                                                    {% else %}
+                                                        <li><a href="{{ r.sheets }}">Fact sheets</a></li>
+                                                    {% endif %}
+                                                    {% if r.code == None or r.code == "" %}
+                                                        <li class="disabled"><a>Code</a></li>
+                                                    {% else %}
+                                                        <li><a href="{{ r.code }}">Code</a></li>
+                                                    {% endif %}
+                                                    {% if r.website == None or r.website == "" %}
+                                                        <li class="disabled"><a>Website</a></li>
+                                                    {% else %}
+                                                        <li><a href="{{ r.website }}">Website</a></li>
+                                                    {% endif %}
+                                                    {% if r.article == None or r.article == "" %}
+                                                        <li class="disabled"><a>Article</a></li>
+                                                    {% else %}
+                                                        <li><a href="{{ r.article }}">Article</a></li>
+                                                    {% endif %}
+                                                    {% if r.other == None or r.other == "" %}
+                                                        <li class="disabled"><a>Other</a></li>
+                                                    {% else %}
+                                                        <li><a href="{{ r.other }}">Other</a></li> 
+                                                    {% endif %}
+                                                </ul>
+                                            </div>
+                                        </td>
                                         {% for s in scores %}
                                             {% if s.result == r %}
                                                 <td>{{ s.score }}</td>

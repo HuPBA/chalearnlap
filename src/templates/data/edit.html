@@ -125,7 +125,14 @@
                         </div> 
                         <hr>
                         <div class="row">
-                            <div class="col-lg-4 col-lg-offset-8 text-right"> 
+                            <div class="col-lg-2 col-lg-offset-8 text-right">
+                                {% if data.is_public %}
+                                    <a class="btn btn-action" href="{% url "data_unpublish" dataset_id=dataset_id id=data.id %}">Unpublish</a>
+                                {% else %}
+                                    <a class="btn btn-action" href="{% url "data_publish" dataset_id=dataset_id id=data.id %}">Publish</a>
+                                {% endif %}
+                            </div>
+                            <div class="col-lg-2 text-right"> 
                                 <button class="btn btn-action" type="submit" name="signup-button">Save</button>
                             </div>
                         </div>                           

@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block container %}
+	<ol class="breadcrumb"> 
+        <li> <a href="{% url "home" %}">Home</a> </li>
+        <li class="active">Publications list</li>                 
+    </ol> 
+    <div class="row"> 
+        <article class="col-xs-12 maincontent"> 
+            <header class="page-header"> 
+                <h1 class="page-title">Publications 
+                {% if perm %}
+                    <a href="{% url "publication_creation" %}"><i class="fa fa-plus-circle" aria-hidden="true"></i></a>
+                {% endif %}
+                </h1>
+            </header>    
+            {% if publications.count > 0 %}
+                <div class="row">
+                    {% if perm %}
+                        {% for p in publications %} 
+                            <div class="col-sm-12">
+                                <div class="top-margin"> 
+                                    <p class="text-center"><b><a href="{% url "publication_detail" id=p.id %}">{{ p.title }}</a></b>&ensp;<a href="{% url "publication_edit" pub_id=p.id %}"><i class="fa fa-pencil" aria-hidden="true"></i></a>&ensp;<a id="{{ p.id }}" class="delete-event" value="{% url "publication_remove" pub_id=p.id %}" href=""><i class="fa fa-minus-circle fa" aria-hidden="true"></i></a></p>
+                                </div>
+                            </div>
+                        {% endfor %} 
+                    {% else %}
+                        {% for p in publications %} 
+                            <div class="col-sm-12">
+                                <div class="top-margin">
+                                    <p class="text-center"><b><a href="{% url "publication_detail" id=p.id %}">{{ p.title }}</a></b></p>
+                                </div>
+                            </div>
+                        {% endfor %}  
+                    {% endif %}
+                </div>
+            {% else %}
+                <div class="row">
+                    <div class="col-sm-12">
+                        <p class="text-center"> There are no publications registered</p>
+                    </div>
+                </div>
+            {% endif %}                     
+        </article>
+    </div>                      
+{% endblock container %}    

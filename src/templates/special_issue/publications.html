@@ -1,0 +1,33 @@
+{% extends "special_issue/base.html" %}
+{% block breadcrumb %}
+    <li><a href="{% url "home" %}">Home</a></li>
+    <li>{{ issue.title }}</li>  
+    <li class="active">Publications</li>  
+{% endblock breadcrumb %} 
+{% block content %}
+    <div class="col-md-7"> 
+        <div class="panel panel-default"> 
+            <div class="panel-body"> 
+                <h3 class="thin text-center">Publications</h3> 
+                <hr> 
+                {% if publications.count > 0 %}
+                    <div class="row">
+                        {% for p in publications %} 
+                            <div class="col-sm-12">
+                                <div class="top-margin"> 
+                                    <p class="text-center"><b><a href="{% url "publication_detail" id=p.id %}">{{ p.title }}</a></b></p>
+                                </div>
+                            </div>
+                        {% endfor %}  
+                    </div>
+                {% else %}
+                    <div class="row">
+                        <div class="col-sm-12"> 
+                            <p class="text-center"> There are no publications registered in this challenge</p>
+                        </div>  
+                    </div>
+                {% endif %}
+            </div>                             
+        </div>                         
+    </div>
+{% endblock content %}  

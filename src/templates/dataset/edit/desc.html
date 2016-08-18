@@ -1,0 +1,61 @@
+{% extends "dataset/edit/base.html" %}
+{% block breadcrumb %}
+    {% if datasetform.non_field_errors  %}
+        {% for e in datasetform.non_field_errors %} 
+            <div class="row"> 
+                <div class="col-md-6 widget col-md-offset-3"> 
+                    <div class="alert alert-danger" role="alert">{{ e }}</div>
+                </div>
+            </div>
+        {% endfor %} 
+    {% endif %}
+	<li><a href="{% url "home" %}">Home</a></li>
+    <li>{{ dataset.title }}</li>  
+    <li class="active">Description</li>  
+{% endblock breadcrumb %} 
+{% block content %}
+    <div class="col-md-10"> 
+        <form method="POST" action="" enctype="multipart/form-data"> {% csrf_token %}              
+            <div class="panel panel-default"> 
+                <div class="panel-body"> 
+                    <div class="row">
+                        <div class="col-sm-12"> 
+                            <div class="top-margin"> 
+                                <label>Title 
+                                    {% if datasetform.dataset_title.field.required %}
+                                    <span class="text-danger">*</span>
+                                    {% endif %}
+                                </label>  
+                                {% if datasetform.errors.dataset_title %}
+                                    <div class="alert alert-danger" role="alert">{{ datasetform.errors.dataset_title }}</div>
+                                {% endif %}
+                                {{ datasetform.dataset_title }} 
+                            </div> 
+                            <div class="top-margin"> 
+                                <label>Description 
+                                    {% if datasetform.description.field.required %}
+                                    <span class="text-danger">*</span>
+                                    {% endif %}
+                                </label>  
+                                {% if datasetform.errors.description %}
+                                    <div class="alert alert-danger" role="alert">{{ datasetform.errors.description }}</div>
+                                {% endif %}
+                                {{ datasetform.description }} 
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12"> 
+                            <hr>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-2 col-lg-offset-10 text-right"> 
+                            <button class="btn btn-action" type="submit" name="signup-button">Save</button>
+                        </div>
+                    </div>  
+                </div>
+            </div>  
+        </form>                           
+    </div>                         
+{% endblock content %}  

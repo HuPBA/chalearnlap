@@ -14,22 +14,28 @@
         <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+        <link href="https://cdn.datatables.net/1.10.12/css/dataTables.bootstrap.min.css" rel="stylesheet"/>
         {% block header %} 
         {% endblock header %}  
     </head>     
-    <body class="home">        
-        <div class="navbar navbar-inverse navbar-fixed-top headroom"> 
-            <div class="container header-container"> 
+    <body class="home"> 
+        <div class="navbar navbar-inverse"> 
+            <div class="container-fluid cont-header"> 
                 <div class="navbar-header"> 
-                    <!-- Button for smallest screens -->                     
-                    <a class="navbar-brand" href="{% url "home" %}">
-                        <img id="header-icon" src="{% static "images/icon.png" %}" alt="ChaLearn">
-                    </a>                     
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>             
+                    <a class="navbar-brand" href="http://localhost:8000/">
+                        <img class="img-responsive" src="{% static "images/icon.png" %}" alt="ChaLearn">
+                    </a>             
                 </div>
-                <div class="navbar-collapse collapse"> 
+                <div class="navbar-collapse collapse" id="bs-example-navbar-collapse-1"> 
                     <ul class="nav navbar-nav pull-right navbar-header"> 
                         <li class="dropdown"> 
-                            <a href="#" class="dropdown-toggle btn-header-margin" data-toggle="dropdown">Challenges <b class="caret"></b></a> 
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Challenges <b class="caret"></b></a> 
                             {% if challenges.count > 0 %}
                                 <ul class="dropdown-menu"> 
                                     {% for c in challenges %}
@@ -39,7 +45,7 @@
                             {% endif %}                           
                         </li>
                         <li class="dropdown"> 
-                            <a href="#" class="dropdown-toggle btn-header btn-header-margin" data-toggle="dropdown">Dataset<b class="caret"></b></a> 
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dataset<b class="caret"></b></a> 
                             {% if datasets.count > 0 %}
                                 <ul class="dropdown-menu"> 
                                     {% for d in datasets %}
@@ -49,7 +55,7 @@
                             {% endif %}                     
                         </li> 
                         <li class="dropdown"> 
-                            <a href="#" class="dropdown-toggle btn-header btn-header-margin" data-toggle="dropdown">Workshops <b class="caret"></b></a> 
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Workshops <b class="caret"></b></a> 
                             {% if workshops.count > 0 %}
                                 <ul class="dropdown-menu"> 
                                     {% for w in workshops %}
@@ -59,7 +65,7 @@
                             {% endif %}                            
                         </li>
                         <li class="dropdown"> 
-                            <a href="#" class="dropdown-toggle btn-header btn-header-margin" data-toggle="dropdown">Special issues <b class="caret"></b></a> 
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Special issues <b class="caret"></b></a> 
                             {% if special_issues.count > 0 %}
                                 <ul class="dropdown-menu"> 
                                     {% for s in special_issues %}
@@ -68,11 +74,10 @@
                                 </ul>   
                             {% endif %}                           
                         </li>
-                        <li class="dropdown"> 
-                            <a href="{% url "partners_list" %}" class="dropdown-toggle btn-header btn-header-margin">Sponsors</a>                            
-                        </li>
+                        <li><a href="{% url "partners_list" %}">Sponsors</a></li>
+                        <li><a href="{% url "publication_list" %}">Publications</a></li>
                         {% if user.is_authenticated %}
-                            <li class="div-header">
+                            <li>
                                 <a class="btn" data-toggle="dropdown">{{ user.username }} <span class="caret"></span></a>
                                 <ul class="dropdown-menu multi-level">
                                     {% if user.is_superuser %}
@@ -103,8 +108,8 @@
                                 </ul>  
                             </li>                       
                         {% else %}
-                            <li class="div-header"> <a class="btn" href="{% url "auth_login" %}">SIGN IN</a> </li>
-                            <li class="div-header"> <a class="btn" href="{% url "register" %}">SIGN UP</a> </li>
+                            <li> <a class="btn" href="{% url "auth_login" %}">SIGN IN</a> </li>
+                            <li> <a class="btn" href="{% url "register" %}">SIGN UP</a> </li>
                         {% endif %} 
                         <li>
                             <form id="search-form" action="{% url 'watson:search' %}">
@@ -158,6 +163,8 @@
             </div>             
         </footer>         
         <!-- JavaScript libs are placed at the end of the document so the pages load faster -->         
+        <script src="https://cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js"></script>
+        <script src="https://cdn.datatables.net/1.10.12/js/dataTables.bootstrap.min.js"></script>
         <script type="text/javascript" src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script> 
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.2/js/select2.min.js"></script>  
         <script type="text/javascript" src="{% static "js/headroom.min.js" %}"></script>         

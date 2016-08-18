@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Proposal, Role, Profile_Dataset, Result_col, Submission, Result, Score, Event_Relation, Profile, Track, Gallery_Image, Affiliation, Event, File, Partner, Event_Partner, Profile_Event, Schedule_Event, News, Workshop, Challenge, Special_Issue, Result, Data, Dataset, Contact
+from .models import Publication, Proposal, Role, Profile_Dataset, Col, Submission, Result, Score, Event_Relation, Profile, Track, Gallery_Image, Affiliation, Event, File, Partner, Event_Partner, Profile_Event, Schedule_Event, News, Workshop, Challenge, Special_Issue, Result, Data, Dataset, Contact
 # Register your models here.
 
 
@@ -25,6 +25,7 @@ admin.site.register(Track)
 admin.site.register(Gallery_Image)
 admin.site.register(Event_Relation)
 admin.site.register(Score)
-admin.site.register(Result_col)
+admin.site.register(Col)
 admin.site.register(Submission)
 admin.site.register(Profile_Dataset)
+admin.site.register(Publication)

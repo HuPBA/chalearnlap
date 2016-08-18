@@ -25,16 +25,16 @@
                                 <tr>
                                     <th>User</th>
                                     {% for n in names %}
-                                        <th>{{ n }}</th>
+                                        <th>{{ n.name }}</th>
                                     {% endfor %}
                                 </tr>
                             </thead>
                             <tbody>
                             {% for user, score in scores %}
                                 <tr>
-                                    <td>{{ user.user.username }}<br><a href="{{ user.source_code }}"><i class="fa fa-code-fork fa-lg" aria-hidden="true"></i></a>&ensp;<a href="{{ user.publication }}"><i class="fa fa-paperclip fa-lg" aria-hidden="true"></i></a></td>
+                                    <td>{{ user.user.username }}&ensp;<a title="Source code" href="{{ user.source_code }}"><i class="fa fa-code-fork fa-lg" aria-hidden="true"></i></a>&ensp;<a title="Publication" href="{{ user.publication }}"><i class="fa fa-paperclip fa-lg" aria-hidden="true"></i></a></td>
                                     {% for s in score %}
-                                            <td>{{ s.score }}</td>
+                                        <td>{{ s.score }}</td>
                                     {% endfor %}
                                 </tr>
                                 {% endfor %}

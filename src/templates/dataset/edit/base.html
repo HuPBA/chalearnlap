@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block container %}
+    <ol class="breadcrumb"> 
+        {% block breadcrumb %}
+        {% endblock breadcrumb %}            
+    </ol>            
+    <div class="row"> 
+        <article class="col-xs-12 maincontent"> 
+            <header class="page-header"> 
+                <h1 class="page-title">{{ dataset.title }} 
+                    {% if dataset.is_public %}
+                        <a title="Unpublish" href="{% url "dataset_unpublish" id=dataset.id %}"><i class="fa fa-cloud-download" aria-hidden="true"></i></a>
+                    {% else %}
+                        <a title="Publish" href="{% url "dataset_publish" id=dataset.id %}"><i class="fa fa-cloud-upload" aria-hidden="true"></i></a>
+                    {% endif %}
+                    <div class="top-margin">
+                        <div class="dropdown">
+                            <button class="btn btn-action dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Export participants
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                <li><a href="{% url 'export_participants_csv' dataset_id=dataset.id %}">CSV format</a></li>
+                                <li><a href="{% url 'export_participants_xls' dataset_id=dataset.id %}">Excel Binary File format (XLS)</a></li>
+                                <li><a href="{% url 'export_participants_xlsx' dataset_id=dataset.id %}">Office Open XML format (XLSX)</a></li>
+                            </ul>
+                        </div>
+                    </div> 
+                </h1>
+            </header> 
+            <div class="col-md-2" id="leftCol">
+                <ul class="nav nav-stacked" id="sidebar">
+                    <li><a href='{% url 'dataset_edit_desc' id=dataset.id %}'>Description</a></li>
+                    <li><a href='{% url 'dataset_edit_schedule' id=dataset.id %}'>Schedule</a></li>
+                    <li><a href='{% url 'dataset_edit_relations' id=dataset.id %}'>Associated events</a></li>
+                    {% if datas %}
+                        <li><a href='{% url 'dataset_edit_datas' id=dataset.id %}'>Datas</a></li>
+                    {% endif %}
+                    <li><a href='{% url 'dataset_edit_members' id=dataset.id %}'>Admins</a></li>
+                    <li><a href='{% url 'dataset_edit_results' id=dataset.id %}'>Results</a></li>
+                    <li><a href='{% url 'dataset_edit_news' id=dataset.id %}'>News</a></li>  
+                    <li><a href='{% url 'dataset_edit_publications' id=dataset.id %}'>Publications</a></li>  
+                </ul>
+            </div>
+            {% block content %}
+            {% endblock content %}
+        </article>
+    </div>
+{% endblock container %}  
