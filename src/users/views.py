@@ -98,8 +98,7 @@ def user_edit(request, id=None):
 			if 'last_name' in form.cleaned_data:
 				profile.last_name = form.cleaned_data["last_name"]
 			if 'staff' in form.cleaned_data:
-				if form.cleaned_data["staff"] == True:
-					user.is_staff = True
+				user.is_staff = form.cleaned_data["staff"]
 			if 'avatar' in form.cleaned_data:
 				profile.avatar = form.cleaned_data["avatar"]
 			if 'bio' in form.cleaned_data:

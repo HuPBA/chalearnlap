@@ -14,11 +14,13 @@
                 {% if images.count > 0 %}
                     <div class="row">
                         {% for i in images %} 
-                            <div class="col-sm-4 thumbnail-gallery">
-                                    {% thumbnail i.image "120x120" crop="noop" as small %}
-                                        <a href="{{ i.image.url }}" title="zoom"><img class="img-responsive" src="{{ small.url }}" width="{{ small.width }}" height="{{ small.height }}"></a>
+                            <div class="col-sm-12">
+                                <div class="all-margin">
+                                    {% thumbnail i.image "200x200" crop="noop" as small %}
+                                        <a href="{{ i.image.url }}" title="zoom"><img class="img-responsive img-center" src="{{ small.url }}" width="{{ small.width }}" height="{{ small.height }}"></a>
                                     {% endthumbnail %}
-                                    <p>{{ i.description|safe|truncatechars:90 }}</p>
+                                    <p class="text-center">{{ i.description|truncatechars:90|safe}}</p>
+                                </div>
                             </div>
                         {% endfor %}
                     </div>

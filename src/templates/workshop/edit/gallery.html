@@ -22,7 +22,7 @@
                                             {% thumbnail i.image "120x120" crop="noop" as small %}
                                                 <a href="{{ i.image.url }}" title="zoom"><img class="img-responsive" src="{{ small.url }}" width="{{ small.width }}" height="{{ small.height }}"></a>
                                             {% endthumbnail %}
-                                            <p>{{ i.description|safe|truncatechars:90 }}</p>
+                                            <p>{{ i.description|truncatechars:90|safe}}</p>
                                         </div>
                                     {% endfor %}
                                 </div>
