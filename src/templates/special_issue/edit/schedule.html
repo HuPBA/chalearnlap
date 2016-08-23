@@ -17,7 +17,7 @@
                                 <div class="row">
                                     {% for e in schedule %} 
                                         <div class="col-sm-12">
-                                            <p class="text-center">{{ e.date|date:"SHORT_DATETIME_FORMAT" }} {{ e.title }}&ensp;<a href="{% url 'schedule_edit' event_id=issue.id schedule_id=e.id %}"><i class="fa fa-pencil" aria-hidden="true"></i></a>&ensp;<a id="{{ e.id }}" class="delete-event" value="{% url "event_schedule_remove" id=issue.id program_id=e.id %}" href=""><i class="fa fa-minus-circle fa" aria-hidden="true"></i></a></p>
+                                            <p class="text-center">{{ e.date|date:"SHORT_DATE_FORMAT" }} {{ e.title }}&ensp;<a href="{% url 'schedule_edit' event_id=issue.id schedule_id=e.id %}"><i class="fa fa-pencil" aria-hidden="true"></i></a>&ensp;<a id="{{ e.id }}" class="delete-event" value="{% url "event_schedule_remove" id=issue.id program_id=e.id %}" href=""><i class="fa fa-minus-circle fa" aria-hidden="true"></i></a></p>
                                         </div>
                                     {% endfor %}  
                                 </div>

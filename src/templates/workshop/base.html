@@ -28,7 +28,9 @@
                     <li><a href='{% url 'workshop_speakers' id=workshop.id %}'>Invited speakers</a></li>
                     <li><a href='{% url 'workshop_program' id=workshop.id %}'>Program</a></li>
                     <li><a href='{% url 'workshop_gallery' id=workshop.id %}'>Gallery</a></li>
-                    <li><a href='{% url 'workshop_publications' id=workshop.id %}'>Publications</a></li>
+                    {% if publications %}
+                        <li><a href='{% url 'workshop_publications' id=workshop.id %}'>Publications</a></li>
+                    {% endif %}
                 </ul>
             </div>
             {% block content %}

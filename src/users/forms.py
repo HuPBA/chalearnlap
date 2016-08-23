@@ -5,7 +5,7 @@ from registration.forms import RegistrationForm
 from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm, PasswordResetForm, SetPasswordForm
 from ckeditor.widgets import CKEditorWidget
 from ckeditor_uploader.widgets import CKEditorUploadingWidget
-from datetimewidget.widgets import DateTimeWidget
+from datetimewidget.widgets import DateTimeWidget, DateWidget
 
 class UserEditForm(forms.ModelForm):
 	def __init__(self, *args, **kwargs):
@@ -408,12 +408,22 @@ class PartnerCreationForm(forms.Form):
 	def clean(self):
 		return self.cleaned_data
 
+class ProgramCreationForm(forms.Form):
+	def __init__(self, *args, **kwargs):
+		super(ProgramCreationForm, self).__init__(*args, **kwargs)
+		self.fields['title'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}))
+		self.fields['description'] = forms.CharField(required=True, widget=CKEditorUploadingWidget())
+		self.fields['time'] = forms.DateTimeField(required=True, widget=DateTimeWidget(bootstrap_version=3, options = {'format': 'mm/dd/yyyy hh:ii'}), input_formats=['%m/%d/%Y %H:%M'])
+
+	def clean(self):
+		return self.cleaned_data
+
 class ScheduleCreationForm(forms.Form):
 	def __init__(self, *args, **kwargs):
 		super(ScheduleCreationForm, self).__init__(*args, **kwargs)
 		self.fields['title'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}))
 		self.fields['description'] = forms.CharField(required=True, widget=CKEditorUploadingWidget())
-		self.fields['time'] = forms.DateTimeField(required=True, widget=DateTimeWidget(bootstrap_version=3, options = {'format': 'mm/dd/yyyy hh:ii'}), input_formats=['%m/%d/%Y %H:%M'])
+		self.fields['time'] = forms.DateField(required=True, widget=DateWidget(bootstrap_version=3, options = {'format': 'mm/dd/yyyy'}), input_formats=['%m/%d/%Y'])
 
 	def clean(self):
 		return self.cleaned_data

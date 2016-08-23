@@ -36,8 +36,12 @@
                             </div>
                         </li>
                     {% endif %}
-                    <li><a href='{% url 'dataset_results' dataset_id=dataset.id %}'>Results</a></li>
-                    <li><a href='{% url 'dataset_publications' id=dataset.id %}'>Publications</a></li>
+                    {% if results %}
+                        <li><a href='{% url 'dataset_results' dataset_id=dataset.id %}'>Results</a></li>
+                    {% endif %}
+                    {% if publications %}
+                        <li><a href='{% url 'dataset_publications' id=dataset.id %}'>Publications</a></li>
+                    {% endif %}
                 </ul>
             </div>                  
             {% block content %}

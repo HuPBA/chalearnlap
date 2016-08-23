@@ -32,9 +32,7 @@
                     <li><a href='{% url 'challenge_edit_desc' id=challenge.id %}'>Description</a></li>
                     <li><a href='{% url 'challenge_edit_schedule' id=challenge.id %}'>Schedule</a></li>
                     <li><a href='{% url 'challenge_edit_relation' id=challenge.id %}'>Associated events</a></li>
-                    {% if tracks %}
-                        <li><a href='{% url 'challenge_edit_tracks' id=challenge.id %}'>Tracks</a></li>
-                    {% endif %}
+                    <li><a href='{% url 'challenge_edit_tracks' id=challenge.id %}'>Tracks</a></li>
                     <li><a href='{% url 'challenge_edit_members' id=challenge.id %}'>People</a></li>
                     <li><a href='{% url 'challenge_edit_sponsors' id=challenge.id %}'>Sponsors</a></li>
                     <li><a href='{% url 'challenge_edit_result' id=challenge.id %}'>Results</a></li>  

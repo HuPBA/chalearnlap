@@ -26,7 +26,9 @@
                     <li><a href='{% url 'special_issue_members' id=issue.id %}'>People</a></li>
                     <li><a href='{% url 'special_issue_schedule' id=issue.id %}'>Schedule</a></li>
                     <li><a href='{% url 'special_issue_associated_events' id=issue.id %}'>Associated events</a></li>
-                    <li><a href='{% url 'special_issue_publications' id=issue.id %}'>Publications</a></li>
+                    {% if publications %}
+                        <li><a href='{% url 'special_issue_publications' id=issue.id %}'>Publications</a></li>
+                    {% endif %}
                 </ul>
             </div>
             {% block content %}

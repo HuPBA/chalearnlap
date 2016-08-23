@@ -32,9 +32,7 @@
                     <li><a href='{% url 'dataset_edit_desc' id=dataset.id %}'>Description</a></li>
                     <li><a href='{% url 'dataset_edit_schedule' id=dataset.id %}'>Schedule</a></li>
                     <li><a href='{% url 'dataset_edit_relations' id=dataset.id %}'>Associated events</a></li>
-                    {% if datas %}
-                        <li><a href='{% url 'dataset_edit_datas' id=dataset.id %}'>Datas</a></li>
-                    {% endif %}
+                    <li><a href='{% url 'dataset_edit_datas' id=dataset.id %}'>Datas</a></li>
                     <li><a href='{% url 'dataset_edit_members' id=dataset.id %}'>Admins</a></li>
                     <li><a href='{% url 'dataset_edit_results' id=dataset.id %}'>Results</a></li>
                     <li><a href='{% url 'dataset_edit_news' id=dataset.id %}'>News</a></li>  
