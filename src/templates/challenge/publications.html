@@ -12,12 +12,15 @@
                 <hr> 
                 {% if publications.count > 0 %}
                     <div class="row">
-                        {% for p in publications %} 
+                        {% for p in publications %}
                             <div class="col-sm-12">
                                 <div class="top-margin"> 
-                                    <p class="text-center"><b><a href="{% url "publication_detail" id=p.id %}">{{ p.title }}</a></b></p>
+                                    {% if p.publication.title %}
+                                        <p>{{ p.publication.title }}</p>
+                                    {% endif %}
+                                    <p>{{ p.publication.content|safe }}</p>
                                 </div>
-                            </div>
+                            </div> 
                         {% endfor %}  
                     </div>
                 {% else %}

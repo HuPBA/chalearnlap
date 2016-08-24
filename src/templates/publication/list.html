@@ -4,6 +4,7 @@
         <li> <a href="{% url "home" %}">Home</a> </li>
         <li class="active">Publications list</li>                 
     </ol> 
+    <form method="POST" action=""> {% csrf_token %} 
     <div class="row"> 
         <article class="col-xs-12 maincontent"> 
             <header class="page-header"> 
@@ -16,18 +17,72 @@
             {% if publications.count > 0 %}
                 <div class="row">
                     {% if perm %}
-                        {% for p in publications %} 
-                            <div class="col-sm-12">
-                                <div class="top-margin"> 
-                                    <p class="text-center"><b><a href="{% url "publication_detail" id=p.id %}">{{ p.title }}</a></b>&ensp;<a href="{% url "publication_edit" pub_id=p.id %}"><i class="fa fa-pencil" aria-hidden="true"></i></a>&ensp;<a id="{{ p.id }}" class="delete-event" value="{% url "publication_remove" pub_id=p.id %}" href=""><i class="fa fa-minus-circle fa" aria-hidden="true"></i></a></p>
-                                </div>
-                            </div>
-                        {% endfor %} 
-                    {% else %}
-                        {% for p in publications %} 
+                        {% for p, event, dataset in publications %} 
                             <div class="col-sm-12">
                                 <div class="top-margin">
-                                    <p class="text-center"><b><a href="{% url "publication_detail" id=p.id %}">{{ p.title }}</a></b></p>
+                                    {% if p.title %}
+                                        <div class="row">
+                                            <div class="col-sm-11">
+                                                <p>{{ p.title }}</p>
+                                                <p>{{ p.content|safe }}</p>
+                                            </div>
+                                            <div class="col-sm-1">
+                                                <p><br><a href="{% url "publication_edit" pub_id=p.id %}"><i class="fa fa-pencil" aria-hidden="true"></i></a>&ensp;<a id="{{ p.id }}" class="delete-event" value="{% url "publication_remove" pub_id=p.id %}" href=""><i class="fa fa-minus-circle fa" aria-hidden="true"></i></a></p>
+                                            </div>
+                                        </div>
+                                    {% else %}
+                                        <div class="row">
+                                            <div class="col-sm-11">
+                                                <p>{{ p.content|safe }}</p>
+                                            </div>
+                                            <div class="col-sm-1">
+                                                <p><br><a href="{% url "publication_edit" pub_id=p.id %}"><i class="fa fa-pencil" aria-hidden="true"></i></a>&ensp;<a id="{{ p.id }}" class="delete-event" value="{% url "publication_remove" pub_id=p.id %}" href=""><i class="fa fa-minus-circle fa" aria-hidden="true"></i></a></p>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                    {% if event %}
+                                        {% for e in event %}
+                                            <a href="{% url "event_detail" id=e.event.id %}">{{ e.event.title }}</a>&ensp;
+                                        {% endfor %}
+                                    {% endif %}
+                                    {% if dataset %}
+                                        {% for d in dataset %}
+                                            <a href="{% url "dataset_desc" id=d.dataset.id %}">{{ d.dataset.title }}</a>&ensp;
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <br>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        {% for p, event, dataset in publications %} 
+                            <div class="col-sm-12">
+                                <div class="top-margin">
+                                    {% if p.title %}
+                                        <p>{{ p.title }}</p>
+                                        <p>{{ p.content|safe }}</p>
+                                    {% else %}
+                                        <p>{{ p.content|safe }}</p>
+                                    {% endif %}
+                                    {% if event %}
+                                        {% for e in event %}
+                                            <a href="{% url "event_detail" id=e.event.id %}">{{ e.event.title }}</a>&ensp;
+                                        {% endfor %}
+                                    {% endif %}
+                                    {% if dataset %}
+                                        {% for d in dataset %}
+                                            <a href="{% url "dataset_desc" id=d.dataset.id %}">{{ d.dataset.title }}</a>&ensp;
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <br>
                                 </div>
                             </div>
                         {% endfor %}  
@@ -41,5 +96,6 @@
                 </div>
             {% endif %}                     
         </article>
-    </div>                      
+    </div>   
+    </form>                   
 {% endblock container %}    

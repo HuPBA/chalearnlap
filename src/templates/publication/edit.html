@@ -27,7 +27,7 @@
                                 <h3 class="thin text-center">Publication edit</h3> 
                                 <hr> 
                                 <div class="row">
-                                    <div class="col-md-5"> 
+                                    <div class="col-md-6"> 
                                         <div class="top-margin"> 
                                             <label>Title 
                                                 {% if form.title.field.required %}
@@ -40,19 +40,6 @@
                                             {{ form.title }} 
                                         </div>  
                                     </div>
-                                    <div class="col-md-4">
-                                        <div class="top-margin"> 
-                                            <label>Extra information
-                                                {% if form.url.field.required %}
-                                                <span class="text-danger">*</span>
-                                                {% endif %}
-                                            </label>  
-                                            {% if form.errors.url %}
-                                                <div class="alert alert-danger" role="alert">{{ form.errors.url }}</div>
-                                            {% endif %}
-                                            {{ form.url }} 
-                                        </div> 
-                                    </div> 
                                 </div> 
                                 <div class="row">
                                     <div class="col-md-12">                                 

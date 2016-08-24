@@ -15,7 +15,7 @@
                         {% for p in publications %} 
                             <div class="col-sm-12">
                                 <div class="top-margin"> 
-                                    <p class="text-center"><b><a href="{% url "publication_detail" id=p.id %}">{{ p.title }}</a></b></p>
+                                    <p class="text-center"><b><a href="{% url "publication_detail" id=p.publication.id %}">{{ p.publication.title }}</a></b></p>
                                 </div>
                             </div>
                         {% endfor %}  

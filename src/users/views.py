@@ -1,11 +1,11 @@
 from django.shortcuts import render, get_object_or_404, redirect, render_to_response
 from django.http import HttpResponse
-from .forms import ProgramCreationForm, PublicationEditForm, PublicationEventCreationForm, PublicationCreationForm, SubmissionEditForm, ColEditForm, EditChallengeResult, ProfileForm, AffiliationForm, SelectRoleForm, UserEditForm, UserRegisterForm, EditProfileForm, EditExtraForm, DatasetCreationForm, DataCreationForm, EventCreationForm, EditEventForm, RoleCreationForm, NewsCreationForm, FileCreationForm, NewsEditForm, SelectDatasetForm, MemberCreationForm, MemberSelectForm, PartnerCreationForm, PartnerSelectForm, ScheduleCreationForm, ScheduleEditForm, DatasetEditForm, DataEditForm, TrackCreationForm, GalleryImageForm, TrackEditForm, RelationCreationForm, RelationEditForm, SubmissionCreationForm, SubmissionScoresForm, ResultEditForm
+from .forms import ProgramEditForm, ProgramCreationForm, PublicationEditForm, PublicationEventCreationForm, PublicationCreationForm, SubmissionEditForm, ColEditForm, EditChallengeResult, ProfileForm, AffiliationForm, SelectRoleForm, UserEditForm, UserRegisterForm, EditProfileForm, EditExtraForm, DatasetCreationForm, DataCreationForm, EventCreationForm, EditEventForm, RoleCreationForm, NewsCreationForm, FileCreationForm, NewsEditForm, SelectDatasetForm, MemberCreationForm, MemberSelectForm, PartnerCreationForm, PartnerSelectForm, ScheduleCreationForm, ScheduleEditForm, DatasetEditForm, DataEditForm, TrackCreationForm, GalleryImageForm, TrackEditForm, RelationCreationForm, RelationEditForm, SubmissionCreationForm, SubmissionScoresForm, ResultEditForm
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_protect
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
-from .models import Publication, Profile_Dataset, Submission, Col, Profile, Result, Score, Proposal, Profile_Event, Affiliation, Event, Dataset, Data, Partner, Event, Special_Issue, Workshop, Challenge, Role, News, File, Contact, Event_Partner, Schedule_Event, Track, Gallery_Image, Event_Relation
+from .models import Publication_Event, Publication_Dataset, Publication, Profile_Dataset, Submission, Col, Profile, Result, Score, Proposal, Profile_Event, Affiliation, Event, Dataset, Data, Partner, Event, Special_Issue, Workshop, Challenge, Role, News, File, Contact, Event_Partner, Schedule_Event, Track, Gallery_Image, Event_Relation
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.template import RequestContext
 from django.core.urlresolvers import reverse
@@ -24,6 +24,7 @@ import xlwt
 import xlsxwriter
 import StringIO
 from decimal import Decimal
+from itertools import chain
 
 @require_POST
 def file_upload(request):
@@ -740,7 +741,7 @@ def dataset_edit_publications(request, id=None):
 		}
 		return render(request, "dataset/desc.html", context, context_instance=RequestContext(request))
 	else:
-		publications = Publication.objects.filter(dataset=id)
+		publications = Publication_Dataset.objects.filter(dataset=dataset)
 		context = {
 			"news": news,
 			"dataset": dataset,
@@ -843,7 +844,7 @@ def dataset_desc(request, id=None):
 	news = News.objects.filter(dataset_id=id)
 	profile_dataset = check_dataset_permission(request, dataset)
 	submissions = Submission.objects.filter(dataset=dataset)
-	publications = Publication.objects.filter(dataset=dataset)
+	publications = Publication_Dataset.objects.filter(dataset=dataset)
 	context = {
 		"submissions": submissions,
 		"publications": publications,
@@ -861,7 +862,7 @@ def dataset_schedule(request, id=None):
 	news = News.objects.filter(dataset_id=id)
 	profile_dataset = check_dataset_permission(request, dataset)
 	submissions = Submission.objects.filter(dataset=dataset)
-	publications = Publication.objects.filter(dataset=dataset)
+	publications = Publication_Dataset.objects.filter(dataset=dataset)
 	context = {
 		"submissions": submissions,
 		"publications": publications,
@@ -895,7 +896,7 @@ def dataset_associated_events(request, dataset_id=None):
 	news = News.objects.filter(dataset_id=dataset_id)
 	profile_dataset = check_dataset_permission(request, dataset)
 	submissions = Submission.objects.filter(dataset=dataset)
-	publications = Publication.objects.filter(dataset=dataset)
+	publications = Publication_Dataset.objects.filter(dataset=dataset)
 	context = {
 		"submissions": submissions,
 		"publications": publications,
@@ -918,7 +919,7 @@ def dataset_publications(request, id=None):
 	datas = Data.objects.all().filter(dataset=dataset,is_public=True)
 	news = News.objects.filter(dataset_id=id)
 	profile_dataset = check_dataset_permission(request, dataset)
-	publications = Publication.objects.filter(dataset=id)
+	publications = Publication_Dataset.objects.filter(dataset=dataset)
 	submissions = Submission.objects.filter(dataset=dataset)
 	context = {
 		"submissions": submissions,
@@ -1707,7 +1708,7 @@ def challenge_edit_publications(request, id=None):
 		}
 		return render(request, "challenge/desc.html", context, context_instance=RequestContext(request))
 	else:	
-		publications = Publication.objects.filter(event=challenge)
+		publications = Publication_Event.objects.filter(event=challenge)
 		context = {
 			"challenge": challenge, 
 			"publications": publications,
@@ -1767,7 +1768,7 @@ def challenge_desc(request, id=None):
 	profile_event = check_event_permission(request, challenge)
 	results = Result.objects.filter(challenge=challenge)
 	sponsors = Event_Partner.objects.filter(event_id=id)
-	publications = Publication.objects.filter(event=challenge)
+	publications = Publication_Event.objects.filter(event=challenge)
 	context = {
 		"challenge": challenge,
 		"news": news,
@@ -1788,7 +1789,7 @@ def challenge_associated_events(request, id=None):
 	profile_event = check_event_permission(request, challenge)
 	results = Result.objects.filter(challenge=challenge)
 	sponsors = Event_Partner.objects.filter(event_id=id)
-	publications = Publication.objects.filter(event=challenge)
+	publications = Publication_Event.objects.filter(event=challenge)
 	context = {
 		"results": results,
 		"sponsors": sponsors,
@@ -2046,7 +2047,7 @@ def challenge_members(request, id=None):
 	profile_event = check_event_permission(request, challenge)
 	results = Result.objects.filter(challenge=challenge)
 	sponsors = Event_Partner.objects.filter(event_id=id)
-	publications = Publication.objects.filter(event=challenge)
+	publications = Publication_Event.objects.filter(event=challenge)
 	context = {
 		"results": results,
 		"sponsors": sponsors,
@@ -2066,7 +2067,7 @@ def challenge_sponsors(request, id=None):
 	news = News.objects.filter(event_id=id).order_by('-upload_date')
 	profile_event = check_event_permission(request, challenge)
 	results = Result.objects.filter(challenge=challenge)
-	publications = Publication.objects.filter(event=challenge)
+	publications = Publication_Event.objects.filter(event=challenge)
 	context = {
 		"results": results,
 		"publications": publications,
@@ -2086,7 +2087,7 @@ def challenge_schedule(request, id=None):
 	profile_event = check_event_permission(request, challenge)
 	results = Result.objects.filter(challenge=challenge)
 	sponsors = Event_Partner.objects.filter(event_id=id)
-	publications = Publication.objects.filter(event=challenge)
+	publications = Publication_Event.objects.filter(event=challenge)
 	context = {
 		"results": results,
 		"sponsors": sponsors,
@@ -2117,7 +2118,7 @@ def challenge_result(request, id=None):
 			names.append(n.name)
 	profile_event = check_event_permission(request, challenge)
 	sponsors = Event_Partner.objects.filter(event_id=id)
-	publications = Publication.objects.filter(event=challenge)
+	publications = Publication_Event.objects.filter(event=challenge)
 	context = {
 		"sponsors": sponsors,
 		"publications": publications,
@@ -2135,7 +2136,7 @@ def challenge_publications(request, id=None):
 	challenge = Challenge.objects.filter(id=id)[0]
 	tracks = Track.objects.filter(challenge__id=id).exclude(dataset=None)
 	news = News.objects.filter(event_id=id).order_by('-upload_date')
-	publications = Publication.objects.filter(event=id)
+	publications = Publication_Event.objects.filter(event=challenge)
 	profile_event = check_event_permission(request, challenge)
 	results = Result.objects.filter(challenge=challenge)
 	sponsors = Event_Partner.objects.filter(event_id=id)
@@ -2352,7 +2353,7 @@ def workshop_edit_publications(request, id=None):
 		}
 		return render(request, "workshop/desc.html", context, context_instance=RequestContext(request))
 	else:
-		publications = Publication.objects.filter(event=id)
+		publications = Publication_Event.objects.filter(event=workshop)
 		context = {
 			"workshop": workshop,
 			"news": news,
@@ -2378,7 +2379,7 @@ def workshop_desc(request, id=None):
 	workshop = Workshop.objects.filter(id=id)[0]
 	news = News.objects.filter(event_id=id).order_by('-upload_date')
 	profile_event = check_event_permission(request, workshop)
-	publications = Publication.objects.filter(event=id)
+	publications = Publication_Event.objects.filter(event=workshop)
 	context = {
 		"publications": publications,
 		"workshop": workshop,
@@ -2392,7 +2393,7 @@ def workshop_schedule(request, id=None):
 	news = News.objects.filter(event_id=id).order_by('-upload_date')
 	schedule = Schedule_Event.objects.filter(event_schedule=workshop,schedule_event_parent=None).order_by('date')
 	profile_event = check_event_permission(request, workshop)
-	publications = Publication.objects.filter(event=id)
+	publications = Publication_Event.objects.filter(event=workshop)
 	context = {
 		"publications": publications,
 		"workshop": workshop,
@@ -2408,7 +2409,7 @@ def workshop_associated_events(request, id=None):
 	relations = Event_Relation.objects.filter(event_associated__id=id)
 	associated = Event_Relation.objects.filter(workshop_relation=workshop)
 	profile_event = check_event_permission(request, workshop)
-	publications = Publication.objects.filter(event=id)
+	publications = Publication_Event.objects.filter(event=workshop)
 	context = {
 		"publications": publications,
 		"workshop": workshop,
@@ -2424,7 +2425,7 @@ def workshop_program(request, id=None):
 	news = News.objects.filter(event_id=id).order_by('-upload_date')
 	program = Schedule_Event.objects.filter(event_program=workshop,schedule_event_parent=None).order_by('date')
 	profile_event = check_event_permission(request, workshop)
-	publications = Publication.objects.filter(event=id)
+	publications = Publication_Event.objects.filter(event=workshop)
 	context = {
 		"publications": publications,
 		"workshop": workshop,
@@ -2439,7 +2440,7 @@ def workshop_speakers(request, id=None):
 	speakers = Profile_Event.objects.filter(role__name='speaker', event=workshop)
 	news = News.objects.filter(event_id=id).order_by('-upload_date')
 	profile_event = check_event_permission(request, workshop)
-	publications = Publication.objects.filter(event=id)
+	publications = Publication_Event.objects.filter(event=workshop)
 	context = {
 		"publications": publications,
 		"workshop": workshop,
@@ -2454,7 +2455,7 @@ def workshop_gallery(request, id=None):
 	images = Gallery_Image.objects.filter(workshop=workshop)
 	news = News.objects.filter(event_id=id).order_by('-upload_date')
 	profile_event = check_event_permission(request, workshop)
-	publications = Publication.objects.filter(event=id)
+	publications = Publication_Event.objects.filter(event=workshop)
 	context = {
 		"publications": publications,
 		"workshop": workshop,
@@ -2468,7 +2469,7 @@ def workshop_publications(request, id=None):
 	workshop = Workshop.objects.filter(id=id)[0]
 	news = News.objects.filter(event_id=id).order_by('-upload_date')
 	profile_event = check_event_permission(request, workshop)
-	publications = Publication.objects.filter(event=id)
+	publications = Publication_Event.objects.filter(event=workshop)
 	context = {
 		"workshop": workshop,
 		"news": news,
@@ -2703,7 +2704,7 @@ def special_issue_edit_publications(request, id=None):
 		}
 		return render(request, "special_issue/desc.html", context, context_instance=RequestContext(request))
 	else:
-		publications = Publication.objects.filter(event=id)
+		publications = Publication_Event.objects.filter(event=issue)
 		context = {
 			"issue": issue,
 			"publications": publications,
@@ -2728,7 +2729,7 @@ def special_issue_desc(request, id=None):
 	issue = Special_Issue.objects.filter(id=id)[0]
 	news = News.objects.filter(event_id=id).order_by('-upload_date')
 	profile_event = check_event_permission(request, issue)
-	publications = Publication.objects.filter(event=id)
+	publications = Publication_Event.objects.filter(event=issue)
 	context = {
 		"publications": publications,
 		"issue": issue,
@@ -2747,7 +2748,7 @@ def special_issue_members(request, id=None):
 		if members2.count() > 0:
 			members.append((r.name,members2))
 	profile_event = check_event_permission(request, issue)
-	publications = Publication.objects.filter(event=id)
+	publications = Publication_Event.objects.filter(event=issue)
 	context = {
 		"publications": publications,
 		"issue": issue,
@@ -2762,7 +2763,7 @@ def special_issue_schedule(request, id=None):
 	news = News.objects.filter(event_id=id).order_by('-upload_date')
 	schedule = Schedule_Event.objects.filter(event_schedule=issue,schedule_event_parent=None).order_by('date')
 	profile_event = check_event_permission(request, issue)
-	publications = Publication.objects.filter(event=id)
+	publications = Publication_Event.objects.filter(event=issue)
 	context = {
 		"publications": publications,
 		"issue": issue,
@@ -2778,7 +2779,7 @@ def special_issue_associated_events(request, id=None):
 	relations = Event_Relation.objects.filter(event_associated__id=id)
 	associated = Event_Relation.objects.filter(issue_relation=issue)
 	profile_event = check_event_permission(request, issue)
-	publications = Publication.objects.filter(event=id)
+	publications = Publication_Event.objects.filter(event=issue)
 	context = {
 		"publications": publications,
 		"issue": issue,
@@ -2793,7 +2794,7 @@ def special_issue_publications(request, id=None):
 	issue = Special_Issue.objects.filter(id=id)[0]
 	news = News.objects.filter(event_id=id).order_by('-upload_date')
 	profile_event = check_event_permission(request, issue)
-	publications = Publication.objects.filter(event=id)
+	publications = Publication_Event.objects.filter(event=issue)
 	context = {
 		"issue": issue,
 		"news": news,
@@ -3029,9 +3030,9 @@ def schedule_edit(request, schedule_id=None, dataset_id=None, event_id=None, pro
 	else:
 		schedule = Schedule_Event.objects.filter(id=program_id)[0]
 		w = Workshop.objects.filter(id=event_id)[0]
-		scheduleform = ScheduleEditForm(schedule=schedule)		
+		scheduleform = ProgramEditForm(schedule=schedule)		
 		if request.method == 'POST':
-			scheduleform = ScheduleEditForm(request.POST, schedule=schedule)
+			scheduleform = ProgramEditForm(request.POST, schedule=schedule)
 			if scheduleform.is_valid():
 				title = scheduleform.cleaned_data['title']
 				desc = scheduleform.cleaned_data['description']
@@ -3096,31 +3097,31 @@ def submission_creation(request, dataset_id=None):
 
 @login_required(login_url='auth_login')
 def publication_creation(request, id=None):
-	# If it creates by challenge, workshop, special issue, dataset edit mode.
+	# If it creates by the global publications list
 	if id==None:
 		choices = []
 		events = Event.objects.filter(is_public=True)
 		datasets = Dataset.objects.filter(is_public=True)
-		for e in events:
-			choices.append((e.id, e.title))
-		for d in datasets:
-			choices.append((d.id, d.title))
-		form = PublicationCreationForm(choices)
+		form = PublicationCreationForm(qset1=events, qset2=datasets)
 		if request.method == 'POST':
-			form = PublicationCreationForm(choices, request.POST)
+			form = PublicationCreationForm(request.POST, qset1=events, qset2=datasets)
 			if form.is_valid():
 				title = form.cleaned_data['title']
 				content = form.cleaned_data['content']
-				url = form.cleaned_data['url']
+				if title:
+					publi = Publication.objects.create(title=title, content=content)
+				else:
+					publi = Publication.objects.create(content=content)
 				event = form.cleaned_data['event']
-				if Event.objects.filter(id=event):
-					e = Event.objects.filter(id=event)[0]
-					Publication.objects.create(title=title, content=content, url=url, event=e)
-				elif Dataset.objects.filter(id=event):
-					d = Dataset.objects.filter(id=event)[0]
-					Publication.objects.create(title=title, content=content, url=url, dataset=d)
+				dataset = form.cleaned_data['dataset']
+				if event:
+					for e in event:
+						Publication_Event.objects.create(publication=publi, event=e)
+				if dataset:
+					for d in dataset:
+						Publication_Dataset.objects.create(publication=publi, dataset=d)
 				return HttpResponseRedirect(reverse('publication_list'))
-	# If it creates by the global publications list
+	# If it creates by challenge, workshop, special issue, dataset edit mode.
 	else:
 		form = PublicationEventCreationForm()
 		if request.method == 'POST':
@@ -3128,10 +3129,13 @@ def publication_creation(request, id=None):
 			if form.is_valid():
 				title = form.cleaned_data['title']
 				content = form.cleaned_data['content']
-				url = form.cleaned_data['url']
 				if Event.objects.filter(id=id):
 					e = Event.objects.filter(id=id)[0]
-					Publication.objects.create(title=title, content=content, url=url, event=e)
+					if title:
+						publi = Publication.objects.create(title=title, content=content)
+					else:
+						publi = Publication.objects.create(content=content)
+					Publication_Event.objects.create(publication=publi, event=e)
 					if Challenge.objects.filter(id=id).count() > 0:
 						return HttpResponseRedirect(reverse('challenge_edit_publications', kwargs={'id':id}))
 					elif Workshop.objects.filter(id=id).count() > 0:
@@ -3140,7 +3144,11 @@ def publication_creation(request, id=None):
 						return HttpResponseRedirect(reverse('special_issue_edit_publications', kwargs={'id':id}))
 				elif Dataset.objects.filter(id=id):
 					d = Dataset.objects.filter(id=id)[0]
-					Publication.objects.create(title=title, content=content, url=url, dataset=d)
+					if title:
+						publi = Publication.objects.create(title=title, content=content)
+					else:
+						publi = Publication.objects.create(content=content)
+					Publication_Dataset.objects.create(publication=publi, dataset=d)
 					return HttpResponseRedirect(reverse('dataset_edit_publications', kwargs={'id':id}))
 	context = {
 		"form": form,
@@ -3156,10 +3164,8 @@ def publication_edit(request, id=None, pub_id=None):
 		if form.is_valid():
 			title = form.cleaned_data['title']
 			content = form.cleaned_data['content']
-			url = form.cleaned_data['url']
 			publication.title = title
 			publication.content = content
-			publication.url = url
 			publication.save()
 			if Challenge.objects.filter(id=id).count() > 0:
 				return HttpResponseRedirect(reverse('challenge_edit_publications', kwargs={'id':id}))
@@ -3177,13 +3183,23 @@ def publication_edit(request, id=None, pub_id=None):
 	return render(request, "publication/edit.html", context, context_instance=RequestContext(request))
 
 def publication_list(request):
-	publications = Publication.objects.all()
+	publications_list = Publication.objects.all()
 	if check_staff_user(request):
+		publications = []
+		for p in publications_list:
+			p_events = Publication_Event.objects.filter(publication=p)
+			p_datasets = Publication_Dataset.objects.filter(publication=p)
+			publications.append((p,p_events,p_datasets))
 		context = {
 			"publications": publications,
 			"perm": True,
 		}
 	else:
+		publications = []
+		for p in publications_list:
+			p_events = Publication_Event.objects.filter(publication=p)
+			p_datasets = Publication_Dataset.objects.filter(publication=p)
+			publications.append((p,p_events,p_datasets))
 		context = {
 			"publications": publications,
 		}
@@ -3191,8 +3207,12 @@ def publication_list(request):
 
 def publication_detail(request, id=None):
 	publication = Publication.objects.filter(id=id)[0]
+	publi_events = Publication_Event.objects.filter(publication=publication)
+	publi_datasets = Publication_Dataset.objects.filter(publication=publication)
 	context = {
 		"publication": publication,
+		"publi_datasets": publi_datasets,
+		"publi_events": publi_events,
 	}
 	return render(request, "publication/detail.html", context, context_instance=RequestContext(request))
 

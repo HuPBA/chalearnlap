@@ -15,29 +15,30 @@
                 <div class="col-md-10 col-md-offset-1"> 
                     <div class="panel panel-default"> 
                         <div class="panel-body">
-                            <div class="top-margin"> 
-                                <label>Title: </label>  
-                                <p>{{ publication.title }}</p>
-                            </div>                              
+                            {% if publication.title %}
+                                <div class="top-margin"> 
+                                    <label>Title: </label>  
+                                    <p>{{ publication.title }}</p>
+                                </div>  
+                            {% endif %}                            
                             <div class="top-margin"> 
                                 <label>Content: </label>   
                                 <p>{{ publication.content|safe }}</p>  
                             </div> 
-                            {% if publication.url %}
-                            <div class="top-margin"> 
-                                <label>Extra information: </label>   
-                                <a href="{{ publication.url }}">{{ publication.url }}</p>  
-                            </div> 
-                            {% endif %}
-                            {% if publication.dataset %}
+                            {% if publi_datasets %}
                                 <div class="top-margin"> 
-                                    <label>Dataset associated: </label>   
-                                    <a href="{% url "dataset_desc" id=publication.dataset.id %}">{{ publication.dataset.title }}</a>  
+                                    <label>Datasets associated: </label>   
+                                    {% for d in publi_datasets %}
+                                        <a href="{% url "dataset_desc" id=d.dataset.id %}">{{ d.dataset.title }}</a>  
+                                    {% endfor %}
                                 </div> 
-                            {% elif publication.event %}
+                            {% endif %}
+                            {% if publi_events %}
                                 <div class="top-margin"> 
-                                    <label>Event associated: </label>   
-                                    <a href="{% url "event_detail" id=publication.event.id %}">{{ publication.event.title }}</a>  
+                                    <label>Events associated: </label>
+                                    {% for e in publi_events %}
+                                        <a href="{% url "event_detail" id=e.event.id %}">{{ e.event.title }}</a>
+                                    {% endfor %}  
                                 </div> 
                             {% endif %}
                         </div>

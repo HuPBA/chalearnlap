@@ -41,9 +41,9 @@
                                         </div>  
                                     </div>
                                     {% if form.event %}
-                                        <div class="col-md-3">
+                                        <div class="col-md-7">
                                             <div class="top-margin"> 
-                                                <label>Event or Dataset associated
+                                                <label>Event associated
                                                     {% if form.event.field.required %}
                                                     <span class="text-danger">*</span>
                                                     {% endif %}
@@ -54,20 +54,20 @@
                                                 {{ form.event }} 
                                             </div> 
                                         </div> 
-                                    {% endif %}
-                                    <div class="col-md-4">
-                                        <div class="top-margin"> 
-                                            <label>Extra information
-                                                {% if form.url.field.required %}
-                                                <span class="text-danger">*</span>
+                                        <div class="col-md-7">
+                                            <div class="top-margin"> 
+                                                <label>Dataset associated
+                                                    {% if form.dataset.field.required %}
+                                                    <span class="text-danger">*</span>
+                                                    {% endif %}
+                                                </label>  
+                                                {% if form.errors.dataset %}
+                                                    <div class="alert alert-danger" role="alert">{{ form.errors.dataset }}</div>
                                                 {% endif %}
-                                            </label>  
-                                            {% if form.errors.url %}
-                                                <div class="alert alert-danger" role="alert">{{ form.errors.url }}</div>
-                                            {% endif %}
-                                            {{ form.url }} 
-                                        </div> 
-                                    </div> 
+                                                {{ form.dataset }} 
+                                            </div> 
+                                        </div>
+                                    {% endif %}
                                 </div> 
                                 <div class="row">
                                     <div class="col-md-12">                                 
@@ -94,7 +94,6 @@
                                         <button class="btn btn-action" type="submit" name="signup-button">Save</button>
                                     </div>
                                 </div> 
-
                             </div>
                         </div>                                    
                     </div>                             

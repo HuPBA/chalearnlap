@@ -434,6 +434,17 @@ class ScheduleEditForm(forms.Form):
 		super(ScheduleEditForm, self).__init__(*args, **kwargs)
 		self.fields['title'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}), initial=schedule.title)
 		self.fields['description'] = forms.CharField(required=True, widget=CKEditorUploadingWidget(), initial=schedule.description)
+		self.fields['time'] = forms.DateField(required=True, widget=DateWidget(bootstrap_version=3, options = {'format': 'mm/dd/yyyy'}), input_formats=['%m/%d/%Y'], initial=schedule.date)
+
+	def clean(self):
+		return self.cleaned_data
+
+class ProgramEditForm(forms.Form):
+	def __init__(self, *args, **kwargs):
+		schedule = kwargs.pop('schedule', None)
+		super(ProgramEditForm, self).__init__(*args, **kwargs)
+		self.fields['title'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}), initial=schedule.title)
+		self.fields['description'] = forms.CharField(required=True, widget=CKEditorUploadingWidget(), initial=schedule.description)
 		self.fields['time'] = forms.DateTimeField(required=True, widget=DateTimeWidget(bootstrap_version=3, options = {'format': 'mm/dd/yyyy hh:ii'}), input_formats=['%m/%d/%Y %H:%M'], initial=schedule.date)
 
 	def clean(self):
@@ -544,12 +555,15 @@ class SubmissionEditForm(forms.Form):
 		return self.cleaned_data
 
 class PublicationCreationForm(forms.Form):
-	def __init__(self, choices, *args, **kwargs):
+	def __init__(self, *args, **kwargs):
+		qset1 = kwargs.pop('qset1', Event.objects.all())
+		qset2 = kwargs.pop('qset2', Dataset.objects.all())
 		super(PublicationCreationForm, self).__init__(*args, **kwargs)
-		self.fields['title'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}))
+		self.fields['title'] = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}))
 		self.fields['content'] = forms.CharField(required=True, widget=CKEditorWidget())
-		self.fields['url'] = forms.URLField(required=False, widget=forms.TextInput(attrs={'class': "form-control", 'placeholder': "URL"}))
-		self.fields['event'] = forms.ChoiceField(widget=forms.Select(attrs={'class': "form-control"}), required=True, choices=choices)
+		# self.fields['url'] = forms.URLField(required=False, widget=forms.TextInput(attrs={'class': "form-control", 'placeholder': "URL"}))
+		self.fields['event'] = forms.ModelMultipleChoiceField(required=False, widget=forms.SelectMultiple(attrs={'class': "js-example-basic-multiple", 'id': "input-addmembers"}), queryset=qset1)
+		self.fields['dataset'] = forms.ModelMultipleChoiceField(required=False, widget=forms.SelectMultiple(attrs={'class': "js-example-basic-multiple", 'id': "input-addmembers"}), queryset=qset2)
 
 	def clean(self):
 		return self.cleaned_data
@@ -557,9 +571,9 @@ class PublicationCreationForm(forms.Form):
 class PublicationEventCreationForm(forms.Form):
 	def __init__(self, *args, **kwargs):
 		super(PublicationEventCreationForm, self).__init__(*args, **kwargs)
-		self.fields['title'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}))
+		self.fields['title'] = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}))
 		self.fields['content'] = forms.CharField(required=True, widget=CKEditorWidget())
-		self.fields['url'] = forms.URLField(required=False, widget=forms.TextInput(attrs={'class': "form-control", 'placeholder': "URL"}))
+		# self.fields['url'] = forms.URLField(required=False, widget=forms.TextInput(attrs={'class': "form-control", 'placeholder': "URL"}))
 
 	def clean(self):
 		return self.cleaned_data
@@ -567,9 +581,12 @@ class PublicationEventCreationForm(forms.Form):
 class PublicationEditForm(forms.Form):
 	def __init__(self, publication, *args, **kwargs):
 		super(PublicationEditForm, self).__init__(*args, **kwargs)
-		self.fields['title'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}), initial=publication.title)
+		if publication.title:
+			self.fields['title'] = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}), initial=publication.title)
+		else:
+			self.fields['title'] = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}))
 		self.fields['content'] = forms.CharField(required=True, widget=CKEditorWidget(), initial=publication.content)
-		self.fields['url'] = forms.URLField(required=False, widget=forms.TextInput(attrs={'class': "form-control", 'placeholder': "URL"}), initial=publication.url)
+		# self.fields['url'] = forms.URLField(required=False, widget=forms.TextInput(attrs={'class': "form-control", 'placeholder': "URL"}), initial=publication.url)
 
 	def clean(self):
 		return self.cleaned_data
