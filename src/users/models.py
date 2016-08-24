@@ -325,9 +325,10 @@ class Col(models.Model):
 class Publication(models.Model):
 	title = models.CharField(null=True, max_length=100)
 	content = RichTextField(null=True)
-	url = models.URLField(null=True)
-	dataset = models.ForeignKey(Dataset, on_delete=models.CASCADE, null=True)
-	event = models.ForeignKey(Event, on_delete=models.CASCADE, null=True)
+	events = models.ManyToManyField(Event, through='Publication_Event')
+	# url = models.URLField(null=True)
+	# dataset = models.ForeignKey(Dataset, on_delete=models.CASCADE, null=True)
+	# event = models.ForeignKey(Event, on_delete=models.CASCADE, null=True)
 
 class Profile_Dataset(models.Model):
 	profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='fk_profile_dataset', null=True)
@@ -339,3 +340,11 @@ class Profile_Dataset(models.Model):
 			return True
 		else:
 			return False
+
+class Publication_Dataset(models.Model):
+	publication = models.ForeignKey(Publication, on_delete=models.CASCADE, related_name='fk_publication_dataset', null=True)
+	dataset = models.ForeignKey(Dataset, on_delete=models.CASCADE, related_name='fk_dataset_publication', null=True)
+
+class Publication_Event(models.Model):
+	publication = models.ForeignKey(Publication, on_delete=models.CASCADE, related_name='fk_publication_event', null=True)
+	event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='fk_event_publication', null=True)
