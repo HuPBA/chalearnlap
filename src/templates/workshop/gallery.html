@@ -14,12 +14,12 @@
                 {% if images.count > 0 %}
                     <div class="row">
                         {% for i in images %} 
-                            <div class="col-sm-12">
+                            <div class="col-sm-8 col-sm-offset-2">
                                 <div class="all-margin">
-                                    {% thumbnail i.image "200x200" crop="noop" as small %}
+                                    {% thumbnail i.image "250x250" crop="noop" as small %}
                                         <a href="{{ i.image.url }}" title="zoom"><img class="img-responsive img-center" src="{{ small.url }}" width="{{ small.width }}" height="{{ small.height }}"></a>
                                     {% endthumbnail %}
-                                    <p class="text-center">{{ i.description|safe}}</p>
+                                    <p>{{ i.description|safe}}</p>
                                 </div>
                             </div>
                         {% endfor %}

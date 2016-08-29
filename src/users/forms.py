@@ -150,6 +150,16 @@ class GalleryImageForm(forms.Form):
 	def clean(self):
 		return self.cleaned_data
 
+class GalleryImageEditForm(forms.Form):
+	def __init__(self, *args, **kwargs):
+		image = kwargs.pop('image', None)
+		super(GalleryImageEditForm, self).__init__(*args, **kwargs)
+		if image:
+			self.fields['desc'] = forms.CharField(required=True, widget=CKEditorWidget(), initial=image.description)
+
+	def clean(self):
+		return self.cleaned_data
+
 class MemberCreationForm(RegistrationForm):
 	def __init__(self, *args, **kwargs):
 		super(MemberCreationForm, self).__init__(*args, **kwargs)
@@ -412,7 +422,7 @@ class ProgramCreationForm(forms.Form):
 	def __init__(self, *args, **kwargs):
 		super(ProgramCreationForm, self).__init__(*args, **kwargs)
 		self.fields['title'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}))
-		self.fields['description'] = forms.CharField(required=True, widget=CKEditorUploadingWidget())
+		self.fields['description'] = forms.CharField(required=False, widget=CKEditorUploadingWidget())
 		self.fields['time'] = forms.DateTimeField(required=True, widget=DateTimeWidget(bootstrap_version=3, options = {'format': 'mm/dd/yyyy hh:ii'}), input_formats=['%m/%d/%Y %H:%M'])
 
 	def clean(self):
@@ -422,7 +432,7 @@ class ScheduleCreationForm(forms.Form):
 	def __init__(self, *args, **kwargs):
 		super(ScheduleCreationForm, self).__init__(*args, **kwargs)
 		self.fields['title'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}))
-		self.fields['description'] = forms.CharField(required=True, widget=CKEditorUploadingWidget())
+		self.fields['description'] = forms.CharField(required=False, widget=CKEditorUploadingWidget())
 		self.fields['time'] = forms.DateField(required=True, widget=DateWidget(bootstrap_version=3, options = {'format': 'mm/dd/yyyy'}), input_formats=['%m/%d/%Y'])
 
 	def clean(self):
@@ -433,7 +443,7 @@ class ScheduleEditForm(forms.Form):
 		schedule = kwargs.pop('schedule', None)
 		super(ScheduleEditForm, self).__init__(*args, **kwargs)
 		self.fields['title'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}), initial=schedule.title)
-		self.fields['description'] = forms.CharField(required=True, widget=CKEditorUploadingWidget(), initial=schedule.description)
+		self.fields['description'] = forms.CharField(required=False, widget=CKEditorUploadingWidget(), initial=schedule.description)
 		self.fields['time'] = forms.DateField(required=True, widget=DateWidget(bootstrap_version=3, options = {'format': 'mm/dd/yyyy'}), input_formats=['%m/%d/%Y'], initial=schedule.date)
 
 	def clean(self):
@@ -444,7 +454,7 @@ class ProgramEditForm(forms.Form):
 		schedule = kwargs.pop('schedule', None)
 		super(ProgramEditForm, self).__init__(*args, **kwargs)
 		self.fields['title'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}), initial=schedule.title)
-		self.fields['description'] = forms.CharField(required=True, widget=CKEditorUploadingWidget(), initial=schedule.description)
+		self.fields['description'] = forms.CharField(required=False, widget=CKEditorUploadingWidget(), initial=schedule.description)
 		self.fields['time'] = forms.DateTimeField(required=True, widget=DateTimeWidget(bootstrap_version=3, options = {'format': 'mm/dd/yyyy hh:ii'}), input_formats=['%m/%d/%Y %H:%M'], initial=schedule.date)
 
 	def clean(self):
@@ -496,31 +506,22 @@ class SubmissionScoresForm(forms.Form):
 	def clean(self):
 		return self.cleaned_data
 
-class ResultEditForm(forms.Form):
+class ResultUserEditForm(forms.Form):
 	def __init__(self, *args, **kwargs):
-		result = kwargs.pop('result', None)
-		super(ResultEditForm, self).__init__(*args, **kwargs)
-		self.fields['name'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}), initial=result.user)
-		if result and result.sheets:
-			self.fields['sheets'] = forms.URLField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}), initial=result.sheets)
-		else:
-			self.fields['sheets'] = forms.URLField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}))
-		if result and result.code:
-			self.fields['code'] = forms.URLField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}), initial=result.code)
-		else:
-			self.fields['code'] = forms.URLField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}))
-		if result and result.website:
-			self.fields['website'] = forms.URLField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}), initial=result.website)
-		else:
-			self.fields['website'] = forms.URLField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}))
-		if result and result.article:
-			self.fields['article'] = forms.URLField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}), initial=result.article)
-		else:
-			self.fields['article'] = forms.URLField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}))
-		if result and result.other:
-			self.fields['other'] = forms.URLField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}), initial=result.other)
-		else:
-			self.fields['other'] = forms.URLField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}))
+		result_user = kwargs.pop('result_user', None)
+		super(ResultUserEditForm, self).__init__(*args, **kwargs)
+		if result_user:
+			for r in result_user:
+				self.fields[r.name] = forms.URLField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}), initial=r.link)
+
+	def clean(self):
+		return self.cleaned_data
+
+class ResultUserCreationForm(forms.Form):
+	def __init__(self, *args, **kwargs):
+		super(ResultUserCreationForm, self).__init__(*args, **kwargs)
+		self.fields['name'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}))
+		self.fields['link'] = forms.URLField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}))
 
 	def clean(self):
 		return self.cleaned_data

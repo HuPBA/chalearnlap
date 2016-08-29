@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% block container %}
+    {% if resultcreationform.non_field_errors  %}
+        {% for e in resultcreationform.non_field_errors %} 
+            <div class="row"> 
+                <div class="col-md-6 widget col-md-offset-3"> 
+                    <div class="alert alert-danger" role="alert">{{ e }}</div>
+                </div>
+            </div>
+        {% endfor %} 
+    {% endif %}
+    {% if resulteditform.non_field_errors  %}
+        {% for e in resulteditform.non_field_errors %} 
+            <div class="row"> 
+                <div class="col-md-6 widget col-md-offset-3"> 
+                    <div class="alert alert-danger" role="alert">{{ e }}</div>
+                </div>
+            </div>
+        {% endfor %} 
+    {% endif %}
+    <ol class="breadcrumb"> 
+        <li> <a href="{% url "home" %}">Home</a> </li>           
+        <li class="active">Result edit</li>                 
+    </ol>            
+    <div class="row"> 
+        <article class="col-xs-12 maincontent"> 
+            <header class="page-header"> 
+                <h1 class="page-title">Result edit</h1> 
+            </header> 
+            <form method="POST" action=""> {% csrf_token %}      
+                <div class="panel panel-default"> 
+                    <div class="panel-body"> 
+                        <h3 class="thin text-center">Result</h3>
+                        <hr> 
+                        {% if result_user %}
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="panel panel-default"> 
+                                        <div class="panel-body">
+                                            <label>{{ r.name }}<span class="text-danger"></span></label>  
+                                            {{ resulteditform.as_p }} 
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <hr>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-lg-2 col-lg-offset-8"> 
+                                                    <button class="btn btn-action" name="edit" type="submit" value="edit">Save</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="panel panel-default"> 
+                                        <div class="panel-body">
+                                            <div class="col-md-12">
+                                                <div class="top-margin"> 
+                                                    <label>Name
+                                                        {% if resultcreationform.name.field.required %}
+                                                        <span class="text-danger">*</span>
+                                                        {% endif %}
+                                                    </label>   
+                                                    {% if resultcreationform.errors.name %}
+                                                        <div class="alert alert-danger" role="alert">{{ resultcreationform.errors.name }}</div>
+                                                    {% endif %}
+                                                    {{ resultcreationform.name }}                                      
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <div class="top-margin"> 
+                                                    <label>Link
+                                                        {% if resultcreationform.link.field.required %}
+                                                        <span class="text-danger">*</span>
+                                                        {% endif %}
+                                                    </label>   
+                                                    {% if resultcreationform.errors.link %}
+                                                        <div class="alert alert-danger" role="alert">{{ resultcreationform.errors.link }}</div>
+                                                    {% endif %}
+                                                    {{ resultcreationform.link }}                                      
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <hr>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-lg-2 col-lg-offset-8 text-right"> 
+                                                    <button class="btn btn-action" name="creation" type="submit" value="creation">Create</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="top-margin"> 
+                                        <label>Name
+                                            {% if resultcreationform.name.field.required %}
+                                            <span class="text-danger">*</span>
+                                            {% endif %}
+                                        </label>   
+                                        {% if resultcreationform.errors.name %}
+                                            <div class="alert alert-danger" role="alert">{{ resultcreationform.errors.name }}</div>
+                                        {% endif %}
+                                        {{ resultcreationform.name }}                                      
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="top-margin"> 
+                                        <label>Link
+                                            {% if resultcreationform.link.field.required %}
+                                            <span class="text-danger">*</span>
+                                            {% endif %}
+                                        </label>   
+                                        {% if resultcreationform.errors.link %}
+                                            <div class="alert alert-danger" role="alert">{{ resultcreationform.errors.link }}</div>
+                                        {% endif %}
+                                        {{ resultcreationform.link }}                                      
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <hr>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-2 col-lg-offset-10 text-right"> 
+                                    <button class="btn btn-action" name="creation" type="submit">Create</button>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>                                   
+                </div> 
+            </form>
+        </article>
+    </div>
+{% endblock container %}  

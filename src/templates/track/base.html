@@ -2,7 +2,14 @@
 {% block container %}
     <ol class="breadcrumb"> 
         {% block breadcrumb %}
-        {% endblock breadcrumb %}                
+        {% endblock breadcrumb %} 
+        {% if not_perm %}
+            <div class="row"> 
+                <div class="col-md-6 widget col-md-offset-3"> 
+                    <div class="alert alert-danger" role="alert">You don't have permission to edit</div>
+                </div>
+            </div>
+        {% endif %}               
     </ol>            
     <div class="row"> 
         <article class="col-xs-12 maincontent"> 
@@ -15,6 +22,7 @@
                     <li><a href='{% url 'dataset_desc' id=track.dataset.id %}'>Dataset associated</a></li>
                     <li><a href='{% url 'track_metrics' id=challenge.id track_id=track.id %}'>Evaluation metrics</a></li>
                     <li><a href='{% url 'track_baseline' id=challenge.id track_id=track.id %}'>Baseline</a></li>
+                    <li><a href='{% url 'track_result' id=challenge.id track_id=track.id %}'>Results</a></li>
                 </ul>
             </div>                   
             {% block content %}

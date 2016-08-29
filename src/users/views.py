@@ -1,11 +1,11 @@
 from django.shortcuts import render, get_object_or_404, redirect, render_to_response
 from django.http import HttpResponse
-from .forms import ProgramEditForm, ProgramCreationForm, PublicationEditForm, PublicationEventCreationForm, PublicationCreationForm, SubmissionEditForm, ColEditForm, EditChallengeResult, ProfileForm, AffiliationForm, SelectRoleForm, UserEditForm, UserRegisterForm, EditProfileForm, EditExtraForm, DatasetCreationForm, DataCreationForm, EventCreationForm, EditEventForm, RoleCreationForm, NewsCreationForm, FileCreationForm, NewsEditForm, SelectDatasetForm, MemberCreationForm, MemberSelectForm, PartnerCreationForm, PartnerSelectForm, ScheduleCreationForm, ScheduleEditForm, DatasetEditForm, DataEditForm, TrackCreationForm, GalleryImageForm, TrackEditForm, RelationCreationForm, RelationEditForm, SubmissionCreationForm, SubmissionScoresForm, ResultEditForm
+from .forms import GalleryImageEditForm, ResultUserEditForm, ResultUserCreationForm, ProgramEditForm, ProgramCreationForm, PublicationEditForm, PublicationEventCreationForm, PublicationCreationForm, SubmissionEditForm, ColEditForm, EditChallengeResult, ProfileForm, AffiliationForm, SelectRoleForm, UserEditForm, UserRegisterForm, EditProfileForm, EditExtraForm, DatasetCreationForm, DataCreationForm, EventCreationForm, EditEventForm, RoleCreationForm, NewsCreationForm, FileCreationForm, NewsEditForm, SelectDatasetForm, MemberCreationForm, MemberSelectForm, PartnerCreationForm, PartnerSelectForm, ScheduleCreationForm, ScheduleEditForm, DatasetEditForm, DataEditForm, TrackCreationForm, GalleryImageForm, TrackEditForm, RelationCreationForm, RelationEditForm, SubmissionCreationForm, SubmissionScoresForm
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_protect
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
-from .models import Publication_Event, Publication_Dataset, Publication, Profile_Dataset, Submission, Col, Profile, Result, Score, Proposal, Profile_Event, Affiliation, Event, Dataset, Data, Partner, Event, Special_Issue, Workshop, Challenge, Role, News, File, Contact, Event_Partner, Schedule_Event, Track, Gallery_Image, Event_Relation
+from .models import Result_User, Publication_Event, Publication_Dataset, Publication, Profile_Dataset, Submission, Col, Profile, Result, Score, Proposal, Profile_Event, Affiliation, Event, Dataset, Data, Partner, Event, Special_Issue, Workshop, Challenge, Role, News, File, Contact, Event_Partner, Schedule_Event, Track, Gallery_Image, Event_Relation
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.template import RequestContext
 from django.core.urlresolvers import reverse
@@ -1716,36 +1716,54 @@ def challenge_edit_publications(request, id=None):
 		return render(request, "challenge/edit/publications.html", context, context_instance=RequestContext(request))
 
 @login_required(login_url='auth_login')
-def result_edit(request, id=None, result_id=None):
+def result_edit(request, id=None, track_id=None, result_id=None):
 	challenge = Challenge.objects.filter(id=id)[0]
+	track = Track.objects.filter(id=track_id)[0]
 	result = Result.objects.filter(id=result_id)[0]
-	resultform = ResultEditForm(result=result)
-	if request.method == 'POST':
-		resultform = ResultEditForm(request.POST, result=result)
-		if resultform.is_valid():
-			name = resultform.cleaned_data['name']
-			sheets = resultform.cleaned_data['sheets']
-			code = resultform.cleaned_data['code']
-			website = resultform.cleaned_data['website']
-			article = resultform.cleaned_data['article']
-			other = resultform.cleaned_data['other']
-			result.user = name
-			result.sheets = sheets
-			result.code = code
-			result.website = website
-			result.article = article
-			result.other = other
-			result.save()
-	context = {
-		"resultform": resultform,
-	}
-	return render(request, "challenge/edit/result_user.html", context, context_instance=RequestContext(request))
+	result_user = Result_User.objects.filter(result=result)
+	if result_user:
+		resulteditform = ResultUserEditForm(result_user=result_user)
+		resultcreationform = ResultUserCreationForm()
+		if request.method == 'POST':
+			if 'creation' in request.POST:
+				resultcreationform = ResultUserCreationForm(request.POST)
+				if resultcreationform.is_valid():
+					name = resultcreationform.cleaned_data['name']
+					link = resultcreationform.cleaned_data['link']
+					Result_User.objects.create(name=name, link=link, result=result)
+					return HttpResponseRedirect(reverse('track_edit_result', kwargs={'id':id, 'track_id':track_id}))
+			elif 'edit' in request.POST:
+				resulteditform = ResultUserEditForm(request.POST, result_user=result_user)
+				if resulteditform.is_valid():
+					for r in result_user:
+						r.link = resulteditform.cleaned_data[r.name]
+						r.save()
+					return HttpResponseRedirect(reverse('track_edit_result', kwargs={'id':id, 'track_id':track_id}))
+		context = {
+			"resulteditform": resulteditform,
+			"resultcreationform": resultcreationform,
+			"result_user": result_user,
+		}
+	else:
+		resultcreationform = ResultUserCreationForm()
+		if request.method == 'POST':
+			if 'creation' in request.POST:
+				resultcreationform = ResultUserCreationForm(request.POST)
+				if resultcreationform.is_valid():
+					name = resultcreationform.cleaned_data['name']
+					link = resultcreationform.cleaned_data['link']
+					Result_User.objects.create(name=name, link=link, result=result)
+					return HttpResponseRedirect(reverse('track_edit_result', kwargs={'id':id, 'track_id':track_id}))
+		context = {
+			"resultcreationform": resultcreationform,
+		}
+	return render(request, "track/edit/result_user.html", context, context_instance=RequestContext(request))
 
 @login_required(login_url='auth_login')
-def result_remove(request, id=None, result_id=None):
+def result_remove(request, id=None, track_id=None, result_id=None):
 	result = Result.objects.filter(id=result_id)[0]
 	result.delete()
-	return HttpResponse(reverse('challenge_edit_result', kwargs={'id':id}))
+	return HttpResponse(reverse('track_edit_result', kwargs={'id':id, 'track_id':track_id}))
 
 @login_required(login_url='auth_login')
 def challenge_publish(request, id=None):
@@ -1766,7 +1784,6 @@ def challenge_desc(request, id=None):
 	tracks = Track.objects.filter(challenge__id=id).exclude(dataset=None)
 	news = News.objects.filter(event_id=id).order_by('-upload_date')
 	profile_event = check_event_permission(request, challenge)
-	results = Result.objects.filter(challenge=challenge)
 	sponsors = Event_Partner.objects.filter(event_id=id)
 	publications = Publication_Event.objects.filter(event=challenge)
 	context = {
@@ -1774,7 +1791,6 @@ def challenge_desc(request, id=None):
 		"news": news,
 		"tracks": tracks,
 		"profile": profile_event,
-		"results": results,
 		"sponsors": sponsors,
 		"publications": publications,
 	}
@@ -1787,11 +1803,9 @@ def challenge_associated_events(request, id=None):
 	relations = Event_Relation.objects.filter(event_associated=challenge)
 	associated = Event_Relation.objects.filter(challenge_relation=challenge)
 	profile_event = check_event_permission(request, challenge)
-	results = Result.objects.filter(challenge=challenge)
 	sponsors = Event_Partner.objects.filter(event_id=id)
 	publications = Publication_Event.objects.filter(event=challenge)
 	context = {
-		"results": results,
 		"sponsors": sponsors,
 		"publications": publications,
 		"challenge": challenge,
@@ -1968,6 +1982,38 @@ def track_baseline(request, id=None,track_id=None):
 	}
 	return render(request, "track/baseline.html", context, context_instance=RequestContext(request))
 
+def track_result(request, id=None, track_id=None):
+	challenge = Challenge.objects.filter(id=id)[0]
+	news = News.objects.filter(event_id=id).order_by('-upload_date')
+	track = Track.objects.filter(id=track_id)[0]
+	result = Result.objects.filter(track=track)
+	results = None
+	scores = None
+	names = None
+	if result:
+		result = Result.objects.filter(track=track)[0]
+		scores = Score.objects.filter(result__track=track)
+		results = Result.objects.filter(track=track)
+		results2 = []
+		for r in results:
+			extra = Result_User.objects.filter(result=r)
+			results2.append((r,extra))
+		qset = Score.objects.filter(result=result)
+		names = []
+		for n in qset:
+			names.append(n.name)
+	# profile_event = check_event_permission(request, challenge)
+	context = {
+		"challenge": challenge,
+		"track": track,
+		"news": news,
+		"scores": scores,	
+		"names": names,	
+		"results": results2,
+		# "profile": profile_event,		
+	}
+	return render(request, "track/result.html", context, context_instance=RequestContext(request))
+
 @login_required(login_url='auth_login')
 def track_creation(request, id=None):
 	c = None
@@ -1997,36 +2043,114 @@ def track_creation(request, id=None):
 	return render(request, "track/creation.html", context, context_instance=RequestContext(request))
 
 @login_required(login_url='auth_login')
-def track_edit(request, id=None, track_id=None):
+def track_edit_desc(request, id=None, track_id=None):
 	c = None
 	if Challenge.objects.filter(id=id).count() > 0:
 		c = Challenge.objects.filter(id=id)[0]
 	track = Track.objects.filter(id=track_id)[0]
-	datasets = Dataset.objects.all()
-	choices = []
-	for d in datasets:
-	    choices.append((d.id, d.title))
-	trackform = TrackEditForm(choices, track=track)
-	if request.method == 'POST':
-		trackform = TrackEditForm(choices, request.POST, track=track)
-		if trackform.is_valid():
-			title = trackform.cleaned_data['title']
-			desc = trackform.cleaned_data['description']
-			metrics = trackform.cleaned_data['metrics']
-			baseline = trackform.cleaned_data['baseline']
-			dataset_id = trackform.cleaned_data['dataset_select']
-			track.title = title
-			track.description = desc 
-			track.metrics = metrics
-			track.baseline = baseline
-			track.dataset = Dataset.objects.filter(id=dataset_id)[0]
-			track.save()
-			return HttpResponseRedirect(reverse('challenge_edit_tracks', kwargs={'id':id}))
-	context = {
-		"trackform": trackform,
-		"c": c,
-	}
-	return render(request, "track/edit.html", context, context_instance=RequestContext(request))
+	if check_edit_event_permission(request, c) == False:
+		news = News.objects.filter(event_id=id).order_by('-upload_date')
+		context = {
+			"challenge": challenge, 
+			"tracks": tracks,
+			"news": news,
+			"not_perm": True,
+		}
+		return render(request, "track/desc.html", context, context_instance=RequestContext(request))
+	else:
+		datasets = Dataset.objects.all()
+		choices = []
+		for d in datasets:
+		    choices.append((d.id, d.title))
+		trackform = TrackEditForm(choices, track=track)
+		if request.method == 'POST':
+			trackform = TrackEditForm(choices, request.POST, track=track)
+			if trackform.is_valid():
+				title = trackform.cleaned_data['title']
+				desc = trackform.cleaned_data['description']
+				metrics = trackform.cleaned_data['metrics']
+				baseline = trackform.cleaned_data['baseline']
+				dataset_id = trackform.cleaned_data['dataset_select']
+				track.title = title
+				track.description = desc 
+				track.metrics = metrics
+				track.baseline = baseline
+				track.dataset = Dataset.objects.filter(id=dataset_id)[0]
+				track.save()
+				return HttpResponseRedirect(reverse('track_desc', kwargs={'id':id, 'track_id': track_id}))
+		context = {
+			"trackform": trackform,
+			"challenge": c,
+			"track": track,
+		}
+		return render(request, "track/edit/desc.html", context, context_instance=RequestContext(request))
+
+@login_required(login_url='auth_login')
+def track_edit_result(request, id=None, track_id=None):
+	c = None
+	if Challenge.objects.filter(id=id).count() > 0:
+		c = Challenge.objects.filter(id=id)[0]
+	track = Track.objects.filter(id=track_id)[0]
+	if check_edit_event_permission(request, c) == False:
+		news = News.objects.filter(event_id=id).order_by('-upload_date')
+		context = {
+			"challenge": challenge, 
+			"tracks": tracks,
+			"news": news,
+			"not_perm": True,
+		}
+		return render(request, "track/desc.html", context, context_instance=RequestContext(request))
+	else:
+		eventform = EditChallengeResult()
+		result = Result.objects.filter(track=track)
+		results = None
+		scores = None
+		names = None
+		if result:
+			result = Result.objects.filter(track=track)[0]
+			scores = Score.objects.filter(result__track=track)
+			results = Result.objects.filter(track=track)
+			qset = Score.objects.filter(result=result)
+			names = []
+			for n in qset:
+				names.append(n.name)
+		if request.method == 'POST':
+			eventform = EditChallengeResult(request.POST, request.FILES)
+			if eventform.is_valid():
+				if eventform.cleaned_data["file"]:
+					Result.objects.filter(track=track).delete()
+					csv_file = csv.reader(eventform.cleaned_data["file"])
+					titles = True
+					names = None
+					for l in csv_file:
+						if len(l) > 1:
+							if titles:
+								names = l
+								titles = False
+							else:
+								username = l[0]
+								result = Result.objects.create(user=l[0], track=track)
+								i = 1
+								for item in l:
+									element = item.split()
+									if len(element) > 0:
+										element = element[0]
+										try:
+											digit = float(element)
+											Score.objects.create(name=names[i], result=result, score=digit)
+											i+=1
+										except ValueError:
+											continue
+				return HttpResponseRedirect(reverse('track_edit_result', kwargs={'id':id,'track_id':track_id}))
+		context = {
+			"eventform": eventform,
+			"challenge": c, 
+			"track": track,
+			"results": results,
+			"names": names, 
+			"scores": scores,
+		}
+		return render(request, "track/edit/result.html", context, context_instance=RequestContext(request))
 
 @login_required(login_url='auth_login')
 def track_remove(request, id=None, track_id=None):
@@ -2045,11 +2169,9 @@ def challenge_members(request, id=None):
 			members.append((r.name,members2))
 	news = News.objects.filter(event_id=id).order_by('-upload_date')
 	profile_event = check_event_permission(request, challenge)
-	results = Result.objects.filter(challenge=challenge)
 	sponsors = Event_Partner.objects.filter(event_id=id)
 	publications = Publication_Event.objects.filter(event=challenge)
 	context = {
-		"results": results,
 		"sponsors": sponsors,
 		"publications": publications,
 		"challenge": challenge,
@@ -2066,10 +2188,8 @@ def challenge_sponsors(request, id=None):
 	tracks = Track.objects.filter(challenge__id=id).exclude(dataset=None)
 	news = News.objects.filter(event_id=id).order_by('-upload_date')
 	profile_event = check_event_permission(request, challenge)
-	results = Result.objects.filter(challenge=challenge)
 	publications = Publication_Event.objects.filter(event=challenge)
 	context = {
-		"results": results,
 		"publications": publications,
 		"challenge": challenge,
 		"sponsors": sponsors,
@@ -2085,11 +2205,9 @@ def challenge_schedule(request, id=None):
 	news = News.objects.filter(event_id=id).order_by('-upload_date')
 	schedule = Schedule_Event.objects.filter(event_schedule=challenge,schedule_event_parent=None).order_by('date')
 	profile_event = check_event_permission(request, challenge)
-	results = Result.objects.filter(challenge=challenge)
 	sponsors = Event_Partner.objects.filter(event_id=id)
 	publications = Publication_Event.objects.filter(event=challenge)
 	context = {
-		"results": results,
 		"sponsors": sponsors,
 		"publications": publications,
 		"challenge": challenge,
@@ -2100,37 +2218,37 @@ def challenge_schedule(request, id=None):
 	}
 	return render(request, "challenge/schedule.html", context, context_instance=RequestContext(request))
 
-def challenge_result(request, id=None):
-	challenge = Challenge.objects.filter(id=id)[0]
-	tracks = Track.objects.filter(challenge__id=id).exclude(dataset=None)
-	news = News.objects.filter(event_id=id).order_by('-upload_date')
-	result = Result.objects.filter(challenge=challenge)
-	results = None
-	scores = None
-	names = None
-	if result:
-		result = Result.objects.filter(challenge=challenge)[0]
-		scores = Score.objects.filter(result__challenge=challenge)
-		results = Result.objects.filter(challenge=challenge)
-		qset = Score.objects.filter(result=result)
-		names = []
-		for n in qset:
-			names.append(n.name)
-	profile_event = check_event_permission(request, challenge)
-	sponsors = Event_Partner.objects.filter(event_id=id)
-	publications = Publication_Event.objects.filter(event=challenge)
-	context = {
-		"sponsors": sponsors,
-		"publications": publications,
-		"challenge": challenge,
-		"news": news,
-		"tracks": tracks,
-		"scores": scores,	
-		"names": names,	
-		"results": results,
-		"profile": profile_event,		
-	}
-	return render(request, "challenge/result.html", context, context_instance=RequestContext(request))
+# def challenge_result(request, id=None):
+# 	challenge = Challenge.objects.filter(id=id)[0]
+# 	tracks = Track.objects.filter(challenge__id=id).exclude(dataset=None)
+# 	news = News.objects.filter(event_id=id).order_by('-upload_date')
+# 	result = Result.objects.filter(challenge=challenge)
+# 	results = None
+# 	scores = None
+# 	names = None
+# 	if result:
+# 		result = Result.objects.filter(challenge=challenge)[0]
+# 		scores = Score.objects.filter(result__challenge=challenge)
+# 		results = Result.objects.filter(challenge=challenge)
+# 		qset = Score.objects.filter(result=result)
+# 		names = []
+# 		for n in qset:
+# 			names.append(n.name)
+# 	profile_event = check_event_permission(request, challenge)
+# 	sponsors = Event_Partner.objects.filter(event_id=id)
+# 	publications = Publication_Event.objects.filter(event=challenge)
+# 	context = {
+# 		"sponsors": sponsors,
+# 		"publications": publications,
+# 		"challenge": challenge,
+# 		"news": news,
+# 		"tracks": tracks,
+# 		"scores": scores,	
+# 		"names": names,	
+# 		"results": results,
+# 		"profile": profile_event,		
+# 	}
+# 	return render(request, "challenge/result.html", context, context_instance=RequestContext(request))
 
 def challenge_publications(request, id=None):
 	challenge = Challenge.objects.filter(id=id)[0]
@@ -2138,10 +2256,8 @@ def challenge_publications(request, id=None):
 	news = News.objects.filter(event_id=id).order_by('-upload_date')
 	publications = Publication_Event.objects.filter(event=challenge)
 	profile_event = check_event_permission(request, challenge)
-	results = Result.objects.filter(challenge=challenge)
 	sponsors = Event_Partner.objects.filter(event_id=id)
 	context = {
-		"results": results,
 		"sponsors": sponsors,
 		"challenge": challenge,
 		"news": news,
@@ -2502,6 +2618,26 @@ def remove_gallery_picture(request, id=None, pic_id=None):
 	image = Gallery_Image.objects.filter(id=pic_id)
 	image.delete()
 	return HttpResponse(reverse('workshop_edit_gallery', kwargs={'id':id}))
+
+@login_required(login_url='auth_login')
+# @user_passes_test(lambda u:u.is_staff, login_url='/')
+def edit_gallery_picture(request, id=None, pic_id=None):
+	workshop = Workshop.objects.filter(id=id)[0]
+	image = Gallery_Image.objects.filter(id=pic_id)[0]
+	form = GalleryImageEditForm(image=image)
+	if request.method == 'POST':
+		form = GalleryImageEditForm(request.POST, image=image)
+		if form.is_valid():
+			desc = form.cleaned_data["desc"]
+			image.description = desc
+			image.save()
+			return HttpResponseRedirect(reverse('workshop_edit_gallery', kwargs={'id':id}))
+	context = {
+		"workshop": workshop,
+		"image": image,
+		"form": form,
+	}
+	return render(request, "workshop/edit_picture.html", context, context_instance=RequestContext(request))
 
 def speaker_select(request, id=None):
 	workshop = Workshop.objects.filter(id=id)[0]

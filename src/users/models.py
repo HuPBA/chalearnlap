@@ -208,8 +208,8 @@ class News(models.Model):
 			return reverse("home")
 
 class Schedule_Event(models.Model):
-	title = models.CharField(max_length=100, null=True)
-	description = RichTextUploadingField()
+	title = models.CharField(max_length=150, null=True)
+	description = RichTextUploadingField(null=True)
 	date = models.DateTimeField()
 	schedule_event_parent = models.ForeignKey("self", on_delete=models.CASCADE, null=True)
 	event_schedule = models.ForeignKey(Event, on_delete=models.CASCADE, null=True, related_name='event_schedule')
@@ -241,15 +241,18 @@ class Track(models.Model):
 
 class Result(models.Model):
 	user = models.CharField(null=True, max_length=100)
-	sheets = models.URLField(null=True)
-	code = models.URLField(null=True)
-	website = models.URLField(null=True)
-	article = models.URLField(null=True)
-	other = models.URLField(null=True)
-	challenge = models.ForeignKey(Challenge, on_delete=models.CASCADE, null=True)
+	track = models.ForeignKey(Track, on_delete=models.CASCADE, null=True)
 
 	def __str__(self):
 		return unicode(self.user).encode('utf-8')
+
+class Result_User(models.Model):
+	name = models.CharField(null=True, max_length=100)
+	link = models.URLField(null=True)
+	result = models.ForeignKey(Result, on_delete=models.CASCADE, null=True)
+
+	def __str__(self):
+		return unicode(self.name).encode('utf-8')
 
 class Data(models.Model):
 	title = models.CharField(max_length=100)
@@ -302,6 +305,22 @@ class Score(models.Model):
 
 	def __str__(self):
 		return unicode(self.name).encode('utf-8')
+
+# class Score_Result(models.Model):
+# 	name = models.CharField(null=True, max_length=100)
+# 	score = models.FloatField(null=True)
+# 	result = models.ForeignKey(Result, on_delete=models.CASCADE, null=True)
+
+# 	def __str__(self):
+# 		return unicode(self.name).encode('utf-8')
+
+# class Score_Submission(models.Model):
+# 	name = models.CharField(null=True, max_length=100)
+# 	score = models.FloatField(null=True)
+# 	submission = models.ForeignKey(Submission, on_delete=models.CASCADE, null=True)
+
+# 	def __str__(self):
+# 		return unicode(self.name).encode('utf-8')
 
 class Col(models.Model):
 	dataset = models.ForeignKey(Dataset, on_delete=models.CASCADE, null=True)

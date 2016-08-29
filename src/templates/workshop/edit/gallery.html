@@ -18,9 +18,9 @@
                                 <div class="row">
                                     {% for i in images %} 
                                         <div class="col-sm-4 thumbnail-gallery">
-                                        <a id="{{ m.id }}" class="delete-event" value="{% url 'remove_gallery_picture' id=workshop.id pic_id=i.id %}" href=""><i class="fa fa-minus-circle fa" aria-hidden="true"></i></a>
+                                        <p class="text-center"><a id="{{ m.id }}" class="delete-event" value="{% url 'remove_gallery_picture' id=workshop.id pic_id=i.id %}" href=""><i class="fa fa-minus-circle fa" aria-hidden="true"></i></a>&ensp;<a href="{% url "edit_gallery_picture" id=workshop.id pic_id=i.id %}"><i class="fa fa-pencil" aria-hidden="true"></i></a></p>
                                             {% thumbnail i.image "120x120" crop="noop" as small %}
-                                                <a href="{{ i.image.url }}" title="zoom"><img class="img-responsive" src="{{ small.url }}" width="{{ small.width }}" height="{{ small.height }}"></a>
+                                                <a href="{{ i.image.url }}" title="zoom"><img class="img-responsive img-center" src="{{ small.url }}" width="{{ small.width }}" height="{{ small.height }}"></a>
                                             {% endthumbnail %}
                                             <p>{{ i.description|truncatewords_html:9|safe}}</p>
                                         </div>

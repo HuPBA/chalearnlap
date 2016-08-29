@@ -165,7 +165,7 @@
                                                 {% for t in tracks %} 
                                                     <div class="col-sm-12">
                                                         <div class="top-margin"> 
-                                                            <p class="text-center"><a href='{% url "track_edit" id=event.id track_id=t.id %}'>{{ t.title }}</a>&ensp;<a id="{{ t.id }}" class="delete-event" value="{% url 'track_remove' id=event.id track_id=t.id %}" href=""><i class="fa fa-minus-circle fa" aria-hidden="true"></i></a></p>
+                                                            <p class="text-center"><a href='{% url "track_edit_desc" id=event.id track_id=t.id %}'>{{ t.title }}</a>&ensp;<a id="{{ t.id }}" class="delete-event" value="{% url 'track_remove' id=event.id track_id=t.id %}" href=""><i class="fa fa-minus-circle fa" aria-hidden="true"></i></a></p>
                                                         </div>
                                                     </div>
                                                 {% endfor %}  
