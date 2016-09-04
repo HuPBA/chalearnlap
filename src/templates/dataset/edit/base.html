@@ -34,7 +34,15 @@
                     <li><a href='{% url 'dataset_edit_relations' id=dataset.id %}'>Associated events</a></li>
                     <li><a href='{% url 'dataset_edit_datas' id=dataset.id %}'>Datas</a></li>
                     <li><a href='{% url 'dataset_edit_members' id=dataset.id %}'>Admins</a></li>
-                    <li><a href='{% url 'dataset_edit_results' id=dataset.id %}'>Results</a></li>
+                    <li><a href="#" data-toggle="collapse" data-target="#drilldown-2">Results <b class="caret"></b></a>
+                        <div style="padding-left:0px;">
+                            <ul id="drilldown-2" class="nav nav-pills nav-stacked collapse">
+                                {% for g in grids %}
+                                    <li><a href='{% url 'dataset_edit_results' id=dataset.id grid_id=g.id %}'>{{ g.track.title }}</a></li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </li>
                     <li><a href='{% url 'dataset_edit_news' id=dataset.id %}'>News</a></li>  
                     <li><a href='{% url 'dataset_edit_publications' id=dataset.id %}'>Publications</a></li>  
                 </ul>

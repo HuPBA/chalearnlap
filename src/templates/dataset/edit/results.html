@@ -11,26 +11,32 @@
             <div class="panel-body"> 
                 <div class="row">
                     <div class="col-sm-12"> 
-                        <h3 class="thin text-center">Dataset results</h3> 
+                        <h3 class="thin text-center">Users submissions</h3> 
                         <hr> 
                         <div class="table-responsive">
-                            <table class="table table-condensed">
+                            <table class="table table-bordered">
                                 <thead>
                                     <tr>
                                         <th>User</th>
-                                        {% for n in names %}
-                                            <th>{{ n.name }}&ensp;<a href="{% url "dataset_edit_col" id=dataset.id col_id=n.id %}"><i class="fa fa-pencil" aria-hidden="true"></i></a></th>
-                                        {% endfor %}
+                                        {% if scores %}
+                                            {% for n in headers %}
+                                                <th>{{ n.name }}</th>
+                                            {% endfor %}
+                                        {% else %}
+                                            {% for n in headers %}
+                                                <th>{{ n.name }}</th>
+                                            {% endfor %}
+                                        {% endif %}
                                     </tr>
                                 </thead>
                                 <tbody>
-                                {% for user, score in scores %}
-                                    <tr>
-                                        <td>{{ user.user.username }}&ensp;<a href="{% url "dataset_edit_submission" id=dataset.id submission_id=user.id %}"><i class="fa fa-pencil" aria-hidden="true"></i></a></td>
-                                        {% for s in score %}
+                                    {% for sub,scores in submission_scores %}
+                                        <tr>
+                                            <td>{{ sub.user.username }}<br>&ensp;<a href="{% url "dataset_edit_submission" id=dataset.id submission_id=sub.id %}"><i class="fa fa-pencil" aria-hidden="true"></i></a></td>
+                                            {% for s in scores %}
                                                 <td>{{ s.score }}</td>
-                                        {% endfor %}
-                                    </tr>
+                                            {% endfor %}
+                                        </tr>
                                     {% endfor %}
                                 </tbody>
                             </table>

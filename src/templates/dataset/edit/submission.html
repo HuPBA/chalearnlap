@@ -9,6 +9,15 @@
             </div>
         {% endfor %} 
     {% endif %}
+    {% if roweditform.non_field_errors  %}
+        {% for e in roweditform.non_field_errors %} 
+            <div class="row"> 
+                <div class="col-md-6 widget col-md-offset-3"> 
+                    <div class="alert alert-danger" role="alert">{{ e }}</div>
+                </div>
+            </div>
+        {% endfor %} 
+    {% endif %}
 	<li><a href="{% url "home" %}">Home</a></li>
     <li>{{ dataset.title }}</li>  
     <li class="active">Description</li>  
@@ -21,8 +30,15 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="top-margin"> 
+                                <h3 class="thin text-center">Scores</h3>
+                                {{ roweditform.as_p }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="top-margin"> 
+                                <h3 class="thin text-center">User information</h3>
                                 <label>Source Code
-                                    {% if subform.sheets.source_code.required %}
+                                    {% if subform.source_code.field.required %}
                                     <span class="text-danger">*</span>
                                     {% endif %}
                                 </label>   
@@ -31,8 +47,6 @@
                                 {% endif %}
                                 {{ subform.source_code }}                                      
                             </div>
-                        </div>
-                        <div class="col-md-6">
                             <div class="top-margin"> 
                                 <label>Publication
                                     {% if subform.publication.field.required %}
@@ -44,8 +58,6 @@
                                 {% endif %}
                                 {{ subform.publication }}                                      
                             </div>
-                        </div>
-                        <div class="col-md-6">
                             <div class="top-margin"> 
                                 <label>Submission file
                                     {% if subform.sub_file.field.required %}

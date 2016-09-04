@@ -17,9 +17,9 @@
 {% block JS_OPTS %}
     <!-- acceptFileTypes: /(\.|\/)(zip|txt|csv|bat|sh)$/i, -->
     autoUpload: true,
-	maxNumberOfFiles: 1,
+	maxNumberOfFiles: 50,
 {% endblock %}
 
 {% block UPLOAD_FORM_EXTRA %}
-    <input type="hidden" name="file_id" id="file_id" value="{{ new_file.id }}">
+<input type="hidden" name="workshop_id" value="{{ workshop.id }}">
 {% endblock %}

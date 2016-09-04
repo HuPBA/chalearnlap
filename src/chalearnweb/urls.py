@@ -24,6 +24,7 @@ urlpatterns = [
     url(r'^', include("users.urls")),
     url(r'^ckeditor/', include('ckeditor_uploader.urls')),
     url(r'file/upload/', views.file_upload, name = 'jfu_file_upload' ),
+    url(r'image/upload/', views.image_upload, name = 'jfu_image_upload' ),
     url(r"^search/", include("watson.urls", namespace="watson")),
     url(r'^$', views.home, name="home"),
 ]

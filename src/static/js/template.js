@@ -48,6 +48,5 @@ jQuery(document).ready(function($) {
 	    $("#dialog").dialog("open");
 	    return false;
 	});
-
-	$('#table-order').DataTable();
+	$('table.display').DataTable();
 });

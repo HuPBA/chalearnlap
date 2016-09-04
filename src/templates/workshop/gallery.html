@@ -19,7 +19,9 @@
                                     {% thumbnail i.image "250x250" crop="noop" as small %}
                                         <a href="{{ i.image.url }}" title="zoom"><img class="img-responsive img-center" src="{{ small.url }}" width="{{ small.width }}" height="{{ small.height }}"></a>
                                     {% endthumbnail %}
-                                    <p>{{ i.description|safe}}</p>
+                                    {% if i.description %}
+                                        <p>{{ i.description|safe }}</p>
+                                    {% endif %}
                                 </div>
                             </div>
                         {% endfor %}

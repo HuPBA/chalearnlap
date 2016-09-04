@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.models import User
-from .models import Profile, Affiliation, Dataset, Data, Partner, Event
+from .models import Gallery_Image, Profile, Affiliation, Dataset, Data, Partner, Event
 from registration.forms import RegistrationForm
 from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm, PasswordResetForm, SetPasswordForm
 from ckeditor.widgets import CKEditorWidget
@@ -140,12 +140,11 @@ class TrackEditForm(forms.Form):
 
 	def clean(self):
 		return self.cleaned_data
-
+		
 class GalleryImageForm(forms.Form):
 	def __init__(self, *args, **kwargs):
 		super(GalleryImageForm, self).__init__(*args, **kwargs)
-		self.fields['image'] = forms.ImageField(required=True, widget=forms.FileInput(attrs={'class': "form-control"}))
-		self.fields['desc'] = forms.CharField(required=True, widget=CKEditorWidget())
+		self.fields['f_id'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}))
 
 	def clean(self):
 		return self.cleaned_data
@@ -155,7 +154,7 @@ class GalleryImageEditForm(forms.Form):
 		image = kwargs.pop('image', None)
 		super(GalleryImageEditForm, self).__init__(*args, **kwargs)
 		if image:
-			self.fields['desc'] = forms.CharField(required=True, widget=CKEditorWidget(), initial=image.description)
+			self.fields['desc'] = forms.CharField(required=False, widget=CKEditorWidget(), initial=image.description)
 
 	def clean(self):
 		return self.cleaned_data
@@ -498,10 +497,31 @@ class SubmissionCreationForm(forms.Form):
 
 class SubmissionScoresForm(forms.Form):
 	def __init__(self, *args, **kwargs):
-		results = kwargs.pop('results', None)
+		headers = kwargs.pop('headers', None)
 		super(SubmissionScoresForm, self).__init__(*args, **kwargs)
-		for r in results:
-			self.fields[r.name] = forms.FloatField(required=True, widget=forms.NumberInput(attrs={'class': "form-control"}))
+		for h in headers:
+			self.fields[h.name] = forms.FloatField(required=True, widget=forms.NumberInput(attrs={'class': "form-control"}))
+
+	def clean(self):
+		return self.cleaned_data
+
+class ResultRowForm(forms.Form):
+	def __init__(self, *args, **kwargs):
+		headers = kwargs.pop('headers', None)
+		super(ResultRowForm, self).__init__(*args, **kwargs)
+		self.fields['username'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}))
+		for h in headers:
+			self.fields[h.name] = forms.FloatField(required=False, widget=forms.NumberInput(attrs={'class': "form-control"}))
+
+	def clean(self):
+		return self.cleaned_data
+
+class ResultRowEditForm(forms.Form):
+	def __init__(self, *args, **kwargs):
+		scores = kwargs.pop('scores', None)
+		super(ResultRowEditForm, self).__init__(*args, **kwargs)
+		for s in scores:
+			self.fields[s.name] = forms.FloatField(required=True, widget=forms.NumberInput(attrs={'class': "form-control"}), initial=s.score)
 
 	def clean(self):
 		return self.cleaned_data
@@ -531,6 +551,15 @@ class ColEditForm(forms.Form):
 		col = kwargs.pop('col', None)
 		super(ColEditForm, self).__init__(*args, **kwargs)
 		self.fields['name'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}), initial=col.name)
+
+	def clean(self):
+		return self.cleaned_data
+
+class HeaderEditForm(forms.Form):
+	def __init__(self, *args, **kwargs):
+		header = kwargs.pop('header', None)
+		super(HeaderEditForm, self).__init__(*args, **kwargs)
+		self.fields['name'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}), initial=header.name)
 
 	def clean(self):
 		return self.cleaned_data
@@ -592,3 +621,10 @@ class PublicationEditForm(forms.Form):
 	def clean(self):
 		return self.cleaned_data
 
+class ResultNewTableForm(forms.Form):
+	def __init__(self, *args, **kwargs):
+		super(ResultNewTableForm, self).__init__(*args, **kwargs)
+		self.fields['cols'] = forms.IntegerField(required=True, min_value=1, max_value=10, widget=forms.TextInput(attrs={'class': "form-control"}))
+
+	def clean(self):
+		return self.cleaned_data

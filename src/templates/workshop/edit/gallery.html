@@ -12,8 +12,8 @@
                 <div class="panel-body"> 
                     <div class="row">
                         <div class="col-sm-12">
-                            <h3 class="thin text-center">Gallery pictures &ensp;<a href="{% url "add_gallery_picture" id=workshop.id %}"><i class="fa fa-plus-circle" aria-hidden="true"></i></a></h3>
-                            <hr>
+                            <h3 class="thin text-center">Gallery pictures &ensp;<a title="Add picture" href="{% url "add_gallery_picture" id=workshop.id %}"><i class="fa fa-plus-circle" aria-hidden="true"></i></a>&ensp;<a title="Remove all" href="{% url "remove_gallery" id=workshop.id %}"><i class="fa fa-trash" aria-hidden="true"></i></a></h3>
+                            <hr> 
                             {% if images.count > 0 %}
                                 <div class="row">
                                     {% for i in images %} 
@@ -22,7 +22,9 @@
                                             {% thumbnail i.image "120x120" crop="noop" as small %}
                                                 <a href="{{ i.image.url }}" title="zoom"><img class="img-responsive img-center" src="{{ small.url }}" width="{{ small.width }}" height="{{ small.height }}"></a>
                                             {% endthumbnail %}
-                                            <p>{{ i.description|truncatewords_html:9|safe}}</p>
+                                            {% if i.description %}
+                                                <p>{{ i.description|truncatewords_html:4|safe }}</p>
+                                            {% endif %}
                                         </div>
                                     {% endfor %}
                                 </div>

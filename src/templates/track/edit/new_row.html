@@ -1,0 +1,41 @@
+{% extends "track/edit/base.html" %}
+{% block breadcrumb %}
+    {% if form.non_field_errors  %}
+        {% for e in form.non_field_errors %} 
+            <div class="row"> 
+                <div class="col-md-6 widget col-md-offset-3"> 
+                    <div class="alert alert-danger" role="alert">{{ e }}</div>
+                </div>
+            </div>
+        {% endfor %} 
+    {% endif %}
+    <li> <a href="{% url "home" %}">Home</a> </li>           
+    <li class="active">Result edit</li>   
+{% endblock breadcrumb %} 
+{% block content %}
+    <div class="col-md-10"> 
+        <form method="POST" action="" enctype="multipart/form-data"> {% csrf_token %}              
+            <div class="panel panel-default"> 
+                <div class="panel-body"> 
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <h3 class="thin text-center">Results</h3>
+                            <hr> 
+                            <div class="top-margin"> 
+                                {{ form.as_p }} 
+                            </div>
+                            <div class="col-md-12">
+                                <hr>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-2 col-lg-offset-10 text-right"> 
+                            <button class="btn btn-action" name="save" type="submit">Save</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+{% endblock content %}  

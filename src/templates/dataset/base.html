@@ -36,8 +36,16 @@
                             </div>
                         </li>
                     {% endif %}
-                    {% if results %}
-                        <li><a href='{% url 'dataset_results' dataset_id=dataset.id %}'>Results</a></li>
+                    {% if grids %}
+                        <li><a href="#" data-toggle="collapse" data-target="#drilldown-2">Results <b class="caret"></b></a>
+                            <div style="padding-left:0px;">
+                                <ul id="drilldown-2" class="nav nav-pills nav-stacked collapse">
+                                    {% for g in grids %}
+                                        <li><a href='{% url 'dataset_results' dataset_id=dataset.id grid_id=g.id %}'>{{ g.track.title }}</a></li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </li>
                     {% endif %}
                     {% if publications %}
                         <li><a href='{% url 'dataset_publications' id=dataset.id %}'>Publications</a></li>

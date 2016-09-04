@@ -11,15 +11,21 @@
             <div class="panel-body"> 
                 <h3 class="thin text-center">Track results</h3> 
                 <hr> 
-                {% if results %}
+                {% if headers %}
                     <div class="table-responsive">
-                        <table id="table-order" class="table table-bordered">
+                        <table class="table table-bordered display">
                             <thead>
                                 <tr>
                                     <th>User</th>
-                                    {% for n in names %}
-                                        <th>{{ n }}</th>
-                                    {% endfor %}
+                                    {% if scores %}
+                                        {% for n in headers %}
+                                            <th>{{ n.name }}</th>
+                                        {% endfor %}
+                                    {% else %}
+                                        {% for n in headers %}
+                                            <th>{{ n.name }}&ensp;<a href="{% url "header_edit" id=challenge.id track_id=track.id header_id=n.id %}"><i class="fa fa-pencil" aria-hidden="true"></i></a></th>
+                                        {% endfor %}
+                                    {% endif %}
                                 </tr>
                             </thead>
                             <tbody>

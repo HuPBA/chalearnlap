@@ -239,9 +239,17 @@ class Track(models.Model):
 	challenge = models.ForeignKey(Challenge, on_delete=models.CASCADE, null=True)
 	dataset = models.ForeignKey(Dataset, on_delete=models.CASCADE, null=True)
 
+class Result_Grid(models.Model):
+	track = models.OneToOneField(Track, on_delete=models.CASCADE, null=True)
+
+class Grid_Header(models.Model):
+	grid = models.ForeignKey(Result_Grid, on_delete=models.CASCADE, null=True)
+	name = models.CharField(max_length=100)
+
 class Result(models.Model):
 	user = models.CharField(null=True, max_length=100)
-	track = models.ForeignKey(Track, on_delete=models.CASCADE, null=True)
+	# track = models.ForeignKey(Track, on_delete=models.CASCADE, null=True)
+	grid = models.ForeignKey(Result_Grid, on_delete=models.CASCADE, null=True)
 
 	def __str__(self):
 		return unicode(self.user).encode('utf-8')
@@ -250,6 +258,28 @@ class Result_User(models.Model):
 	name = models.CharField(null=True, max_length=100)
 	link = models.URLField(null=True)
 	result = models.ForeignKey(Result, on_delete=models.CASCADE, null=True)
+
+	def __str__(self):
+		return unicode(self.name).encode('utf-8')
+
+def submission_path(instance, filename):
+	return 'submissions/%s/%s' % (instance.user.username, filename)
+
+class Submission(models.Model):
+	user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+	grid = models.ForeignKey(Result_Grid, on_delete=models.CASCADE, null=True)
+	source_code = models.URLField(null=True)
+	publication = models.URLField(null=True)
+	sub_file = models.FileField(upload_to=submission_path, null=True)
+
+	def __str__(self):
+		return unicode(self.user.username).encode('utf-8')
+
+class Score(models.Model):
+	name = models.CharField(null=True, max_length=100)
+	score = models.FloatField(null=True)
+	result = models.ForeignKey(Result, on_delete=models.CASCADE, null=True)
+	submission = models.ForeignKey(Submission, on_delete=models.CASCADE, null=True)
 
 	def __str__(self):
 		return unicode(self.name).encode('utf-8')
@@ -284,27 +314,27 @@ class File(models.Model):
 		basename, extension = os.path.splitext(os.path.basename(self.file.name))
 		return basename
 
-def submission_path(instance, filename):
-	return 'submissions/%s/%s' % (instance.user.username, filename)
+# def submission_path(instance, filename):
+# 	return 'submissions/%s/%s' % (instance.user.username, filename)
 
-class Submission(models.Model):
-	user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
-	dataset = models.ForeignKey(Dataset, on_delete=models.CASCADE, null=True)
-	source_code = models.URLField(null=True)
-	publication = models.URLField(null=True)
-	sub_file = models.FileField(upload_to=submission_path, null=True)
+# class Submission(models.Model):
+# 	user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+# 	dataset = models.ForeignKey(Dataset, on_delete=models.CASCADE, null=True)
+# 	source_code = models.URLField(null=True)
+# 	publication = models.URLField(null=True)
+# 	sub_file = models.FileField(upload_to=submission_path, null=True)
 
-	def __str__(self):
-		return unicode(self.user.username).encode('utf-8')
+# 	def __str__(self):
+# 		return unicode(self.user.username).encode('utf-8')
 
-class Score(models.Model):
-	name = models.CharField(null=True, max_length=100)
-	score = models.FloatField(null=True)
-	result = models.ForeignKey(Result, on_delete=models.CASCADE, null=True)
-	submission = models.ForeignKey(Submission, on_delete=models.CASCADE, null=True)
+# class Score(models.Model):
+# 	name = models.CharField(null=True, max_length=100)
+# 	score = models.FloatField(null=True)
+# 	result = models.ForeignKey(Result, on_delete=models.CASCADE, null=True)
+# 	submission = models.ForeignKey(Submission, on_delete=models.CASCADE, null=True)
 
-	def __str__(self):
-		return unicode(self.name).encode('utf-8')
+# 	def __str__(self):
+# 		return unicode(self.name).encode('utf-8')
 
 # class Score_Result(models.Model):
 # 	name = models.CharField(null=True, max_length=100)
@@ -322,12 +352,12 @@ class Score(models.Model):
 # 	def __str__(self):
 # 		return unicode(self.name).encode('utf-8')
 
-class Col(models.Model):
-	dataset = models.ForeignKey(Dataset, on_delete=models.CASCADE, null=True)
-	name = models.CharField(null=True, max_length=100)
+# class Col(models.Model):
+# 	dataset = models.ForeignKey(Dataset, on_delete=models.CASCADE, null=True)
+# 	name = models.CharField(null=True, max_length=100)
 
-	def __str__(self):
-		return unicode(self.name).encode('utf-8')
+# 	def __str__(self):
+# 		return unicode(self.name).encode('utf-8')
 
 class Publication(models.Model):
 	title = models.CharField(null=True, max_length=100)
