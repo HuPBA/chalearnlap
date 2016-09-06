@@ -1235,8 +1235,22 @@ def dataset_results(request, dataset_id=None, grid_id=None):
 
 def partner_list(request):
 	partners = Partner.objects.all()
+	global_partners = []
+	event_partners = []
+	for p in partners:
+		if not Event_Partner.objects.filter(partner=p).exclude(event__isnull=True).count() > 0:
+			global_partners.append((p))
+	events = Event.objects.filter(is_public=True)
+	for e in events:
+		if Event_Partner.objects.filter(event=e).count() > 0:
+			event_partners_aux = Event_Partner.objects.filter(event=e)
+			partners_aux = []
+			for ep in event_partners_aux:
+				partners_aux.append((ep.partner))
+			event_partners.append((ep.event.title, partners_aux))
 	context = {
-		"partners": partners,
+		"global_partners": global_partners,
+		"event_partners": event_partners,
 	}
 	return render(request, "partner/list.html", context, context_instance=RequestContext(request))
 
@@ -1696,6 +1710,40 @@ def challenge_edit_sponsors(request, id=None):
 			"partners": partners,
 		}
 		return render(request, "challenge/edit/sponsors.html", context, context_instance=RequestContext(request))
+
+@login_required(login_url='auth_login')
+def challenge_sponsors_creation(request, id=None):
+	challenge = Challenge.objects.filter(id=id)[0]
+	tracks = Track.objects.filter(challenge=challenge)
+	if check_edit_event_permission(request, challenge) == False:
+		news = News.objects.filter(event_id=id).order_by('-upload_date')
+		context = {
+			"challenge": challenge, 
+			"tracks": tracks,
+			"news": news,
+			"not_perm": True,
+		}
+		return render(request, "challenge/desc.html", context, context_instance=RequestContext(request))
+	else:
+		partnerform = PartnerCreationForm()
+		if request.method == 'POST':
+			partnerform = PartnerCreationForm(request.POST, request.FILES)
+			if partnerform.is_valid():
+				name = partnerform.cleaned_data['name']
+				url = partnerform.cleaned_data['url']
+				banner = partnerform.cleaned_data['banner']
+				first_name = partnerform.cleaned_data['first_name']
+				last_name = partnerform.cleaned_data['last_name']
+				email = partnerform.cleaned_data['email']
+				bio = partnerform.cleaned_data['bio']
+				new_contact = Contact.objects.create(first_name=first_name, last_name=last_name, email=email, bio=bio)
+				new_partner = Partner.objects.create(name=name, url=url, banner=banner, contact=new_contact)
+				Event_Partner.objects.create(event=challenge, partner=new_partner)
+				return HttpResponseRedirect(reverse('challenge_edit_sponsors', kwargs={'id':id}))
+		context = {
+			"partnerform": partnerform,
+		}
+		return render(request, "partner/creation.html", context, context_instance=RequestContext(request))
 
 @login_required(login_url='auth_login')
 def challenge_edit_tracks(request, id=None):
@@ -2627,6 +2675,57 @@ def workshop_edit_publications(request, id=None):
 		return render(request, "workshop/edit/publications.html", context, context_instance=RequestContext(request))
 
 @login_required(login_url='auth_login')
+def workshop_edit_sponsors(request, id=None):
+	workshop = Workshop.objects.filter(id=id)[0]
+	news = News.objects.filter(event_id=id).order_by('-upload_date')
+	if check_edit_event_permission(request, workshop) == False:
+		context = {
+			"workshop": workshop,
+			"news": news,
+			"not_perm": True,
+		}
+		return render(request, "workshop/desc.html", context, context_instance=RequestContext(request))
+	else:
+		sponsors = Event_Partner.objects.filter(event_id=id)
+		context = {
+			"workshop": workshop, 
+			"sponsors": sponsors,
+		}
+		return render(request, "workshop/edit/sponsors.html", context, context_instance=RequestContext(request))
+
+@login_required(login_url='auth_login')
+def workshop_sponsors_creation(request, id=None):
+	workshop = Workshop.objects.filter(id=id)[0]
+	if check_edit_event_permission(request, workshop) == False:
+		news = News.objects.filter(event_id=id).order_by('-upload_date')
+		context = {
+			"workshop": workshop, 
+			"news": news,
+			"not_perm": True,
+		}
+		return render(request, "workshop/desc.html", context, context_instance=RequestContext(request))
+	else:
+		partnerform = PartnerCreationForm()
+		if request.method == 'POST':
+			partnerform = PartnerCreationForm(request.POST, request.FILES)
+			if partnerform.is_valid():
+				name = partnerform.cleaned_data['name']
+				url = partnerform.cleaned_data['url']
+				banner = partnerform.cleaned_data['banner']
+				first_name = partnerform.cleaned_data['first_name']
+				last_name = partnerform.cleaned_data['last_name']
+				email = partnerform.cleaned_data['email']
+				bio = partnerform.cleaned_data['bio']
+				new_contact = Contact.objects.create(first_name=first_name, last_name=last_name, email=email, bio=bio)
+				new_partner = Partner.objects.create(name=name, url=url, banner=banner, contact=new_contact)
+				Event_Partner.objects.create(event=workshop, partner=new_partner)
+				return HttpResponseRedirect(reverse('workshop_edit_sponsors', kwargs={'id':id}))
+		context = {
+			"partnerform": partnerform,
+		}
+		return render(request, "partner/creation.html", context, context_instance=RequestContext(request))
+
+@login_required(login_url='auth_login')
 def workshop_publish(request, id=None):
 	workshop = Workshop.objects.filter(id=id)[0]
 	workshop.is_public = True
@@ -2645,11 +2744,13 @@ def workshop_desc(request, id=None):
 	news = News.objects.filter(event_id=id).order_by('-upload_date')
 	profile_event = check_event_permission(request, workshop)
 	publications = Publication_Event.objects.filter(event=workshop)
+	sponsors = Event_Partner.objects.filter(event_id=id)
 	context = {
 		"publications": publications,
 		"workshop": workshop,
 		"news": news,
-		"profile": profile_event,				
+		"profile": profile_event,
+		"sponsors": sponsors,				
 	}
 	return render(request, "workshop/desc.html", context, context_instance=RequestContext(request))
 
@@ -2659,12 +2760,14 @@ def workshop_schedule(request, id=None):
 	schedule = Schedule_Event.objects.filter(event_schedule=workshop,schedule_event_parent=None).order_by('date')
 	profile_event = check_event_permission(request, workshop)
 	publications = Publication_Event.objects.filter(event=workshop)
+	sponsors = Event_Partner.objects.filter(event_id=id)
 	context = {
 		"publications": publications,
 		"workshop": workshop,
 		"news": news,
 		"schedule": schedule,
 		"profile": profile_event,
+		"sponsors": sponsors,
 	}
 	return render(request, "workshop/schedule.html", context, context_instance=RequestContext(request))
 
@@ -2675,6 +2778,7 @@ def workshop_associated_events(request, id=None):
 	associated = Event_Relation.objects.filter(workshop_relation=workshop)
 	profile_event = check_event_permission(request, workshop)
 	publications = Publication_Event.objects.filter(event=workshop)
+	sponsors = Event_Partner.objects.filter(event_id=id)
 	context = {
 		"publications": publications,
 		"workshop": workshop,
@@ -2682,6 +2786,7 @@ def workshop_associated_events(request, id=None):
 		"relations": relations,
 		"associated": associated,
 		"profile": profile_event,
+		"sponsors": sponsors,
 	}
 	return render(request, "workshop/relation.html", context, context_instance=RequestContext(request))
 
@@ -2691,12 +2796,14 @@ def workshop_program(request, id=None):
 	program = Schedule_Event.objects.filter(event_program=workshop,schedule_event_parent=None).order_by('date')
 	profile_event = check_event_permission(request, workshop)
 	publications = Publication_Event.objects.filter(event=workshop)
+	sponsors = Event_Partner.objects.filter(event_id=id)
 	context = {
 		"publications": publications,
 		"workshop": workshop,
 		"news": news,
 		"program": program,
 		"profile": profile_event,
+		"sponsors": sponsors,
 	}
 	return render(request, "workshop/program.html", context, context_instance=RequestContext(request))
 
@@ -2706,12 +2813,14 @@ def workshop_speakers(request, id=None):
 	news = News.objects.filter(event_id=id).order_by('-upload_date')
 	profile_event = check_event_permission(request, workshop)
 	publications = Publication_Event.objects.filter(event=workshop)
+	sponsors = Event_Partner.objects.filter(event_id=id)
 	context = {
 		"publications": publications,
 		"workshop": workshop,
 		"speakers": speakers,
 		"news": news,
 		"profile": profile_event,
+		"sponsors": sponsors,
 	}
 	return render(request, "workshop/speakers.html", context, context_instance=RequestContext(request))
 
@@ -2721,12 +2830,14 @@ def workshop_gallery(request, id=None):
 	news = News.objects.filter(event_id=id).order_by('-upload_date')
 	profile_event = check_event_permission(request, workshop)
 	publications = Publication_Event.objects.filter(event=workshop)
+	sponsors = Event_Partner.objects.filter(event_id=id)
 	context = {
 		"publications": publications,
 		"workshop": workshop,
 		"news": news,
 		"images": images,
 		"profile": profile_event,
+		"sponsors": sponsors,
 	}
 	return render(request, "workshop/gallery.html", context, context_instance=RequestContext(request))
 
@@ -2735,13 +2846,30 @@ def workshop_publications(request, id=None):
 	news = News.objects.filter(event_id=id).order_by('-upload_date')
 	profile_event = check_event_permission(request, workshop)
 	publications = Publication_Event.objects.filter(event=workshop)
+	sponsors = Event_Partner.objects.filter(event_id=id)
 	context = {
 		"workshop": workshop,
 		"news": news,
 		"publications": publications,
 		"profile": profile_event,
+		"sponsors": sponsors,
 	}
 	return render(request, "workshop/publications.html", context, context_instance=RequestContext(request))
+
+def workshop_sponsors(request, id=None):
+	workshop = Workshop.objects.filter(id=id)[0]
+	news = News.objects.filter(event_id=id).order_by('-upload_date')
+	profile_event = check_event_permission(request, workshop)
+	publications = Publication_Event.objects.filter(event=workshop)
+	sponsors = Event_Partner.objects.filter(event=workshop)
+	context = {
+		"workshop": workshop,
+		"news": news,
+		"publications": publications,
+		"profile": profile_event,
+		"sponsors": sponsors,
+	}
+	return render(request, "workshop/sponsors.html", context, context_instance=RequestContext(request))
 
 @login_required(login_url='auth_login')
 def add_gallery_picture(request, id=None):

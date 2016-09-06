@@ -31,6 +31,9 @@
                     {% if publications %}
                         <li><a href='{% url 'workshop_publications' id=workshop.id %}'>Publications</a></li>
                     {% endif %}
+                    {% if sponsors %}
+                        <li><a href='{% url 'workshop_sponsors' id=workshop.id %}'>Sponsors</a></li>
+                    {% endif %}
                 </ul>
             </div>
             {% block content %}

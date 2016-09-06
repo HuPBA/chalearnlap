@@ -9,16 +9,35 @@
             <header class="page-header"> 
                 <h1 class="page-title">Sponsors</h1> 
             </header>    
-            {% if partners.count > 0 %}
-                <div class="row">
-                    {% for p in partners %} 
-                        <div class="col-sm-4 sponsor-cell">
-                            <h3 class="thin text-center">{{ p.name }}</h3>
-                            <br>
-                            <a href="{{ p.url }}"><img id="partner-logo" class="img-responsive img-center" src="{{ p.banner.url }}"></a>
-                        </div>
-                    {% endfor %}  
-                </div>
+            {% if global_partners.count > 0 or event_partners.count > 0 %}
+                {% if global_partners.count > 0 %}
+                    <div class="row">
+                        <h1 class="thin text-center">Global Sponsors</h1>
+                        {% for p in global_partners %} 
+                            <div class="col-sm-4 sponsor-cell">
+                                <!-- <h3 class="thin text-center">{{ p.name }}</h3> -->
+                                <br>
+                                <a href="{{ p.url }}"><img id="partner-logo" class="img-responsive img-center" src="{{ p.banner.url }}"></a>
+                            </div>
+                        {% endfor %}  
+                    </div>
+                {% endif %}
+                {% if event_partners.count > 0 %}
+                   <!--  <div class="row"> -->
+                        {% for title,partners in event_partners %}
+                        <div class="row">
+                            <h1 class="thin text-center">{{ title }} Sponsors</h1> 
+                            {% for p in partners %}
+                                <div class="col-sm-4 sponsor-cell">
+                                    <!-- <h3 class="thin text-center">{{ p.name }}</h3> -->
+                                    <br>
+                                    <a href="{{ p.url }}"><img id="partner-logo" class="img-responsive img-center" src="{{ p.banner.url }}"></a>
+                                </div>
+                            {% endfor %} 
+                            </div>
+                        {% endfor %}  
+                    
+                {% endif %}
             {% else %}
                 <div class="row">
                     <div class="col-sm-12">
