@@ -27,11 +27,22 @@
                         <hr> 
                         <form method="POST" action=""> {% csrf_token %} 
                             <div class="top-margin"> 
-                                <label>First Name
+                                <label>Role selection</label>
+                                <div class="row">
+                                    <div class="col-md-6"> 
+                                        {{ selectRoleForm.role_select }} 
+                                    </div>
+                                    <div class="col-md-6"> 
+                                        <a class="btn btn-action" href="{% url "role_creation" %}">Create Role</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="top-margin"> 
+                                <label>Name
                                     {% if selectform.email.field.required %}
                                     <span class="text-danger">*</span>
                                     {% endif %}
-                                </label> &ensp;<a href="{% url "profile_creation" %}"><i class="fa fa-plus-circle" aria-hidden="true"></i></a>
+                                </label>
                                 {% if selectform.errors.email %}
                                     <div class="alert alert-danger" role="alert">{{ selectform.errors.email }}</div>
                                 {% endif %}
@@ -39,7 +50,10 @@
                             </div>                                     
                             <hr> 
                             <div class="row">
-                                <div class="col-lg-4 col-lg-offset-8 text-right"> 
+                                <div class="col-lg-4 col-lg-offset-3 text-right"> 
+                                    <a class="btn btn-action" href="{% url "speaker_creation" id=workshop.id %}">Create new speaker</a>
+                                </div>
+                                <div class="col-lg-4 col-lg-offset-1 text-right"> 
                                     <button class="btn btn-action" type="submit">Save</button>
                                 </div>
                             </div>                                     

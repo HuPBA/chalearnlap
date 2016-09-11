@@ -29,6 +29,9 @@
                     {% if publications %}
                         <li><a href='{% url 'special_issue_publications' id=issue.id %}'>Publications</a></li>
                     {% endif %}
+                    {% if papers %}
+                        <li><a href='{% url 'special_issue_papers' id=issue.id %}'>Papers published</a></li>
+                    {% endif %}
                 </ul>
             </div>
             {% block content %}

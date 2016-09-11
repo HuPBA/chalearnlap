@@ -409,10 +409,10 @@ class PartnerCreationForm(forms.Form):
 		self.fields['name'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}))
 		self.fields['url'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}))
 		self.fields['banner'] = forms.ImageField(required=True, widget=forms.FileInput(attrs={'class': "form-control"}))
-		self.fields['first_name'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}))
-		self.fields['last_name'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}))
-		self.fields['email'] = forms.CharField(required=True, widget=forms.EmailInput(attrs={'class': "form-control"}))
-		self.fields['bio'] = forms.CharField(required=True, widget=forms.Textarea(attrs={'class': "form-control"}))
+		self.fields['first_name'] = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}))
+		self.fields['last_name'] = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}))
+		self.fields['email'] = forms.CharField(required=False, widget=forms.EmailInput(attrs={'class': "form-control"}))
+		self.fields['bio'] = forms.CharField(required=False, widget=forms.Textarea(attrs={'class': "form-control"}))
 
 	def clean(self):
 		return self.cleaned_data

@@ -13,14 +13,17 @@
                 {% if sponsors.count > 0 %}
                     <div class="row">
                         {% for s in sponsors %} 
-                            <div class="col-sm-6 sponsor-cell">
+                            <div class="col-sm-4 sponsor-cell">
+                                <a href="{{ s.partner.url }}"><img id="partner-logo" class="img-responsive img-center" src="{{ s.partner.banner.url }}"></a>
+                            </div>
+                            <!-- <div class="col-sm-6 sponsor-cell">
                             {% if s.partner.banner %}
                                 <h3 class="thin text-center">{{ s.partner.name }}</h3>
                                 <a href="{{ s.partner.url }}"><img id="partner-logo" class="img-responsive img-center" src="{{ s.partner.banner.url }}"></a>
                             {% else %}
                                 <h3>{{ s.partner.name }}</h3>
                             {% endif %}
-                            </div>
+                            </div> -->
                         {% endfor %}  
                     </div>
                 {% else %}

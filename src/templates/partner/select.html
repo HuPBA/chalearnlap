@@ -10,20 +10,8 @@
             </div>
         {% endfor %} 
     {% endif %}
-    {% if selectRoleForm.non_field_errors  %}
-        {% for e in selectRoleForm.non_field_errors %} 
-            <div class="row"> 
-                <div class="col-md-6 widget col-md-offset-3"> 
-                    <div class="alert alert-danger" role="alert">{{ e }}</div>
-                </div>
-            </div>
-        {% endfor %} 
-    {% endif %}
     <ol class="breadcrumb"> 
         <li> <a href="{% url "home" %}">Home</a> </li>
-        {% if c %}
-            <li><a href="{% url "challenge_edit_desc" id=c.id%}">{{ c.title }}</a></li> 
-        {% endif %}  
         <li class="active">Select sponsors</li>                 
     </ol>                                                         
     <div class="row"> 
@@ -36,18 +24,7 @@
                     <div class="panel-body"> 
                         <h3 class="thin text-center">Select sponsors</h3> 
                         <hr> 
-                        <form method="POST" action=""> {% csrf_token %} 
-                            <div class="top-margin"> 
-                                <label>Role selection</label>
-                                <div class="row">
-                                    <div class="col-md-6"> 
-                                        {{ selectRoleForm.role_select }} 
-                                    </div>
-                                    <div class="col-md-6"> 
-                                        <a class="btn btn-action" href="{% url "role_creation" %}">Add Role</a>
-                                    </div>
-                                </div>
-                            </div>
+                        <form method="POST" action=""> {% csrf_token %}
                             <div class="top-margin"> 
                                 <label>Partner
                                     {% if selectform.partner.field.required %}
@@ -61,7 +38,16 @@
                             </div>                                     
                             <hr> 
                             <div class="row">
-                                <div class="col-lg-4 col-lg-offset-8 text-right"> 
+                            {% if challenge %}
+                                <div class="col-lg-4 col-lg-offset-3 text-right"> 
+                                    <a class="btn btn-action" href="{% url "challenge_sponsors_creation" id=challenge.id %}">Create new sponsor</a>
+                                </div>
+                            {% elif workshop %}
+                                <div class="col-lg-4 col-lg-offset-3 text-right"> 
+                                    <a class="btn btn-action" href="{% url "workshop_sponsors_creation" id=workshop.id %}">Create new sponsor</a>
+                                </div>
+                            {% endif %}
+                                <div class="col-lg-2 col-lg-offset-2 text-right"> 
                                     <button class="btn btn-action" type="submit">Save</button>
                                 </div>
                             </div>                                     

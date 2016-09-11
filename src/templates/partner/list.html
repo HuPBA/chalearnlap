@@ -23,20 +23,20 @@
                     </div>
                 {% endif %}
                 {% if event_partners.count > 0 %}
-                   <!--  <div class="row"> -->
+                        <hr>
                         {% for title,partners in event_partners %}
-                        <div class="row">
-                            <h1 class="thin text-center">{{ title }} Sponsors</h1> 
-                            {% for p in partners %}
-                                <div class="col-sm-4 sponsor-cell">
-                                    <!-- <h3 class="thin text-center">{{ p.name }}</h3> -->
-                                    <br>
-                                    <a href="{{ p.url }}"><img id="partner-logo" class="img-responsive img-center" src="{{ p.banner.url }}"></a>
-                                </div>
-                            {% endfor %} 
+                            <div class="row">
+                                <h1 class="thin text-center">{{ title }} Sponsors</h1> 
+                                {% for p in partners %}
+                                    <div class="col-sm-4 sponsor-cell">
+                                        <!-- <h3 class="thin text-center">{{ p.name }}</h3> -->
+                                        <br>
+                                        <a href="{{ p.url }}"><img id="partner-logo" class="img-responsive img-center" src="{{ p.banner.url }}"></a>
+                                    </div>
+                                {% endfor %} 
                             </div>
+                            <hr>
                         {% endfor %}  
-                    
                 {% endif %}
             {% else %}
                 <div class="row">
