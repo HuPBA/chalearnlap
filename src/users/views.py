@@ -1247,7 +1247,7 @@ def partner_list(request):
 			partners_aux = []
 			for ep in event_partners_aux:
 				partners_aux.append((ep.partner))
-			event_partners.append((ep.event.title, partners_aux))
+			event_partners.append((ep.event, partners_aux))
 	context = {
 		"global_partners": global_partners,
 		"event_partners": event_partners,
@@ -1264,7 +1264,6 @@ def partner_creation(request):
 			name = partnerform.cleaned_data['name']
 			url = partnerform.cleaned_data['url']
 			banner = partnerform.cleaned_data['banner']
-			if partnerform.cleaned_data['first_name']
 			first_name = partnerform.cleaned_data['first_name']
 			last_name = partnerform.cleaned_data['last_name']
 			email = partnerform.cleaned_data['email']

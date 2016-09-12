@@ -12,9 +12,9 @@
             {% if global_partners.count > 0 or event_partners.count > 0 %}
                 {% if global_partners.count > 0 %}
                     <div class="row">
-                        <h1 class="thin text-center">Global Sponsors</h1>
+                        <h1 class="thin text-center">General Sponsors</h1>
                         {% for p in global_partners %} 
-                            <div class="col-sm-4 sponsor-cell">
+                            <div class="col-sm-3 sponsor-cell">
                                 <!-- <h3 class="thin text-center">{{ p.name }}</h3> -->
                                 <br>
                                 <a href="{{ p.url }}"><img id="partner-logo" class="img-responsive img-center" src="{{ p.banner.url }}"></a>
@@ -24,11 +24,11 @@
                 {% endif %}
                 {% if event_partners.count > 0 %}
                         <hr>
-                        {% for title,partners in event_partners %}
+                        {% for event,partners in event_partners %}
                             <div class="row">
-                                <h1 class="thin text-center">{{ title }} Sponsors</h1> 
+                                <a href="{% url "event_detail" id=event.id %}"><h1 class="thin text-center">{{ event.title }} Sponsors</h1> </a>
                                 {% for p in partners %}
-                                    <div class="col-sm-4 sponsor-cell">
+                                    <div class="col-sm-3 sponsor-cell">
                                         <!-- <h3 class="thin text-center">{{ p.name }}</h3> -->
                                         <br>
                                         <a href="{{ p.url }}"><img id="partner-logo" class="img-responsive img-center" src="{{ p.banner.url }}"></a>

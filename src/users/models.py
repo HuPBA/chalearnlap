@@ -164,12 +164,6 @@ class Special_Issue(Event):
 	def get_absolute_url(self):
 		return reverse("special_issue_desc", kwargs={"id": self.id})
 
-class Paper(models.Model):
-	issue = models.ForeignKey(Special_Issue, on_delete=models.CASCADE, null=True)
-	title = models.CharField(max_length=100)
-	content = RichTextField()
-	publication = models.URLField(null=True)
-
 class Workshop(Event):
 	def __str__(self):
 		return unicode(self.title).encode('utf-8')
