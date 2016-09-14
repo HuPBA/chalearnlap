@@ -11,13 +11,13 @@
                 <div class="panel-body"> 
                     <div class="row">
                         <div class="col-sm-12">
-                            <h3 class="thin text-center">Schedule&ensp;<a href="{% url "schedule_creation" event_id=workshop.id %}"><i class="fa fa-plus-circle" aria-hidden="true"></i></a></h3>
+                            <h3 class="thin text-center">Schedule&ensp;<a href="{% url "workshop_schedule_creation" id=workshop.id %}"><i class="fa fa-plus-circle" aria-hidden="true"></i></a></h3>
                             <hr> 
                             {% if schedule.count > 0 %}
                                 <div class="row">
                                     {% for e in schedule %} 
                                         <div class="col-sm-12">
-                                            <p class="text-center">{{ e.date|date:"SHORT_DATE_FORMAT" }} {{ e.title }}&ensp;<a href="{% url 'schedule_edit' event_id=workshop.id schedule_id=e.id %}"><i class="fa fa-pencil" aria-hidden="true"></i></a>&ensp;<a id="{{ e.id }}" class="delete-event" value="{% url "event_schedule_remove" id=workshop.id program_id=e.id %}" href=""><i class="fa fa-minus-circle fa" aria-hidden="true"></i></a></p>
+                                            <p class="text-center">{{ e.date|date:"SHORT_DATE_FORMAT" }} {{ e.title }}&ensp;<a href="{% url 'workshop_schedule_edit' id=workshop.id schedule_id=e.id %}"><i class="fa fa-pencil" aria-hidden="true"></i></a>&ensp;<a id="{{ e.id }}" class="delete-event" value="{% url "workshop_schedule_remove" id=workshop.id program_id=e.id %}" href=""><i class="fa fa-minus-circle fa" aria-hidden="true"></i></a></p>
                                         </div>
                                     {% endfor %}  
                                 </div>

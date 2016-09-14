@@ -9,13 +9,16 @@
         <div class="panel panel-default"> 
             <div class="panel-body"> 
                 <h3 class="thin text-center">Publications</h3> 
-                <hr> 
+                <hr>
                 {% if publications.count > 0 %}
                     <div class="row">
-                        {% for p in publications %} 
+                        {% for p in publications %}
                             <div class="col-sm-12">
                                 <div class="top-margin"> 
-                                    <p class="text-center"><b><a href="{% url "publication_detail" id=p.publication.id %}">{{ p.publication.title }}</a></b></p>
+                                    {% if p.publication.title %}
+                                        <p><b>{{ p.publication.title }}</b></p>
+                                    {% endif %}
+                                    <p>{{ p.publication.content|safe }}</p>
                                 </div>
                             </div>
                         {% endfor %}  
@@ -23,10 +26,10 @@
                 {% else %}
                     <div class="row">
                         <div class="col-sm-12"> 
-                            <p class="text-center"> There are no publications registered in this challenge</p>
+                            <p class="text-center"> There are no publications registered in this workshop</p>
                         </div>  
                     </div>
-                {% endif %}
+                {% endif %} 
             </div>                             
         </div>                         
     </div>

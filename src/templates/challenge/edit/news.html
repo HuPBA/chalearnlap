@@ -20,14 +20,14 @@
                 <div class="panel-body"> 
                     <div class="row">
                         <div class="col-sm-12"> 
-                            <h3 class="thin text-center">News &ensp;<a href="{% url "news_creation" id=challenge.id %}"><i class="fa fa-plus-circle" aria-hidden="true"></i></a></h3>
+                            <h3 class="thin text-center">News &ensp;<a href="{% url "challenge_news_creation" id=challenge.id %}"><i class="fa fa-plus-circle" aria-hidden="true"></i></a></h3>
                             <hr> 
                             {% if news.count > 0 %}
                                 <div class="row">
                                     {% for n in news %} 
                                         <div class="col-sm-12">
                                             <div class="top-margin"> 
-                                                <p class="text-center">{{ n.title }}&ensp;<a href="{{ n.get_absolute_url }}"><i class="fa fa-pencil" aria-hidden="true"></i></a>&ensp;<a id="{{ n.id }}" class="delete-event" value="{% url 'event_news_remove' id=challenge.id news_id=n.id %}" href=""><i class="fa fa-minus-circle fa" aria-hidden="true"></i></a></p>
+                                                <p class="text-center">{{ n.title }}&ensp;<a href="{% url "challenge_news_edit" id=challenge.id news_id=n.id %}"><i class="fa fa-pencil" aria-hidden="true"></i></a>&ensp;<a id="{{ n.id }}" class="delete-event" value="{% url 'challenge_news_remove' id=challenge.id news_id=n.id %}" href=""><i class="fa fa-minus-circle fa" aria-hidden="true"></i></a></p>
                                             </div>
                                         </div>
                                     {% endfor %}  

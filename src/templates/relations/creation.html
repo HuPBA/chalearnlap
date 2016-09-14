@@ -13,14 +13,10 @@
     {{ relationform.media }}
     <ol class="breadcrumb"> 
         <li> <a href="{% url "home" %}">Home</a> </li>
-        {% if c %}
-            <li><a href="{% url "challenge_edit_relation" id=c.id%}">{{ c.title }}</a></li> 
-        {% elif w %}
-            <li><a href="{% url "workshop_edit_relations" id=w.id%}">{{ w.title }}</a></li> 
-        {% elif s %}
-            <li><a href="{% url "special_issue_edit_relations" id=s.id%}">{{ s.title }}</a></li>
-        {% elif d %}
-            <li><a href="{% url "dataset_edit_relations" id=d.id%}">{{ d.title }}</a></li>
+        {% if event %}
+            <li><a href="{% url "event_detail" id=event.id%}">{{ event.title }}</a></li> 
+        {% elif dataset %}
+            <li><a href="{% url "dataset_edit_relations" id=dataset.id%}">{{ dataset.title }}</a></li>
         {% endif %} 
         <li class="active">Associated event creation</li>                 
     </ol>           

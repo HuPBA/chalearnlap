@@ -12,10 +12,13 @@
                 <hr> 
                 {% if publications.count > 0 %}
                     <div class="row">
-                        {% for p in publications %} 
+                        {% for p in publications %}
                             <div class="col-sm-12">
                                 <div class="top-margin"> 
-                                    <p class="text-center"><b><a href="{% url "publication_detail" id=p.id %}">{{ p.title }}</a></b></p>
+                                    {% if p.title %}
+                                        <p><b>{{ p.title }}</b></p>
+                                    {% endif %}
+                                    <p>{{ p.content|safe }}</p>
                                 </div>
                             </div>
                         {% endfor %}  
@@ -23,7 +26,7 @@
                 {% else %}
                     <div class="row">
                         <div class="col-sm-12"> 
-                            <p class="text-center"> There are no publications registered in this challenge</p>
+                            <p class="text-center"> There are no publications registered in this special issue</p>
                         </div>  
                     </div>
                 {% endif %}

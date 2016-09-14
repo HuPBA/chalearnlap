@@ -197,13 +197,13 @@ class News(models.Model):
 	def __str__(self):
 		return unicode(self.title).encode('utf-8')
 
-	def get_absolute_url(self):
-		if self.event:
-			return reverse("news_edit", kwargs={"id":self.event.id, "news_id":self.id})
-		elif self.dataset:
-			return reverse("news_edit", kwargs={"id":self.dataset.id, "news_id":self.id})
-		else:
-			return reverse("home")
+	# def get_absolute_url(self):
+	# 	if self.event:
+	# 		return reverse("challenge_news_edit", kwargs={"id":self.event.id, "news_id":self.id})
+	# 	elif self.dataset:
+	# 		return reverse("news_edit", kwargs={"id":self.dataset.id, "news_id":self.id})
+	# 	else:
+	# 		return reverse("home")
 
 class Schedule_Event(models.Model):
 	title = models.CharField(max_length=150, null=True)
@@ -361,6 +361,7 @@ class Publication(models.Model):
 	title = models.CharField(null=True, max_length=100)
 	content = RichTextField(null=True)
 	events = models.ManyToManyField(Event, through='Publication_Event')
+	issue = models.ForeignKey(Special_Issue, on_delete=models.CASCADE, related_name='fk_issue_publication', null=True)
 	# url = models.URLField(null=True)
 	# dataset = models.ForeignKey(Dataset, on_delete=models.CASCADE, null=True)
 	# event = models.ForeignKey(Event, on_delete=models.CASCADE, null=True)
