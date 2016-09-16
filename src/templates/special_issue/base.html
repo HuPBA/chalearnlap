@@ -23,7 +23,17 @@
             <div class="col-md-2" id="leftCol">
                 <ul class="nav nav-stacked" id="sidebar">
                     <li><a href='{% url 'special_issue_desc' id=issue.id %}'>Description</a></li>
-                    <li><a href='{% url 'special_issue_members' id=issue.id %}'>People</a></li>
+                    {% if roles %}
+                        <li><a href="#" data-toggle="collapse" data-target="#drilldown-2">People <b class="caret"></b></a>
+                            <div style="padding-left:0px;">
+                                <ul id="drilldown-2" class="nav nav-pills nav-stacked collapse">
+                                    {% for r in roles %}
+                                        <li><a href='{% url 'special_issue_members' id=issue.id role_id=r.id %}'>{{ r.name }}(s)</a></li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </li>
+                    {% endif %}
                     <li><a href='{% url 'special_issue_schedule' id=issue.id %}'>Schedule</a></li>
                     <li><a href='{% url 'special_issue_associated_events' id=issue.id %}'>Associated events</a></li>
                     {% if publications %}

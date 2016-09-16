@@ -53,7 +53,7 @@
                                     {% if selectform.email.field.required %}
                                     <span class="text-danger">*</span>
                                     {% endif %}
-                                </label>&ensp;<a href="{% url "profile_creation" %}"><i class="fa fa-plus-circle" aria-hidden="true"></i></a>
+                                </label>&ensp;<a href="{% url "event_profile_creation" id=event.id %}"><i class="fa fa-plus-circle" aria-hidden="true"></i></a>
                                 {% if selectform.errors.email %}
                                     <div class="alert alert-danger" role="alert">{{ selectform.errors.email }}</div>
                                 {% endif %}

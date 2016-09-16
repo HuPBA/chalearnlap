@@ -66,7 +66,8 @@ class Profile(models.Model):
 	events = models.ManyToManyField(Event, through='Profile_Event')
 
 	def __str__(self):
-		return unicode(self.first_name).encode('utf-8')
+		out = unicode(self.first_name)+unicode(' ')+unicode(self.last_name)
+		return out.encode('utf-8')
 
 	def get_absolute_url(self):
 		return reverse("profile_edit", kwargs={"id": self.id})

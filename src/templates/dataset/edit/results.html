@@ -13,6 +13,22 @@
                     <div class="col-sm-12"> 
                         <h3 class="thin text-center">Users submissions</h3> 
                         <hr> 
+                        <div class="row">
+                            <div class="col-sm-4 col-sm-offset-4"> 
+                                <div class="all-margin">
+                                    <div class="dropdown">
+                                        <button class="btn btn-action dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Export participants
+                                            <span class="caret"></span>
+                                        </button>
+                                        <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                            <li><a href="{% url 'export_participants_csv' dataset_id=dataset.id grid_id=grid.id %}">CSV format</a></li>
+                                            <li><a href="{% url 'export_participants_xls' dataset_id=dataset.id grid_id=grid.id %}">Excel Binary File format (XLS)</a></li>
+                                            <li><a href="{% url 'export_participants_xlsx' dataset_id=dataset.id grid_id=grid.id %}">Office Open XML format (XLSX)</a></li>
+                                        </ul>
+                                    </div>
+                                </div> 
+                            </div>
+                        </div>
                         <div class="table-responsive">
                             <table class="table table-bordered">
                                 <thead>

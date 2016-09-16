@@ -1,18 +1,17 @@
-{% extends "challenge/base.html" %}
+{% extends "workshop/base.html" %}
 {% block breadcrumb %}
     <li><a href="{% url "home" %}">Home</a></li>
-    <li>{{ challenge.title }}</li>  
-    <li class="active">People</li>  
-{% endblock breadcrumb %} 
+    <li>{{ workshop.title }}</li>  
+    <li class="active">Invited speakers</li>  
+{% endblock breadcrumb %}
 {% block content %}
     <div class="col-md-7"> 
         <div class="panel panel-default"> 
             <div class="panel-body"> 
-                <div class="top-margin">
-                    <h3 class="thin text-center">{{ role }}(s)</h3> 
-                    <hr>
-                    {% if members|length > 0 %}
-                        {% for m in members %} 
+                <h3 class="thin text-center">{{ role }}(s)</h3> 
+                <hr> 
+                {% if members|length > 0 %}
+                    {% for m in members %} 
                         <div class="row">
                             <div class="all-margin">
                                 <div class="col-sm-2">
@@ -31,15 +30,14 @@
                                 </div>
                             </div>
                         </div>
-                        {% endfor %} 
-                    {% else %}
-                        <div class="row">
-                            <div class="col-sm-12"> 
-                                <p class="text-center">There are no members registered in {{ challenge.title }}</p>
-                            </div>  
-                        </div>
-                    {% endif %}
-                </div>
+                    {% endfor %} 
+                {% else %}
+                    <div class="row">
+                        <div class="col-sm-12"> 
+                            <p class="text-center"> There is no member registered in this workshop</p>
+                        </div>  
+                    </div>
+                {% endif %}
             </div>                             
         </div>                         
     </div>

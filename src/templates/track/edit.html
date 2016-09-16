@@ -12,8 +12,8 @@
     {% endif %}
     <ol class="breadcrumb"> 
         <li> <a href="{% url "home" %}">Home</a> </li>
-        {% if c %}
-            <li><a href="{% url "challenge_edit_desc" id=c.id%}">{{ c.title }}</a></li> 
+        {% if challenge %}
+            <li><a href="{% url "challenge_edit_desc" id=challenge.id%}">{{ challenge.title }}</a></li> 
         {% endif %}                
         <li class="active">Track edit</li>                 
     </ol>            

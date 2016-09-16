@@ -25,7 +25,17 @@
                     <li><a href='{% url 'workshop_desc' id=workshop.id %}'>Description</a></li>
                     <li><a href='{% url 'workshop_schedule' id=workshop.id %}'>Schedule</a></li>
                     <li><a href='{% url 'workshop_associated_events' id=workshop.id %}'>Associated events</a></li>
-                    <li><a href='{% url 'workshop_speakers' id=workshop.id %}'>Invited speakers</a></li>
+                    {% if roles %}
+                        <li><a href="#" data-toggle="collapse" data-target="#drilldown-2">People <b class="caret"></b></a>
+                            <div style="padding-left:0px;">
+                                <ul id="drilldown-2" class="nav nav-pills nav-stacked collapse">
+                                    {% for r in roles %}
+                                        <li><a href='{% url 'workshop_members' id=workshop.id role_id=r.id %}'>{{ r.name }}(s)</a></li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </li>
+                    {% endif %}
                     <li><a href='{% url 'workshop_program' id=workshop.id %}'>Program</a></li>
                     <li><a href='{% url 'workshop_gallery' id=workshop.id %}'>Gallery</a></li>
                     {% if publications %}

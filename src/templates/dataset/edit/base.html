@@ -13,18 +13,6 @@
                     {% else %}
                         <a title="Publish" href="{% url "dataset_publish" id=dataset.id %}"><i class="fa fa-cloud-upload" aria-hidden="true"></i></a>
                     {% endif %}
-                    <div class="top-margin">
-                        <div class="dropdown">
-                            <button class="btn btn-action dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Export participants
-                                <span class="caret"></span>
-                            </button>
-                            <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                                <li><a href="{% url 'export_participants_csv' dataset_id=dataset.id %}">CSV format</a></li>
-                                <li><a href="{% url 'export_participants_xls' dataset_id=dataset.id %}">Excel Binary File format (XLS)</a></li>
-                                <li><a href="{% url 'export_participants_xlsx' dataset_id=dataset.id %}">Office Open XML format (XLSX)</a></li>
-                            </ul>
-                        </div>
-                    </div> 
                 </h1>
             </header> 
             <div class="col-md-2" id="leftCol">
