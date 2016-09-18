@@ -74,8 +74,12 @@
                                 </ul>   
                             {% endif %}                           
                         </li>
+                        <li><a href="">Main organizers</a></li>
+                        <li><a href="">CIML Book series</a></li>
                         <li><a href="{% url "partners_list" %}">Sponsors</a></li>
                         <li><a href="{% url "publication_list" %}">Publications</a></li>
+                    </ul>
+                    <ul class="nav navbar-nav pull-right navbar-header">
                         {% if user.is_authenticated %}
                             <li>
                                 <a class="btn" data-toggle="dropdown">{{ user.username }} <span class="caret"></span></a>
@@ -116,7 +120,7 @@
                                 <input id="search-input" type="text" class="form-control input-search" name="q" value="{{request.GET.q}}" placeholder="search">
                             </form>
                         </li>
-                    </ul>                     
+                    </ul>
                 </div>                 
             </div>             
         </div>                
@@ -129,16 +133,10 @@
             <div class="footer1"> 
                 <div class="container"> 
                     <div class="row"> 
-                        <div class="col-md-6 widget"> 
+                        <div class="col-md-12 widget"> 
                             <h3 class="widget-title">Contact</h3> 
                             <div class="widget-body"> 
-                                <p>Sergio Escalera, Computer Vision Center (UAB) and University of Barcelona, Catalonia (Spain) <a href="mailto:chalearnweb@gmail.com">chalearnweb@gmail.com</a><br> </p>
-                            </div>                             
-                        </div>                         
-                        <div class="col-md-6 widget"> 
-                            <h3 class="widget-title">Follow me</h3> 
-                            <div class="widget-body"> 
-                                <p class="follow-me-icons"> <a href="#"><i class="fa fa-twitter fa-2"></i><a href="#"><i class="fa fa-github fa-2"></i></a> <a href="#"><i class="fa fa-facebook fa-2"></i></a> </p> 
+                                <p>Sergio Escalera, Computer Vision Center (UAB) and University of Barcelona, Catalonia (Spain) <a href="mailto:sergio.escalera.guerrero@gmail.com">sergio.escalera.guerrero@gmail.com</a><br> </p>
                             </div>                             
                         </div>                         
                     </div>                     

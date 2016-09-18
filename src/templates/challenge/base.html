@@ -41,7 +41,7 @@
                             <div style="padding-left:0px;">
                                 <ul id="drilldown-2" class="nav nav-pills nav-stacked collapse">
                                     {% for r in roles %}
-                                        <li><a href='{% url 'challenge_members' id=challenge.id role_id=r.id %}'>{{ r.name }}(s)</a></li>
+                                        <li><a href='{% url 'challenge_members' id=challenge.id role_id=r.id %}'>{{ r.name }}</a></li>
                                     {% endfor %}
                                 </ul>
                             </div>

@@ -246,6 +246,7 @@ class EditExtraForm(forms.Form):
 			self.fields['name'] = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}))
 			self.fields['country'] = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}))
 			self.fields['city'] = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}))
+			self.fields['email'] = forms.CharField(required=False, widget=forms.EmailInput(attrs={'class': "form-control"}))
 		else:
 			self.fields['first_name'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}), initial=profile.first_name)
 			self.fields['last_name'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}), initial=profile.last_name)
@@ -254,6 +255,7 @@ class EditExtraForm(forms.Form):
 			self.fields['name'] = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}), initial=affiliation.name)
 			self.fields['country'] = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}), initial=affiliation.country)
 			self.fields['city'] = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}), initial=affiliation.city)
+			self.fields['email'] = forms.CharField(required=False, widget=forms.EmailInput(attrs={'class': "form-control"}), initial=profile.email)
 
 	def clean(self):
 		return self.cleaned_data

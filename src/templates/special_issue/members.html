@@ -9,24 +9,23 @@
         <div class="panel panel-default"> 
             <div class="panel-body"> 
 				<div class="top-margin">
-	                <h3 class="thin text-center">{{ role }}(s)</h3> 
+	                <h3 class="thin text-center">{{ role }}</h3> 
 	                <hr> 
                     {% if members|length > 0 %}
                         {% for m in members %} 
                             <div class="row">
-                                <div class="all-margin">
+                                <div class="vertical-margin">
                                     <div class="col-sm-2">
                                         {% if m.profile.avatar %}
                                             <img class="img-responsive" src="{{ m.profile.avatar.url }}">
                                         {% endif %}
                                     </div>
                                     <div class="col-sm-10">
-                                        {% if m.profile.affiliation.name and m.profile.affiliation.city and m.profile.affiliation.country %}
-                                            <p><b>{{ m.profile.first_name }} {{ m.profile.last_name }}</b>, {{ m.profile.affiliation.name }}, {{ m.profile.affiliation.city }}, {{ m.profile.affiliation.country }}</p> 
-                                        {% else %}
-                                            <p><b>{{ m.profile.first_name }} {{ m.profile.last_name }}</b></p> 
+                                        <p><b>{{ m.profile.first_name }} {{ m.profile.last_name }}</b></p>
+                                        <p>{{ m.profile.affiliation }}</p> 
+                                        {% if m.profile.email %}
+                                            <p>{{ m.profile.email }}</p>
                                         {% endif %}
-                                        <p>{{ m.profile.user.email }}</p>
                                         <p align="justify">{{ m.profile.bio }}</p>
                                     </div>
                                 </div>

@@ -47,7 +47,18 @@
                                         <div class="alert alert-danger" role="alert">{{ form.errors.last_name }}</div>
                                     {% endif %}
                                     {{ form.last_name }} 
-                                </div>                                                                     
+                                </div>   
+                                <div class="top-margin"> 
+                                    <label>Email
+                                        {% if form.email.field.required %}
+                                        <span class="text-danger">*</span>
+                                        {% endif %}
+                                    </label>
+                                    {% if form.errors.email %}
+                                        <div class="alert alert-danger" role="alert">{{ form.errors.email }}</div>
+                                    {% endif %}
+                                    {{ form.email }} 
+                                </div>                                                                   
                                 <hr> 
                                 <div class="top-margin"> 
                                     <label>Profile picture

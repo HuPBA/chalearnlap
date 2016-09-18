@@ -365,7 +365,7 @@ img.pull-left
 
 .input-search
 {
-    width: 120px;
+    max-width: 300px;
     margin-left: 10px;
     margin-top: 10px;
     margin-right: 2px;
@@ -641,4 +641,16 @@ td.text-right {
 {
   pointer-events: none;
   cursor: default;
+}
+
+.profile-pic
+{
+  max-width: 150px;
+  max-height: 150px;
+}
+
+.vertical-margin
+{
+  margin-top: 20px;
+  margin-bottom: 20px;
 }

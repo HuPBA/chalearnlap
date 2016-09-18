@@ -430,6 +430,7 @@ def profile_edit(request, id=None, member_id=None):
 			name = form.cleaned_data["name"]
 			country = form.cleaned_data["country"]
 			city = form.cleaned_data["city"]
+			email = form.cleaned_data["email"]
 			affiliation.name = name
 			affiliation.country = country
 			affiliation.city = city
@@ -439,6 +440,7 @@ def profile_edit(request, id=None, member_id=None):
 			profile.last_name = last_name
 			profile.avatar = avatar
 			profile.bio = bio
+			profile.email = email
 			profile.save()
 			if Challenge.objects.filter(id=id).count() > 0:
 				return HttpResponseRedirect(reverse('challenge_edit_members', kwargs={'id':id}))

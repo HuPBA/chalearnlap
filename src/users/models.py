@@ -33,7 +33,17 @@ class Affiliation(models.Model):
 	city = models.CharField(max_length=50)
 
 	def __str__(self):
-		return unicode(self.name).encode('utf-8')
+		if self.name and self.country and self.city:
+			out = unicode(self.name)+unicode(', ')+unicode(self.city)+unicode(', ')+unicode(self.country)
+		elif self.name and self.country:
+			out = unicode(self.name)+unicode(', ')+unicode(self.country)
+		elif self.name and self.city:
+			out = unicode(self.name)+unicode(', ')+unicode(self.city)
+		elif self.name:
+			out = unicode(self.name)
+		else:
+			out = unicode('')
+		return out.encode('utf-8')
 
 class Event(models.Model):
 	title = models.CharField(max_length=100)
@@ -64,6 +74,7 @@ class Profile(models.Model):
 	bio = models.TextField(max_length=3000)
 	avatar = models.ImageField(upload_to=user_avatar_path, null=True)
 	events = models.ManyToManyField(Event, through='Profile_Event')
+	email = models.EmailField(null=True)
 
 	def __str__(self):
 		out = unicode(self.first_name)+unicode(' ')+unicode(self.last_name)
