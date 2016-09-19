@@ -179,16 +179,10 @@ def export_members_csv(request, event_id=None):
 	for u in profile_events:
 		role_name = u.role.name
 		u = u.profile
-		if u.affiliation.city and u.affiliation.country:
-			if u.user:
-				writer.writerow([u.pk,u.user.username,u.first_name,u.last_name,u.user.email,(u.affiliation.name+', '+u.affiliation.city+', '+u.affiliation.country),role_name])
-			else:
-				writer.writerow([u.pk,'',u.first_name,u.last_name,'',(u.affiliation.name+', '+u.affiliation.city+', '+u.affiliation.country),role_name])
-		else:
-			if u.user:
-				writer.writerow([u.pk,u.user.username,u.first_name,u.last_name,u.user.email,(u.affiliation.name),role_name])
-			else:
-				writer.writerow([u.pk,'',u.first_name,u.last_name,'',(u.affiliation.name),role_name])
+		if u.user:
+			writer.writerow([u.pk,unicode(u.user.username).encode('utf-8'),unicode(u.first_name).encode('utf-8'),unicode(u.last_name).encode('utf-8'),unicode(u.user.email).encode('utf-8'),unicode(u.affiliation).encode('utf-8'),unicode(role_name).encode('utf-8')])
+		else: 
+			writer.writerow([u.pk,'',unicode(u.first_name).encode('utf-8'),unicode(u.last_name).encode('utf-8'),unicode(u.email).encode('utf-8'),unicode(u.affiliation).encode('utf-8'),unicode(role_name).encode('utf-8')])
 	return response
 
 @login_required(login_url='auth_login')
@@ -469,8 +463,9 @@ def profile_creation(request, id=None):
 			name = form.cleaned_data["name"]
 			country = form.cleaned_data["country"]
 			city = form.cleaned_data["city"]
+			email = form.cleaned_data["email"]
 			new_aff = Affiliation.objects.create(name=name, country=country, city=city)
-			Profile.objects.create(affiliation=new_aff, first_name=first_name, last_name=last_name, avatar=avatar, bio=bio)
+			Profile.objects.create(affiliation=new_aff, first_name=first_name, last_name=last_name, avatar=avatar, bio=bio, email=email)
 			return HttpResponseRedirect(reverse('challenge_profile_select', kwargs={'id':id}))
 	context = {
 		"form": form,
@@ -557,12 +552,7 @@ def dataset_creation(request):
 		if datasetform.is_valid():
 			dataset_title = datasetform.cleaned_data['dataset_title']
 			desc = datasetform.cleaned_data['description']
-			cols = datasetform.cleaned_data['cols']
 			new_dataset = Dataset.objects.create(title=dataset_title, description=desc)
-			i = 1
-			while i <= cols:
-				Col.objects.create(dataset=new_dataset, name='col'+str(i))
-				i+=1
 			return HttpResponseRedirect(reverse('data_creation', kwargs={'id':new_dataset.id}))
 	context = {
 		"datasetform": datasetform,
@@ -1132,32 +1122,20 @@ def file_creation(request, id=None, dataset_id=None):
 	data = Data.objects.filter(id=id).first()
 	dataset = Dataset.objects.filter(id=dataset_id).first()
 	fileform = FileCreationForm()
-	create = True
 	if request.method == 'POST':
 		fileform = FileCreationForm(request.POST, request.FILES)
 		if fileform.is_valid():
-			create = False
-			f_id = fileform.cleaned_data['f_id']
-			if File.objects.filter(id=f_id).count > 0:
-				new_file = File.objects.filter(id=f_id).first()
-			else:
-				new_file = File.objects.create(data=data)
-				f_id = new_file.id
-			new_file.name = fileform.cleaned_data['name']
-			if fileform.cleaned_data['url']:
-				new_file.url = fileform.cleaned_data['url']
-			new_file.save()
+			name = fileform.cleaned_data['name']
+			url = fileform.cleaned_data['url']
+			file = fileform.cleaned_data['file']
+			if file:
+				File.objects.create(name=name, file=file, data=data)
+			if url:
+				File.objects.create(name=name, url=url, data=data)
 			return HttpResponseRedirect(reverse('data_edit_files', kwargs={'id':data.id, 'dataset_id': dataset_id}))
-	if create:
-		new_file = File.objects.create(data=data)
-		f_id = new_file.id
-	else:
-		new_file = File.objects.filter(id=f_id).first()
 	context = {
 		"data": data,
 		"fileform": fileform,
-		"new_file": new_file,
-		"f_id": f_id,
 		"dataset": dataset,
 	}
 	return render(request, "file/creation.html", context, context_instance=RequestContext(request))
@@ -3500,11 +3478,12 @@ def program_creation(request, id=None):
 
 @login_required(login_url='auth_login')
 # @user_passes_test(lambda u:u.is_staff, login_url='/')
-def schedule_edit(request, id=None, dataset_id=None, schedule_id=None):
-	if schedule_id==None:
+def schedule_edit(request, id=None, dataset_id=None, schedule_id=None, program_id=None):
+	if program_id==None:
 		schedule = Schedule_Event.objects.filter(id=schedule_id).first()
 		scheduleform = ScheduleEditForm(schedule=schedule)
-		event,dataset = None
+		event = None
+		dataset = None
 		if dataset_id==None:
 			event = Event.objects.filter(id=id).first()
 		else:
@@ -3540,7 +3519,7 @@ def schedule_edit(request, id=None, dataset_id=None, schedule_id=None):
 			"dataset": dataset, 
 		}
 	else:
-		schedule = Schedule_Event.objects.filter(id=schedule_id).first()
+		schedule = Schedule_Event.objects.filter(id=program_id).first()
 		# workshop = Workshop.objects.filter(id=event_id).first()
 		event = None
 		dataset = None

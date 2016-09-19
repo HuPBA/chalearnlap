@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-{% load jfutags %}
 {% block container %}
     {% if fileform.non_field_errors  %}
         {% for e in fileform.non_field_errors %} 
@@ -27,10 +26,9 @@
                     <div class="panel panel-default"> 
                         <div class="panel-body">
                             <h3 class="thin text-center">File</h3> 
-                            <span>You can create a data file with a URL or a file located on your PC</span>
+                            <span>You can create a data file with an URL or a file located on your PC</span>
                             <hr>                            
-                            {% jfu 'file/jfu-form.html' 'jfu_file_upload' %}
-                            <form method="POST" action=""> {% csrf_token %}
+                            <form method="POST" action="" enctype="multipart/form-data"> {% csrf_token %}
                                 <div class="top-margin"> 
                                     <label>Name 
                                         {% if fileform.name.field.required %}
@@ -44,6 +42,18 @@
                                 </div>
                                 <div class="top-margin"> 
                                     <label>URL
+                                        {% if fileform.url.field.required %}
+                                        <span class="text-danger">*</span>
+                                        {% endif %}
+                                    </label>  
+                                    {% if fileform.errors.url %}
+                                        <div class="alert alert-danger" role="alert">{{ fileform.errors.url }}</div>
+                                    {% endif %}
+                                    <br>
+                                    {{ fileform.url }}
+                                </div>
+                                <div class="top-margin"> 
+                                    <label>File
                                         {% if fileform.file.field.required %}
                                         <span class="text-danger">*</span>
                                         {% endif %}
@@ -52,9 +62,8 @@
                                         <div class="alert alert-danger" role="alert">{{ fileform.errors.file }}</div>
                                     {% endif %}
                                     <br>
-                                    {{ fileform.url }}
+                                    {{ fileform.file }}
                                 </div>
-                                <input class="form-control" id="f_id" name="f_id" type="hidden" value="{{ f_id }}"/>
                                 <hr>
                                 <div class="row">
                                     <div class="col-lg-3 col-lg-offset-8 text-right"> 

@@ -42,19 +42,6 @@
                                             {{ datasetform.dataset_title }} 
                                         </div>  
                                     </div>
-                                    <div class="col-md-3">
-                                        <div class="top-margin"> 
-                                            <label>Number of result columns
-                                                {% if datasetform.cols.field.required %}
-                                                <span class="text-danger">*</span>
-                                                {% endif %}
-                                            </label>  
-                                            {% if datasetform.errors.cols %}
-                                                <div class="alert alert-danger" role="alert">{{ datasetform.errors.cols }}</div>
-                                            {% endif %}
-                                            {{ datasetform.cols }} 
-                                        </div> 
-                                    </div> 
                                 </div>                                   
                                 <div class="top-margin"> 
                                     <label>Description 

@@ -290,7 +290,6 @@ class DatasetCreationForm(forms.Form):
 		super(DatasetCreationForm, self).__init__(*args, **kwargs)
 		self.fields['dataset_title'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}))
 		self.fields['description'] = forms.CharField(required=True, widget=CKEditorWidget())
-		self.fields['cols'] = forms.IntegerField(required=True, min_value=1, max_value=10, widget=forms.TextInput(attrs={'class': "form-control"}))
 
 	def clean(self):
 		return self.cleaned_data
@@ -332,11 +331,17 @@ class DataEditForm(forms.Form):
 class FileCreationForm(forms.Form):
 	def __init__(self, *args, **kwargs):
 		super(FileCreationForm, self).__init__(*args, **kwargs)
-		self.fields['name'] = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}))
+		self.fields['name'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}))
 		self.fields['url'] = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}))
-		self.fields['f_id'] = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}))
+		# self.fields['f_id'] = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}))
+		self.fields['file'] = forms.FileField(required=False)
 
 	def clean(self):
+		cleaned_data = super(FileCreationForm, self).clean()
+		url = cleaned_data.get("url")
+		file = cleaned_data.get("file")
+		if not url and not file:
+			raise forms.ValidationError("Please enter an URL or upload a file.")
 		return self.cleaned_data
 
 class EventCreationForm(forms.Form):
