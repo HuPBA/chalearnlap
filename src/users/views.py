@@ -77,7 +77,11 @@ class Backend(RegistrationView):
 
 def home(request):
 	news = News.objects.order_by('-upload_date')[:5]
-	return render(request, "home.html", {"news": news}, context_instance=RequestContext(request));
+	return render(request, "home.html", {"news": news}, context_instance=RequestContext(request))
+
+def main_organizers(request):
+	profiles = Profile.objects.filter(main_org=True)
+	return render(request, "main-organizers.html", {"profiles": profiles}, context_instance=RequestContext(request))
 
 def handler404(request):
 	response = render_to_response('404.html', {}, context_instance=RequestContext(request))
@@ -180,9 +184,9 @@ def export_members_csv(request, event_id=None):
 		role_name = u.role.name
 		u = u.profile
 		if u.user:
-			writer.writerow([u.pk,unicode(u.user.username).encode('utf-8'),unicode(u.first_name).encode('utf-8'),unicode(u.last_name).encode('utf-8'),unicode(u.user.email).encode('utf-8'),unicode(u.affiliation).encode('utf-8'),unicode(role_name).encode('utf-8')])
+			writer.writerow([u.pk,unicode(u.user.username),unicode(u.first_name).encode('utf-8'),unicode(u.last_name).encode('utf-8'),unicode(u.user.email).encode('utf-8'),(u.affiliation),unicode(role_name).encode('utf-8')])
 		else: 
-			writer.writerow([u.pk,'',unicode(u.first_name).encode('utf-8'),unicode(u.last_name).encode('utf-8'),unicode(u.email).encode('utf-8'),unicode(u.affiliation).encode('utf-8'),unicode(role_name).encode('utf-8')])
+			writer.writerow([u.pk,'',unicode(u.first_name).encode('utf-8'),unicode(u.last_name).encode('utf-8'),unicode(u.email).encode('utf-8'),(u.affiliation),unicode(role_name).encode('utf-8')])
 	return response
 
 @login_required(login_url='auth_login')
@@ -435,6 +439,10 @@ def profile_edit(request, id=None, member_id=None):
 			profile.avatar = avatar
 			profile.bio = bio
 			profile.email = email
+			if form.cleaned_data["main_org"] == 'True':
+				profile.main_org = True
+			elif form.cleaned_data["main_org"] == 'False':
+				profile.main_org = False
 			profile.save()
 			if Challenge.objects.filter(id=id).count() > 0:
 				return HttpResponseRedirect(reverse('challenge_edit_members', kwargs={'id':id}))
@@ -465,7 +473,10 @@ def profile_creation(request, id=None):
 			city = form.cleaned_data["city"]
 			email = form.cleaned_data["email"]
 			new_aff = Affiliation.objects.create(name=name, country=country, city=city)
-			Profile.objects.create(affiliation=new_aff, first_name=first_name, last_name=last_name, avatar=avatar, bio=bio, email=email)
+			if form.cleaned_data["main_org"] == 'True':
+				Profile.objects.create(affiliation=new_aff, first_name=first_name, last_name=last_name, avatar=avatar, bio=bio, email=email, main_org=True)
+			elif form.cleaned_data["main_org"] == 'False':
+				Profile.objects.create(affiliation=new_aff, first_name=first_name, last_name=last_name, avatar=avatar, bio=bio, email=email, main_org=False)
 			return HttpResponseRedirect(reverse('challenge_profile_select', kwargs={'id':id}))
 	context = {
 		"form": form,

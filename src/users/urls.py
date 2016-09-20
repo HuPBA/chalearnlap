@@ -7,6 +7,7 @@ from django.views.generic.base import TemplateView
 
 urlpatterns = [
     url(r'^home/$', views.home, name="home"),
+    url(r'^main-organizers/$', views.main_organizers, name="main_organizers"),
     # Register, Login, edit password urls (Django auth)
     url(r'^register/$', RegistrationView.as_view(form_class = UserRegisterForm), name = 'register'),
     url(r'^login/$', auth_views.login, {'authentication_form': UserLoginForm}, name = 'auth_login'),
@@ -28,8 +29,8 @@ urlpatterns = [
     url(r'^user/export-xls/$', views.export_user_xls, name="export_user_xls"),
     url(r'^user/export-xlsx/$', views.export_user_xlsx, name="export_user_xlsx"),
     # Profile urls (Editors, Organizers...)
-    url(r'^profile/edit/(?P<id>\d+)/$', views.profile_edit, name="profile_edit"),
-    url(r'^profile/creation/$', views.Backend.as_view(form_class = MemberCreationForm,template_name='registration/registration_form_email.html'), name="profile_creation"),
+    # url(r'^profile/edit/(?P<id>\d+)/$', views.profile_edit, name="profile_edit"),
+    # url(r'^profile/creation/$', views.Backend.as_view(form_class = MemberCreationForm,template_name='registration/registration_form_email.html'), name="profile_creation"),
     url(r'^event/(?P<id>\d+)/people/creation/$', views.profile_creation, name="event_profile_creation"),
     # Dataset urls
     url(r'^dataset/list/$', views.dataset_list, name="dataset_list"),

@@ -74,6 +74,7 @@ class Profile(models.Model):
 	bio = models.TextField(max_length=3000)
 	avatar = models.ImageField(upload_to=user_avatar_path, null=True)
 	events = models.ManyToManyField(Event, through='Profile_Event')
+	main_org = models.BooleanField(default=False)
 	email = models.EmailField(null=True)
 
 	def __str__(self):

@@ -61,6 +61,17 @@
                                 </div>                                                                   
                                 <hr> 
                                 <div class="top-margin"> 
+                                    <label>Main organizer
+                                        {% if form.main_org.field.required %}
+                                        <span class="text-danger">*</span>
+                                        {% endif %}
+                                    </label>
+                                    {% if form.errors.main_org %}
+                                        <div class="alert alert-danger" role="alert">{{ form.errors.main_org }}</div>
+                                    {% endif %}
+                                    {{ form.main_org }} 
+                                </div> 
+                                <div class="top-margin"> 
                                     <label>Profile picture
                                         {% if form.avatar.field.required %}
                                         <span class="text-danger">*</span>

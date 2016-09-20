@@ -247,6 +247,8 @@ class EditExtraForm(forms.Form):
 			self.fields['country'] = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}))
 			self.fields['city'] = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}))
 			self.fields['email'] = forms.CharField(required=False, widget=forms.EmailInput(attrs={'class': "form-control"}))
+			self.fields['main_org'] = forms.TypedChoiceField(required=False, choices=((False, 'False'), (True, 'True')), widget=forms.RadioSelect, initial='False')
+
 		else:
 			self.fields['first_name'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}), initial=profile.first_name)
 			self.fields['last_name'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}), initial=profile.last_name)
@@ -256,6 +258,7 @@ class EditExtraForm(forms.Form):
 			self.fields['country'] = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}), initial=affiliation.country)
 			self.fields['city'] = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}), initial=affiliation.city)
 			self.fields['email'] = forms.CharField(required=False, widget=forms.EmailInput(attrs={'class': "form-control"}), initial=profile.email)
+			self.fields['main_org'] = forms.TypedChoiceField(required=False, choices=((False, 'False'), (True, 'True')), widget=forms.RadioSelect, initial=profile.main_org)
 
 	def clean(self):
 		return self.cleaned_data
