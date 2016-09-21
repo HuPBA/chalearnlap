@@ -5,17 +5,13 @@
         <li class="active">Sponsors list</li>                 
     </ol> 
     <div class="row"> 
-        <article class="col-xs-12 maincontent"> 
-            <header class="page-header"> 
-                <h1 class="page-title">Sponsors</h1> 
-            </header>    
+        <article class="col-xs-12 maincontent">    
             {% if global_partners.count > 0 or event_partners.count > 0 %}
                 {% if global_partners.count > 0 %}
                     <div class="row">
                         <h1 class="thin text-center">General Sponsors</h1>
                         {% for p in global_partners %} 
                             <div class="col-sm-3 sponsor-cell">
-                                <!-- <h3 class="thin text-center">{{ p.name }}</h3> -->
                                 <br>
                                 <a href="{{ p.url }}"><img id="partner-logo" class="img-responsive img-center" src="{{ p.banner.url }}"></a>
                             </div>
@@ -23,20 +19,19 @@
                     </div>
                 {% endif %}
                 {% if event_partners.count > 0 %}
+                    <hr>
+                    {% for event,partners in event_partners %}
+                        <div class="row">
+                            <a href="{% url "event_detail" id=event.id %}"><h1 class="thin text-center">{{ event.title }} Sponsors</h1> </a>
+                            {% for p in partners %}
+                                <div class="col-sm-3 sponsor-cell">
+                                    <br>
+                                    <a href="{{ p.url }}"><img id="partner-logo" class="img-responsive img-center" src="{{ p.banner.url }}"></a>
+                                </div>
+                            {% endfor %} 
+                        </div>
                         <hr>
-                        {% for event,partners in event_partners %}
-                            <div class="row">
-                                <a href="{% url "event_detail" id=event.id %}"><h1 class="thin text-center">{{ event.title }} Sponsors</h1> </a>
-                                {% for p in partners %}
-                                    <div class="col-sm-3 sponsor-cell">
-                                        <!-- <h3 class="thin text-center">{{ p.name }}</h3> -->
-                                        <br>
-                                        <a href="{{ p.url }}"><img id="partner-logo" class="img-responsive img-center" src="{{ p.banner.url }}"></a>
-                                    </div>
-                                {% endfor %} 
-                            </div>
-                            <hr>
-                        {% endfor %}  
+                    {% endfor %}  
                 {% endif %}
             {% else %}
                 <div class="row">

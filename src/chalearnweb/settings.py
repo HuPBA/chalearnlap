@@ -179,7 +179,7 @@ LOGIN_REDIRECT_URL = '/'
 CKEDITOR_CONFIGS = {
     'default': {
         'toolbar': 'full',
-        'height': '300px',
+        'height': '400px',
         'width': 'auto',
     },
 }

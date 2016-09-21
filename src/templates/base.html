@@ -75,7 +75,16 @@
                             {% endif %}                           
                         </li>
                         <li><a href="{% url "main_organizers" %}">Main organizers</a></li>
-                        <li><a href="">CIML Book series</a></li>
+                        <li class="dropdown"> 
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">CIML Book series <b class="caret"></b></a> 
+                            {% if cimlbooks.count > 0 %}
+                                <ul class="dropdown-menu"> 
+                                    {% for c in cimlbooks %}
+                                        <li><a href='{% url 'cimlbook_detail' id=c.id %}'>{{ c.name }}</a></li>
+                                    {% endfor %}                              
+                                </ul>   
+                            {% endif %}                           
+                        </li>
                         <li><a href="{% url "partners_list" %}">Sponsors</a></li>
                         <li><a href="{% url "publication_list" %}">Publications</a></li>
                     </ul>
@@ -84,7 +93,7 @@
                             <li>
                                 <a class="btn" data-toggle="dropdown">{{ user.username }} <span class="caret"></span></a>
                                 <ul class="dropdown-menu multi-level">
-                                    {% if user.is_superuser %}
+                                    {% if user.is_superuser or user.is_staff %}
                                         <li class="dropdown-submenu">
                                         <a>Admin site</a>
                                             <ul class="dropdown-menu">
@@ -92,17 +101,9 @@
                                                 <li><a href="{% url "dataset_list" %}">Dataset zone</a></li> 
                                                 <li><a href="{% url "event_list" %}">Event zone</a></li> 
                                                 <li><a href="{% url "partner_creation" %}">Create general sponsor</a></li> 
-                                                <li><a href="{% url "event_proposal_list" %}">Event proposals list</a></li> 
-                                            </ul>
-                                        </li>
-                                    {% elif user.is_staff %}
-                                        <li class="dropdown-submenu">
-                                        <a>Admin site</a>
-                                            <ul class="dropdown-menu">
-                                                <li><a href="{% url "dataset_list" %}">Dataset zone</a></li> 
-                                                <li><a href="{% url "event_list" %}">Event zone</a></li> 
-                                                <li><a href="{% url "partner_creation" %}">Create general sponsor</a></li> 
-                                                <li><a href="{% url "event_proposal_list" %}">Event proposals list</a></li> 
+                                                <li><a href="{% url "event_proposal_list" %}">Event proposals list</a></li>
+                                                <li><a href="{% url "home_edit" %}">Edit home page</a></li> 
+                                                <li><a href="{% url "cimlbook_creation" %}">Create new CIML book</a></li> 
                                             </ul>
                                         </li>
                                     {% endif %} 

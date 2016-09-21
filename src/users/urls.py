@@ -7,6 +7,11 @@ from django.views.generic.base import TemplateView
 
 urlpatterns = [
     url(r'^home/$', views.home, name="home"),
+    url(r'^home-edit/$', views.home_edit, name="home_edit"),
+    url(r'^cimlbook/(?P<id>\d+)/$', views.cimlbook_detail, name="cimlbook_detail"),
+    url(r'^cimlbook/(?P<id>\d+)/edit/$', views.cimlbook_edit, name="cimlbook_edit"),
+    url(r'^cimlbook/(?P<id>\d+)/remove/$', views.cimlbook_remove, name="cimlbook_remove"),
+    url(r'^cimlbook/creation/$', views.cimlbook_creation, name="cimlbook_creation"),
     url(r'^main-organizers/$', views.main_organizers, name="main_organizers"),
     # Register, Login, edit password urls (Django auth)
     url(r'^register/$', RegistrationView.as_view(form_class = UserRegisterForm), name = 'register'),

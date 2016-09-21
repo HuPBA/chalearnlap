@@ -397,3 +397,16 @@ class Publication_Dataset(models.Model):
 class Publication_Event(models.Model):
 	publication = models.ForeignKey(Publication, on_delete=models.CASCADE, related_name='fk_publication_event', null=True)
 	event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='fk_event_publication', null=True)
+
+class Chalearn(models.Model):
+	home_text = RichTextField(null=True)
+
+	def __str__(self):
+		return unicode(self.id).encode('utf-8')
+
+class CIMLBook(models.Model):
+	name = models.CharField(null=True, max_length=100)
+	content = RichTextField(null=True)
+
+	def __str__(self):
+		return unicode(self.id).encode('utf-8')

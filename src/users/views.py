@@ -1,11 +1,11 @@
 from django.shortcuts import render, get_object_or_404, redirect, render_to_response
 from django.http import HttpResponse
-from .forms import ResultRowEditForm, ResultRowForm, HeaderEditForm, ResultNewTableForm, GalleryImageEditForm, ResultUserEditForm, ResultUserCreationForm, ProgramEditForm, ProgramCreationForm, PublicationEditForm, PublicationEventCreationForm, PublicationCreationForm, SubmissionEditForm, ColEditForm, EditChallengeResult, ProfileForm, AffiliationForm, SelectRoleForm, UserEditForm, UserRegisterForm, EditProfileForm, EditExtraForm, DatasetCreationForm, DataCreationForm, EventCreationForm, EditEventForm, RoleCreationForm, NewsCreationForm, FileCreationForm, NewsEditForm, SelectDatasetForm, MemberCreationForm, MemberSelectForm, PartnerCreationForm, PartnerSelectForm, ScheduleCreationForm, ScheduleEditForm, DatasetEditForm, DataEditForm, TrackCreationForm, GalleryImageForm, TrackEditForm, RelationCreationForm, RelationEditForm, SubmissionCreationForm, SubmissionScoresForm
+from .forms import CIMLBookForm, EditHomeForm, ResultRowEditForm, ResultRowForm, HeaderEditForm, ResultNewTableForm, GalleryImageEditForm, ResultUserEditForm, ResultUserCreationForm, ProgramEditForm, ProgramCreationForm, PublicationEditForm, PublicationEventCreationForm, PublicationCreationForm, SubmissionEditForm, ColEditForm, EditChallengeResult, ProfileForm, AffiliationForm, SelectRoleForm, UserEditForm, UserRegisterForm, EditProfileForm, EditExtraForm, DatasetCreationForm, DataCreationForm, EventCreationForm, EditEventForm, RoleCreationForm, NewsCreationForm, FileCreationForm, NewsEditForm, SelectDatasetForm, MemberCreationForm, MemberSelectForm, PartnerCreationForm, PartnerSelectForm, ScheduleCreationForm, ScheduleEditForm, DatasetEditForm, DataEditForm, TrackCreationForm, GalleryImageForm, TrackEditForm, RelationCreationForm, RelationEditForm, SubmissionCreationForm, SubmissionScoresForm
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_protect
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
-from .models import Result_Grid, Grid_Header, Result_User, Publication_Event, Publication_Dataset, Publication, Profile_Dataset, Submission, Profile, Result, Score, Proposal, Profile_Event, Affiliation, Event, Dataset, Data, Partner, Event, Special_Issue, Workshop, Challenge, Role, News, File, Contact, Event_Partner, Schedule_Event, Track, Gallery_Image, Event_Relation
+from .models import CIMLBook, Chalearn, Result_Grid, Grid_Header, Result_User, Publication_Event, Publication_Dataset, Publication, Profile_Dataset, Submission, Profile, Result, Score, Proposal, Profile_Event, Affiliation, Event, Dataset, Data, Partner, Event, Special_Issue, Workshop, Challenge, Role, News, File, Contact, Event_Partner, Schedule_Event, Track, Gallery_Image, Event_Relation
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.template import RequestContext
 from django.core.urlresolvers import reverse
@@ -77,7 +77,54 @@ class Backend(RegistrationView):
 
 def home(request):
 	news = News.objects.order_by('-upload_date')[:5]
-	return render(request, "home.html", {"news": news}, context_instance=RequestContext(request))
+	chalearn = Chalearn.objects.filter(id=1).first()
+	return render(request, "home.html", {"news": news, "chalearn": chalearn}, context_instance=RequestContext(request))
+
+def home_edit(request):
+	chalearn = Chalearn.objects.filter(id=1).first()
+	form = EditHomeForm(chalearn=chalearn)
+	if request.method == 'POST':
+		form = EditHomeForm(request.POST, chalearn=chalearn)
+		if form.is_valid():
+			chalearn.home_text = form.cleaned_data['text']
+			chalearn.save()
+			return HttpResponseRedirect(reverse('home'))
+	return render(request, "home-edit.html", {"chalearn": chalearn, "form": form}, context_instance=RequestContext(request))
+
+def cimlbook_detail(request, id=None):
+	book = CIMLBook.objects.filter(id=id).first()
+	news = News.objects.order_by('-upload_date')[:5]
+	profile = None
+	if request.user and (not request.user.is_anonymous()):
+		if request.user.is_superuser or request.user.is_staff:
+			profile = Profile.objects.filter(user=request.user)
+	return render(request, "cimlbook-detail.html", {"book": book, "news": news, "profile": profile}, context_instance=RequestContext(request))
+
+def cimlbook_creation(request):
+	form = CIMLBookForm()
+	if request.method == 'POST':
+		form = CIMLBookForm(request.POST)
+		if form.is_valid():
+			CIMLBook.objects.create(name=form.cleaned_data['name'], content=form.cleaned_data['content'])
+			return HttpResponseRedirect(reverse('home'))
+	return render(request, "cimlbook-edit.html", {"form": form}, context_instance=RequestContext(request))
+
+def cimlbook_edit(request, id=None):
+	book = CIMLBook.objects.filter(id=id).first()
+	form = CIMLBookForm(book=book)
+	if request.method == 'POST':
+		form = CIMLBookForm(request.POST, book=book)
+		if form.is_valid():
+			book.name = form.cleaned_data['name']
+			book.content = form.cleaned_data['content']
+			book.save()
+			return HttpResponseRedirect(reverse('cimlbook_detail', kwargs={'id':id}))
+	return render(request, "cimlbook-edit.html", {"form": form}, context_instance=RequestContext(request))
+
+def cimlbook_remove(request, id=None):
+	book = CIMLBook.objects.filter(id=id).first()
+	book.delete()
+	return HttpResponse(reverse('home'))
 
 def main_organizers(request):
 	profiles = Profile.objects.filter(main_org=True)

@@ -1,12 +1,13 @@
 from datetime import datetime
 from django.conf import settings  
-from .models import Challenge, Special_Issue, Workshop, Dataset, Profile, Profile_Event, Profile_Dataset
+from .models import CIMLBook, Challenge, Special_Issue, Workshop, Dataset, Profile, Profile_Event, Profile_Dataset
 
 def base_context(request):
     challenges = Challenge.objects.filter(is_public=True)
     special_issues = Special_Issue.objects.filter(is_public=True)
     workshops = Workshop.objects.filter(is_public=True)
     datasets = Dataset.objects.filter(is_public=True)
+    cimlbooks = CIMLBook.objects.all()
     if request.user and (not request.user.is_anonymous()):
         profile = Profile.objects.filter(user=request.user)
         profile_event = Profile_Event.objects.filter(profile=profile)
@@ -29,4 +30,5 @@ def base_context(request):
         special_issues = special_issues,               
         workshops = workshops,
         datasets = datasets,
+        cimlbooks = cimlbooks,
     )

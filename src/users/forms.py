@@ -638,3 +638,26 @@ class ResultNewTableForm(forms.Form):
 
 	def clean(self):
 		return self.cleaned_data
+
+class EditHomeForm(forms.Form):
+	def __init__(self, *args, **kwargs):
+		chalearn = kwargs.pop('chalearn', None)
+		super(EditHomeForm, self).__init__(*args, **kwargs)
+		self.fields['text'] = forms.CharField(required=True, widget=CKEditorWidget(), initial=chalearn.home_text)
+
+	def clean(self):
+		return self.cleaned_data
+
+class CIMLBookForm(forms.Form):
+	def __init__(self, *args, **kwargs):
+		book = kwargs.pop('book', None)
+		super(CIMLBookForm, self).__init__(*args, **kwargs)
+		if book:
+			self.fields['name'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}), initial=book.name)
+			self.fields['content'] = forms.CharField(required=True, widget=CKEditorWidget(), initial=book.content)
+		else:
+			self.fields['name'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}))
+			self.fields['content'] = forms.CharField(required=True, widget=CKEditorWidget())
+
+	def clean(self):
+		return self.cleaned_data
