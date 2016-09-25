@@ -72,7 +72,7 @@
                                             <div class="alert alert-danger" role="alert">{{ form.errors.email }}</div>
                                         {% endif %}
                                         {{ form.email }} 
-                                    </div>                                 
+                                    </div> 
                                     <div class="row top-margin"> 
                                         {% if form.errors.password2 %}
                                             <div class="alert alert-danger" role="alert">{{ form.errors.password2 }}</div>
@@ -94,6 +94,10 @@
                                             </label>
                                             {{ form.password2 }}  
                                         </div>                                         
+                                    </div> 
+                                    <div class="top-margin"> 
+                                        {{ form.newsletter }} 
+                                        <label>I want to receive news about ChaLearn LAP events</label>
                                     </div>                                     
                                     <hr> 
                                     <div class="top-margin"> 

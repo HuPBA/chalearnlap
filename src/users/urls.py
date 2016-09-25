@@ -34,7 +34,7 @@ urlpatterns = [
     url(r'^user/export-xls/$', views.export_user_xls, name="export_user_xls"),
     url(r'^user/export-xlsx/$', views.export_user_xlsx, name="export_user_xlsx"),
     # Profile urls (Editors, Organizers...)
-    # url(r'^profile/edit/(?P<id>\d+)/$', views.profile_edit, name="profile_edit"),
+    url(r'^profile/edit/(?P<member_id>\d+)/$', views.profile_edit, name="profile_edit"),
     # url(r'^profile/creation/$', views.Backend.as_view(form_class = MemberCreationForm,template_name='registration/registration_form_email.html'), name="profile_creation"),
     url(r'^event/(?P<id>\d+)/people/creation/$', views.profile_creation, name="event_profile_creation"),
     # Dataset urls

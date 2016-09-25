@@ -76,6 +76,7 @@ class Profile(models.Model):
 	events = models.ManyToManyField(Event, through='Profile_Event')
 	main_org = models.BooleanField(default=False)
 	email = models.EmailField(null=True)
+	newsletter = models.BooleanField(default=False)
 
 	def __str__(self):
 		out = unicode(self.first_name)+unicode(' ')+unicode(self.last_name)
@@ -237,7 +238,7 @@ class Event_Relation(models.Model):
 	dataset_relation = models.ForeignKey(Dataset, on_delete=models.CASCADE, related_name='dataset_relation', null=True)
 	event_associated = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='event_associated', null=True)
 	dataset_associated = models.ForeignKey(Dataset, on_delete=models.CASCADE, related_name='dataset_associated', null=True)
-	description = RichTextField()
+	description = RichTextField(null=True)
 
 	def __str__(self):
 		return unicode(self.id).encode('utf-8')

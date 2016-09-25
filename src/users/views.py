@@ -140,7 +140,9 @@ def handler404(request):
 def user_list(request):
 	users = User.objects.all().filter(is_staff=False)
 	admins = User.objects.all().filter(is_staff=True)
+	profiles = Profile.objects.all()
 	context = {
+		"profiles": profiles,
 		"users": users,
 		"admins": admins,
 	}
@@ -182,6 +184,7 @@ def user_edit(request, id=None):
 			user.save()
 			affiliation.save()
 			profile.user = user
+			profile.newsletter = form.cleaned_data["newsletter"] 
 			profile.affiliation = affiliation
 			profile.save()
 			return HttpResponseRedirect(reverse('home'))
@@ -476,6 +479,7 @@ def profile_edit(request, id=None, member_id=None):
 			country = form.cleaned_data["country"]
 			city = form.cleaned_data["city"]
 			email = form.cleaned_data["email"]
+			profile.newsletter = form.cleaned_data["newsletter"]
 			affiliation.name = name
 			affiliation.country = country
 			affiliation.city = city
@@ -498,7 +502,7 @@ def profile_edit(request, id=None, member_id=None):
 			elif Special_Issue.objects.filter(id=id).count() > 0:
 				return HttpResponseRedirect(reverse('special_issue_edit_members', kwargs={'id':id}))
 			else:
-				return HttpResponseRedirect(reverse('home'))
+				return HttpResponseRedirect(reverse('user_list'))
 	context = {
 		"form": form,
 	}
@@ -1070,12 +1074,12 @@ def dataset_remove(request, id=None):
 # @user_passes_test(lambda u:u.is_staff, login_url='/')
 def data_creation(request, id=None):
 	dataform = DataCreationForm()
-	fileform = FileCreationForm()
+	# fileform = FileCreationForm()
 	dataset = Dataset.objects.filter(id=id).first()
 	if request.method == 'POST':
 		dataform = DataCreationForm(request.POST)
-		fileform = FileCreationForm(request.POST, request.FILES)
-		if dataform.is_valid() and fileform.is_valid():
+		# fileform = FileCreationForm(request.POST, request.FILES)
+		if dataform.is_valid():
 			new_dataset = Dataset.objects.filter(id=id).first()
 			title = dataform.cleaned_data['data_title']
 			desc = dataform.cleaned_data['data_desc']
@@ -1090,10 +1094,10 @@ def data_creation(request, id=None):
 			# else:
 			# 	url = fileform.cleaned_data['url']
 			# 	File.objects.create(name=file_name, url=url, data=new_data)
-			return HttpResponseRedirect(reverse('data_edit_desc', kwargs={'dataset_id':id,'id':new_data.id}))
+			return HttpResponseRedirect(reverse('data_edit_files', kwargs={'dataset_id':id,'id':new_data.id}))
 	context = {
 		"dataform": dataform,
-		"fileform": fileform,
+		# "fileform": fileform,
 		"dataset_id": id,
 		"dataset": dataset,
 	}

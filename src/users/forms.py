@@ -190,6 +190,7 @@ class UserRegisterForm(RegistrationForm):
 		self.fields['name'] = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}))
 		self.fields['country'] = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}))
 		self.fields['city'] = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}))
+		self.fields['newsletter'] = forms.BooleanField(required=True, initial=True)
 
 	def clean(self):
 		username = self.cleaned_data.get('username')
@@ -218,6 +219,7 @@ class EditProfileForm(forms.Form):
 			self.fields['name'] = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}))
 			self.fields['country'] = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}))
 			self.fields['city'] = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}))
+			self.fields['newsletter'] = forms.BooleanField(required=False, initial=True)
 		else:
 			self.fields['username'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}), initial=user.username)
 			self.fields['email'] = forms.CharField(required=True, widget=forms.EmailInput(attrs={'class': "form-control"}), initial=user.email)
@@ -229,6 +231,7 @@ class EditProfileForm(forms.Form):
 			self.fields['name'] = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}), initial=affiliation.name)
 			self.fields['country'] = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}), initial=affiliation.country)
 			self.fields['city'] = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}), initial=affiliation.city)
+			self.fields['newsletter'] = forms.BooleanField(required=False, initial=profile.newsletter)
 
 	def clean(self):
 		return self.cleaned_data
@@ -248,7 +251,6 @@ class EditExtraForm(forms.Form):
 			self.fields['city'] = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}))
 			self.fields['email'] = forms.CharField(required=False, widget=forms.EmailInput(attrs={'class': "form-control"}))
 			self.fields['main_org'] = forms.TypedChoiceField(required=False, choices=((False, 'False'), (True, 'True')), widget=forms.RadioSelect, initial='False')
-
 		else:
 			self.fields['first_name'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}), initial=profile.first_name)
 			self.fields['last_name'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}), initial=profile.last_name)
@@ -259,6 +261,8 @@ class EditExtraForm(forms.Form):
 			self.fields['city'] = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}), initial=affiliation.city)
 			self.fields['email'] = forms.CharField(required=False, widget=forms.EmailInput(attrs={'class': "form-control"}), initial=profile.email)
 			self.fields['main_org'] = forms.TypedChoiceField(required=False, choices=((False, 'False'), (True, 'True')), widget=forms.RadioSelect, initial=profile.main_org)
+			if profile.user:
+				self.fields['newsletter'] = forms.BooleanField(required=False, initial=profile.newsletter)
 
 	def clean(self):
 		return self.cleaned_data
@@ -473,7 +477,7 @@ class RelationCreationForm(forms.Form):
 	def __init__(self, choices, *args, **kwargs):
 		super(RelationCreationForm, self).__init__(*args, **kwargs)
 		self.fields['event'] = forms.ChoiceField(widget=forms.Select(attrs={'class': "form-control"}), required=True, choices=choices)
-		self.fields['description'] = forms.CharField(required=True, widget=CKEditorUploadingWidget())
+		self.fields['description'] = forms.CharField(required=False, widget=CKEditorUploadingWidget())
 
 	def clean(self):
 		return self.cleaned_data
@@ -490,7 +494,7 @@ class RelationEditForm(forms.Form):
 			self.fields['event'] = forms.ChoiceField(widget=forms.Select(attrs={'class': "form-control"}), required=True, choices=choices, initial=relation.workshop_relation.id)
 		elif relation.dataset_relation:
 			self.fields['event'] = forms.ChoiceField(widget=forms.Select(attrs={'class': "form-control"}), required=True, choices=choices, initial=relation.dataset_relation.id)
-		self.fields['description'] = forms.CharField(required=True, widget=CKEditorUploadingWidget(), initial=relation)
+		self.fields['description'] = forms.CharField(required=False, widget=CKEditorUploadingWidget(), initial=relation)
 
 	def clean(self):
 		return self.cleaned_data
