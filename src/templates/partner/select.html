@@ -12,6 +12,9 @@
     {% endif %}
     <ol class="breadcrumb"> 
         <li> <a href="{% url "home" %}">Home</a> </li>
+        {% if event %}
+            <li><a href="{% url "event_edit" id=event.id%}">{{ event.title }} (Edit mode)</a></li> 
+        {% endif %} 
         <li class="active">Select sponsors</li>                 
     </ol>                                                         
     <div class="row"> 
@@ -30,7 +33,7 @@
                                     {% if selectform.partner.field.required %}
                                     <span class="text-danger">*</span>
                                     {% endif %}
-                                </label>&ensp;<a href="{% url "partner_creation" %}"><i class="fa fa-plus-circle" aria-hidden="true"></i></a>
+                                </label>&ensp;<a href="{% url "partner_creation" id=event.id %}"><i class="fa fa-plus-circle" aria-hidden="true"></i></a>
                                 {% if selectform.errors.partner %}
                                     <div class="alert alert-danger" role="alert">{{ selectform.errors.partner }}</div>
                                 {% endif %}

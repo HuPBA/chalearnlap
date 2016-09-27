@@ -11,7 +11,12 @@
         {% endfor %} 
     {% endif %}
     <ol class="breadcrumb"> 
-        <li> <a href="{% url "home" %}">Home</a> </li>               
+        <li> <a href="{% url "home" %}">Home</a> </li>     
+        {% if event %}
+            <li><a href="{% url "event_edit" id=event.id%}">{{ event.title }} (Edit mode)</a></li> 
+        {% elif dataset %}
+            <li><a href="{% url "dataset_edit_news" id=dataset.id%}">{{ dataset.title }} (Edit mode)</a></li>
+        {% endif %}           
         <li class="active"> News edit </li>                 
     </ol>           
     <div class="row"> 

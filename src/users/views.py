@@ -190,7 +190,7 @@ def user_edit(request, id=None):
 			return HttpResponseRedirect(reverse('home'))
 	context = {
 		"form": form,
-		"user_edit": user.id
+		"user_edit": user.id,
 	}
 	return render(request, "user/edit.html", context, context_instance=RequestContext(request))
 
@@ -199,7 +199,7 @@ def user_edit(request, id=None):
 def export_user_csv(request):
 	users = Profile.objects.all()
 	response = HttpResponse(content_type='text/csv')
-	response['Content-Disposition'] = 'attachment; filename="users.csv"'
+	response['Content-Disposition'] = 'attachment; filename="all-users.csv"'
 	writer = csv.writer(response)
 	# response.write(u'\ufeff'.encode('utf8'))
 	writer.writerow(['ID','Username','First name','Last name','Email','Affiliation','Events'])
@@ -213,10 +213,10 @@ def export_user_csv(request):
 			else:
 				events += (p.event.title.encode('utf8')+'('+p.role.name.encode('utf8')+'), ')
 			i+=1
-		if u.affiliation.city and u.affiliation.country:
-			writer.writerow([u.pk,u.user.username.encode('utf8'),u.first_name.encode('utf8'),u.last_name.encode('utf8'),u.user.email,(u.affiliation.name.encode('utf8')+', '+u.affiliation.city.encode('utf8')+', '+u.affiliation.country.encode('utf8')),events])
-		else:
-			writer.writerow([u.pk,u.user.username.encode('utf8'),u.first_name.encode('utf8'),u.last_name.encode('utf8'),u.user.email,(u.affiliation.name.encode('utf8')),events])
+		if u.user:
+			writer.writerow([u.pk,unicode(u.user.username),unicode(u.first_name).encode('utf-8'),unicode(u.last_name).encode('utf-8'),unicode(u.user.email).encode('utf-8'),(u.affiliation),events])
+		else: 
+			writer.writerow([u.pk,'',unicode(u.first_name).encode('utf-8'),unicode(u.last_name).encode('utf-8'),unicode(u.email).encode('utf-8'),(u.affiliation),events])
 	return response
 
 @login_required(login_url='auth_login')
@@ -253,10 +253,7 @@ def export_participants_csv(request, dataset_id=None, grid_id=None):
 	writer.writerow(['ID','Username','First name','Last name','Email','Affiliation'])
 	for u in submissions:
 		u = Profile.objects.filter(user=u.user).first()
-		if u.affiliation.city and u.affiliation.country:
-			writer.writerow([u.pk,u.user.username,u.first_name,u.last_name,u.user.email,(u.affiliation.name+', '+u.affiliation.city+', '+u.affiliation.country)])
-		else:
-			writer.writerow([u.pk,u.user.username,u.first_name,u.last_name,u.user.email,(u.affiliation.name)])
+		writer.writerow([u.pk,unicode(u.user.username),unicode(u.first_name).encode('utf-8'),unicode(u.last_name).encode('utf-8'),unicode(u.user.email).encode('utf-8'),(u.affiliation)])
 	return response
 
 @login_required(login_url='auth_login')
@@ -264,7 +261,7 @@ def export_participants_csv(request, dataset_id=None, grid_id=None):
 def export_user_xls(request):
 	users = Profile.objects.all()
 	response = HttpResponse(content_type='application/vnd.ms-excel')
-	response['Content-Disposition'] = 'attachment; filename="users.xls"'
+	response['Content-Disposition'] = 'attachment; filename="all-users.xls"'
 
 	workbook = xlwt.Workbook()
 	worksheet = workbook.add_sheet("Users")
@@ -284,10 +281,30 @@ def export_user_xls(request):
 			else:
 				events += (p.event.title+'('+p.role.name+'), ')
 			i+=1
-		if u.affiliation.city and u.affiliation.country:
-			row=[u.pk,u.user.username,u.first_name,u.last_name,u.user.email,(u.affiliation.name+', '+u.affiliation.city+', '+u.affiliation.country),events]
+		if u.user:
+			if u.affiliation.name and u.affiliation.country and u.affiliation.city:
+				aff = u.affiliation.name+str(', ')+u.affiliation.city+str(', ')+u.affiliation.country
+			elif u.affiliation.name and u.affiliation.country:
+				aff = u.affiliation.name+str(', ')+u.affiliation.country
+			elif u.affiliation.name and u.affiliation.city:
+				aff = u.affiliation.name+str(', ')+u.affiliation.city
+			elif u.affiliation.name:
+				aff = u.affiliation.name
+			else:
+				aff = ''
+			row=[u.pk,u.user.username,u.first_name,u.last_name,u.user.email,aff,events]
 		else:
-			row=[u.pk,u.user.username,u.first_name,u.last_name,u.user.email,(u.affiliation.name),events]
+			if u.affiliation.name and u.affiliation.country and u.affiliation.city:
+				aff = u.affiliation.name+str(', ')+u.affiliation.city+str(', ')+u.affiliation.country
+			elif u.affiliation.name and u.affiliation.country:
+				aff = u.affiliation.name+str(', ')+u.affiliation.country
+			elif u.affiliation.name and u.affiliation.city:
+				aff = u.affiliation.name+str(', ')+u.affiliation.city
+			elif u.affiliation.name:
+				aff = u.affiliation.name
+			else:
+				aff = ''
+			row=[u.pk,'',u.first_name,u.last_name,u.email,aff,events]
 		for col_num in range(len(row)):
 			worksheet.write(row_num, col_num, row[col_num])
 
@@ -314,16 +331,30 @@ def export_members_xls(request, event_id=None):
 		role_name = u.role.name
 		u = u.profile
 		row_num += 1
-		if u.affiliation.city and u.affiliation.country:
-			if u.user:
-				row=[u.pk,u.user.username,u.first_name,u.last_name,u.user.email,(u.affiliation.name+', '+u.affiliation.city+', '+u.affiliation.country),role_name]
+		if u.user:
+			if u.affiliation.name and u.affiliation.country and u.affiliation.city:
+				aff = u.affiliation.name+str(', ')+u.affiliation.city+str(', ')+u.affiliation.country
+			elif u.affiliation.name and u.affiliation.country:
+				aff = u.affiliation.name+str(', ')+u.affiliation.country
+			elif u.affiliation.name and u.affiliation.city:
+				aff = u.affiliation.name+str(', ')+u.affiliation.city
+			elif u.affiliation.name:
+				aff = u.affiliation.name
 			else:
-				row=[u.pk,'',u.first_name,u.last_name,'',(u.affiliation.name+', '+u.affiliation.city+', '+u.affiliation.country),role_name]
+				aff = ''
+			row=[u.pk,u.user.username,u.first_name,u.last_name,u.user.email,aff,role_name]
 		else:
-			if u.user:
-				row=[u.pk,u.user.username,u.first_name,u.last_name,u.user.email,(u.affiliation.name),role_name]
+			if u.affiliation.name and u.affiliation.country and u.affiliation.city:
+				aff = u.affiliation.name+str(', ')+u.affiliation.city+str(', ')+u.affiliation.country
+			elif u.affiliation.name and u.affiliation.country:
+				aff = u.affiliation.name+str(', ')+u.affiliation.country
+			elif u.affiliation.name and u.affiliation.city:
+				aff = u.affiliation.name+str(', ')+u.affiliation.city
+			elif u.affiliation.name:
+				aff = u.affiliation.name
 			else:
-				row=[u.pk,'',u.first_name,u.last_name,'',(u.affiliation.name),role_name]
+				aff = ''
+			row=[u.pk,'',u.first_name,u.last_name,u.email,aff,role_name]
 		for col_num in range(len(row)):
 			worksheet.write(row_num, col_num, row[col_num])
 
@@ -334,7 +365,8 @@ def export_members_xls(request, event_id=None):
 @user_passes_test(lambda u:u.is_superuser, login_url='/')
 def export_participants_xls(request, dataset_id=None, grid_id=None):
 	dataset = Dataset.objects.filter(id=dataset_id).first()
-	submissions = Submission.objects.filter(dataset__id=dataset_id)
+	grid = Result_Grid.objects.filter(id=grid_id).first()
+	submissions = Submission.objects.filter(grid=grid)
 	response = HttpResponse(content_type='application/vnd.ms-excel')
 	filename = (dataset.title).replace(" ", "-")+'_participants.xls'
 	response['Content-Disposition'] = 'attachment; filename=%s' % filename
@@ -349,10 +381,17 @@ def export_participants_xls(request, dataset_id=None, grid_id=None):
 	for u in submissions:
 		u = Profile.objects.filter(user=u.user).first()
 		row_num += 1
-		if u.affiliation.city and u.affiliation.country:
-			row=[u.pk,u.user.username,u.first_name,u.last_name,u.user.email,(u.affiliation.name+', '+u.affiliation.city+', '+u.affiliation.country)]
+		if u.affiliation.name and u.affiliation.country and u.affiliation.city:
+			aff = u.affiliation.name+str(', ')+u.affiliation.city+str(', ')+u.affiliation.country
+		elif u.affiliation.name and u.affiliation.country:
+			aff = u.affiliation.name+str(', ')+u.affiliation.country
+		elif u.affiliation.name and u.affiliation.city:
+			aff = u.affiliation.name+str(', ')+u.affiliation.city
+		elif u.affiliation.name:
+			aff = u.affiliation.name
 		else:
-			row=[u.pk,u.user.username,u.first_name,u.last_name,u.user.email,(u.affiliation.name)]
+			aff = ''
+		row=[u.pk,u.user.username,u.first_name,u.last_name,u.user.email,aff]
 		for col_num in range(len(row)):
 			worksheet.write(row_num, col_num, row[col_num])
 
@@ -382,17 +421,37 @@ def export_user_xlsx(request):
 			else:
 				events += (p.event.title+'('+p.role.name+'), ')
 			i+=1
-		if u.affiliation.city and u.affiliation.country:
-			row=[u.pk,u.user.username,u.first_name,u.last_name,u.user.email,(u.affiliation.name+', '+u.affiliation.city+', '+u.affiliation.country),events]
+		if u.user:
+			if u.affiliation.name and u.affiliation.country and u.affiliation.city:
+				aff = u.affiliation.name+str(', ')+u.affiliation.city+str(', ')+u.affiliation.country
+			elif u.affiliation.name and u.affiliation.country:
+				aff = u.affiliation.name+str(', ')+u.affiliation.country
+			elif u.affiliation.name and u.affiliation.city:
+				aff = u.affiliation.name+str(', ')+u.affiliation.city
+			elif u.affiliation.name:
+				aff = u.affiliation.name
+			else:
+				aff = ''
+			row=[u.pk,u.user.username,u.first_name,u.last_name,u.user.email,aff,events]
 		else:
-			row=[u.pk,u.user.username,u.first_name,u.last_name,u.user.email,(u.affiliation.name),events]
+			if u.affiliation.name and u.affiliation.country and u.affiliation.city:
+				aff = u.affiliation.name+str(', ')+u.affiliation.city+str(', ')+u.affiliation.country
+			elif u.affiliation.name and u.affiliation.country:
+				aff = u.affiliation.name+str(', ')+u.affiliation.country
+			elif u.affiliation.name and u.affiliation.city:
+				aff = u.affiliation.name+str(', ')+u.affiliation.city
+			elif u.affiliation.name:
+				aff = u.affiliation.name
+			else:
+				aff = ''
+			row=[u.pk,'',u.first_name,u.last_name,u.email,aff,events]
 		for col_num in range(len(row)):
 			worksheet.write(row_num, col_num, row[col_num])
 
 	workbook.close()
 	output.seek(0)
 	response = HttpResponse(output.read(), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')  
-	response['Content-Disposition'] = 'attachment; filename="users.xlsx"'
+	response['Content-Disposition'] = 'attachment; filename="all-users.xlsx"'
 	return response
 
 @login_required(login_url='auth_login')
@@ -412,16 +471,30 @@ def export_members_xlsx(request, event_id=None):
 		role_name = u.role.name
 		u = u.profile		
 		row_num += 1
-		if u.affiliation.city and u.affiliation.country:
-			if u.user:
-				row=[u.pk,u.user.username,u.first_name,u.last_name,u.user.email,(u.affiliation.name+', '+u.affiliation.city+', '+u.affiliation.country),role_name]
+		if u.user:
+			if u.affiliation.name and u.affiliation.country and u.affiliation.city:
+				aff = u.affiliation.name+str(', ')+u.affiliation.city+str(', ')+u.affiliation.country
+			elif u.affiliation.name and u.affiliation.country:
+				aff = u.affiliation.name+str(', ')+u.affiliation.country
+			elif u.affiliation.name and u.affiliation.city:
+				aff = u.affiliation.name+str(', ')+u.affiliation.city
+			elif u.affiliation.name:
+				aff = u.affiliation.name
 			else:
-				row=[u.pk,'',u.first_name,u.last_name,'',(u.affiliation.name+', '+u.affiliation.city+', '+u.affiliation.country),role_name]
+				aff = ''
+			row=[u.pk,u.user.username,u.first_name,u.last_name,u.user.email,aff,role_name]
 		else:
-			if u.user:
-				row=[u.pk,u.user.username,u.first_name,u.last_name,u.user.email,(u.affiliation.name),role_name]
+			if u.affiliation.name and u.affiliation.country and u.affiliation.city:
+				aff = u.affiliation.name+str(', ')+u.affiliation.city+str(', ')+u.affiliation.country
+			elif u.affiliation.name and u.affiliation.country:
+				aff = u.affiliation.name+str(', ')+u.affiliation.country
+			elif u.affiliation.name and u.affiliation.city:
+				aff = u.affiliation.name+str(', ')+u.affiliation.city
+			elif u.affiliation.name:
+				aff = u.affiliation.name
 			else:
-				row=[u.pk,'',u.first_name,u.last_name,'',(u.affiliation.name),role_name]
+				aff = ''
+			row=[u.pk,'',u.first_name,u.last_name,u.email,aff,role_name]
 		for col_num in range(len(row)):
 			worksheet.write(row_num, col_num, row[col_num])
 	workbook.close()
@@ -435,7 +508,8 @@ def export_members_xlsx(request, event_id=None):
 @user_passes_test(lambda u:u.is_superuser, login_url='/')
 def export_participants_xlsx(request, dataset_id=None, grid_id=None):
 	dataset = Dataset.objects.filter(id=dataset_id).first()
-	submissions = Submission.objects.filter(dataset__id=dataset_id)
+	grid = Result_Grid.objects.filter(id=grid_id).first()
+	submissions = Submission.objects.filter(grid=grid)
 	output = StringIO.StringIO()
 	workbook = xlsxwriter.Workbook(output)
 	worksheet = workbook.add_worksheet('Dataset participants')
@@ -447,10 +521,17 @@ def export_participants_xlsx(request, dataset_id=None, grid_id=None):
 	for u in submissions:
 		u = Profile.objects.filter(user=u.user).first()
 		row_num += 1
-		if u.affiliation.city and u.affiliation.country:
-			row=[u.pk,u.user.username,u.first_name,u.last_name,u.user.email,(u.affiliation.name+', '+u.affiliation.city+', '+u.affiliation.country)]
+		if u.affiliation.name and u.affiliation.country and u.affiliation.city:
+			aff = u.affiliation.name+str(', ')+u.affiliation.city+str(', ')+u.affiliation.country
+		elif u.affiliation.name and u.affiliation.country:
+			aff = u.affiliation.name+str(', ')+u.affiliation.country
+		elif u.affiliation.name and u.affiliation.city:
+			aff = u.affiliation.name+str(', ')+u.affiliation.city
+		elif u.affiliation.name:
+			aff = u.affiliation.name
 		else:
-			row=[u.pk,u.user.username,u.first_name,u.last_name,u.user.email,(u.affiliation.name)]
+			aff = ''
+		row=[u.pk,u.user.username,u.first_name,u.last_name,u.user.email,aff]
 		for col_num in range(len(row)):
 			worksheet.write(row_num, col_num, row[col_num])
 
@@ -466,6 +547,7 @@ def export_participants_xlsx(request, dataset_id=None, grid_id=None):
 # @user_passes_test(lambda u:u.is_staff, login_url='/')
 def profile_edit(request, id=None, member_id=None):
 	profile = Profile.objects.filter(id=member_id).first()
+	event = Event.objects.filter(id=id).first()
 	affiliation = profile.affiliation
 	form = EditExtraForm(profile=profile, affiliation=affiliation)
 	if request.method == 'POST':
@@ -505,6 +587,7 @@ def profile_edit(request, id=None, member_id=None):
 				return HttpResponseRedirect(reverse('user_list'))
 	context = {
 		"form": form,
+		"event": event,
 	}
 	return render(request, "profile/edit.html", context, context_instance=RequestContext(request))
 
@@ -512,6 +595,7 @@ def profile_edit(request, id=None, member_id=None):
 # @user_passes_test(lambda u:u.is_staff, login_url='/')
 def profile_creation(request, id=None):
 	form = EditExtraForm()
+	event = Event.objects.filter(id=id).first()
 	if request.method == 'POST':
 		form = EditExtraForm(request.POST, request.FILES)
 		if form.is_valid():
@@ -528,9 +612,15 @@ def profile_creation(request, id=None):
 				Profile.objects.create(affiliation=new_aff, first_name=first_name, last_name=last_name, avatar=avatar, bio=bio, email=email, main_org=True)
 			elif form.cleaned_data["main_org"] == 'False':
 				Profile.objects.create(affiliation=new_aff, first_name=first_name, last_name=last_name, avatar=avatar, bio=bio, email=email, main_org=False)
-			return HttpResponseRedirect(reverse('challenge_profile_select', kwargs={'id':id}))
+			if Challenge.objects.filter(id=id).count() > 0:
+				return HttpResponseRedirect(reverse('challenge_profile_select', kwargs={'id':id}))
+			elif Workshop.objects.filter(id=id).count() > 0:
+				return HttpResponseRedirect(reverse('workshop_profile_select', kwargs={'id':id}))
+			elif Special_Issue.objects.filter(id=id).count() > 0:
+				return HttpResponseRedirect(reverse('special_issue_profile_select', kwargs={'id':id}))
 	context = {
 		"form": form,
+		"event": event,
 	}
 	return render(request, "profile/edit.html", context, context_instance=RequestContext(request))
 
@@ -707,12 +797,14 @@ def dataset_edit_desc(request, id=None):
 def dataset_edit_schedule(request, id=None):
 	dataset = Dataset.objects.filter(id=id).first()
 	datas = Data.objects.all().filter(dataset=dataset)
+	grids = Result_Grid.objects.filter(track__dataset=dataset)
 	if check_edit_dataset_permission(request, dataset) == False:
 		news = News.objects.filter(dataset_id=id)
 		context = {
 			"dataset": dataset,
 			"news": news, 		
 			"datas": datas,
+			"grids": grids,
 			"not_perm": True
 		}
 		return render(request, "dataset/desc.html", context, context_instance=RequestContext(request))
@@ -720,6 +812,7 @@ def dataset_edit_schedule(request, id=None):
 		schedule = Schedule_Event.objects.filter(dataset_schedule=dataset).order_by('date')
 		context = {
 			"dataset": dataset,
+			"grids": grids,
 			"schedule": schedule,
 		}
 		return render(request, "dataset/edit/schedule.html", context, context_instance=RequestContext(request))
@@ -728,12 +821,14 @@ def dataset_edit_schedule(request, id=None):
 def dataset_edit_relations(request, id=None):
 	dataset = Dataset.objects.filter(id=id).first()
 	datas = Data.objects.all().filter(dataset=dataset)
+	grids = Result_Grid.objects.filter(track__dataset=dataset)
 	if check_edit_dataset_permission(request, dataset) == False:
 		news = News.objects.filter(dataset_id=id)
 		context = {
 			"dataset": dataset,
 			"news": news, 		
 			"datas": datas,
+			"grids": grids,
 			"not_perm": True
 		}
 		return render(request, "dataset/desc.html", context, context_instance=RequestContext(request))
@@ -743,6 +838,7 @@ def dataset_edit_relations(request, id=None):
 		context = {
 			"dataset": dataset,
 			"relations": relations,
+			"grids": grids,
 			"associated": associated
 		}
 		return render(request, "dataset/edit/relations.html", context, context_instance=RequestContext(request))
@@ -751,18 +847,21 @@ def dataset_edit_relations(request, id=None):
 def dataset_edit_datas(request, id=None):
 	dataset = Dataset.objects.filter(id=id).first()
 	datas = Data.objects.all().filter(dataset=dataset)
+	grids = Result_Grid.objects.filter(track__dataset=dataset)
 	if check_edit_dataset_permission(request, dataset) == False:
 		news = News.objects.filter(dataset_id=id)
 		context = {
 			"dataset": dataset,
 			"news": news, 		
 			"datas": datas,
+			"grids": grids,
 			"not_perm": True
 		}
 		return render(request, "dataset/desc.html", context, context_instance=RequestContext(request))
 	else:
 		context = {
 			"dataset": dataset,
+			"grids": grids,
 			"datas": datas,
 		}
 		return render(request, "dataset/edit/datas.html", context, context_instance=RequestContext(request))
@@ -771,12 +870,14 @@ def dataset_edit_datas(request, id=None):
 def dataset_edit_members(request, id=None):
 	dataset = Dataset.objects.filter(id=id).first()
 	datas = Data.objects.all().filter(dataset=dataset)
+	grids = Result_Grid.objects.filter(track__dataset=dataset)
 	if check_edit_dataset_permission(request, dataset) == False:
 		news = News.objects.filter(dataset_id=id)
 		context = {
 			"dataset": dataset,
 			"news": news, 		
 			"datas": datas,
+			"grids": grids,
 			"not_perm": True
 		}
 		return render(request, "dataset/desc.html", context, context_instance=RequestContext(request))
@@ -784,7 +885,8 @@ def dataset_edit_members(request, id=None):
 		members = Profile_Dataset.objects.filter(dataset=dataset)
 		context = {
 			"dataset": dataset,
-			"members": members
+			"members": members,
+			"grids": grids,
 		}
 		return render(request, "dataset/edit/members.html", context, context_instance=RequestContext(request))
 
@@ -792,12 +894,14 @@ def dataset_edit_members(request, id=None):
 def dataset_edit_results(request, id=None, grid_id=None):
 	dataset = Dataset.objects.filter(id=id).first()
 	datas = Data.objects.all().filter(dataset=dataset)
+	grids = Result_Grid.objects.filter(track__dataset=dataset)
 	if check_edit_dataset_permission(request, dataset) == False:
 		news = News.objects.filter(dataset_id=id)
 		context = {
 			"dataset": dataset,
 			"news": news, 		
 			"datas": datas,
+			"grids": grids,
 			"not_perm": True
 		}
 		return render(request, "dataset/desc.html", context, context_instance=RequestContext(request))
@@ -821,6 +925,7 @@ def dataset_edit_results(request, id=None, grid_id=None):
 			"dataset": dataset,
 			"grid": grid,
 			"headers": headers,	
+			"grids": grids,
 			"submission_scores": submission_scores,
 		}
 		return render(request, "dataset/edit/results.html", context, context_instance=RequestContext(request))
@@ -830,11 +935,13 @@ def dataset_edit_news(request, id=None):
 	dataset = Dataset.objects.filter(id=id).first()
 	datas = Data.objects.all().filter(dataset=dataset)
 	news = News.objects.filter(dataset_id=id)
+	grids = Result_Grid.objects.filter(track__dataset=dataset)
 	if check_edit_dataset_permission(request, dataset) == False:
 		context = {
 			"dataset": dataset,
 			"news": news, 		
 			"datas": datas,
+			"grids": grids,
 			"not_perm": True
 		}
 		return render(request, "dataset/desc.html", context, context_instance=RequestContext(request))
@@ -842,6 +949,7 @@ def dataset_edit_news(request, id=None):
 		context = {
 			"news": news,
 			"dataset": dataset,
+			"grids": grids,
 		}
 		return render(request, "dataset/edit/news.html", context, context_instance=RequestContext(request))
 
@@ -850,11 +958,13 @@ def dataset_edit_publications(request, id=None):
 	dataset = Dataset.objects.filter(id=id).first()
 	datas = Data.objects.all().filter(dataset=dataset)
 	news = News.objects.filter(dataset_id=id)
+	grids = Result_Grid.objects.filter(track__dataset=dataset)
 	if check_edit_dataset_permission(request, dataset) == False:
 		context = {
 			"dataset": dataset,
 			"news": news, 		
 			"datas": datas,
+			"grids": grids,
 			"not_perm": True
 		}
 		return render(request, "dataset/desc.html", context, context_instance=RequestContext(request))
@@ -864,6 +974,7 @@ def dataset_edit_publications(request, id=None):
 			"news": news,
 			"dataset": dataset,
 			"publications": publications,
+			"grids": grids,
 		}
 		return render(request, "dataset/edit/publications.html", context, context_instance=RequestContext(request))
 
@@ -871,11 +982,13 @@ def dataset_edit_publications(request, id=None):
 def dataset_edit_col(request, id=None, col_id=None):
 	dataset = Dataset.objects.filter(id=id).first()
 	datas = Data.objects.all().filter(dataset=dataset)
+	grids = Result_Grid.objects.filter(track__dataset=dataset)
 	if check_edit_dataset_permission(request, dataset) == False:
 		context = {
 			"dataset": dataset,
 			"news": news, 		
 			"datas": datas,
+			"grids": grids,
 			"not_perm": True
 		}
 		return render(request, "dataset/desc.html", context, context_instance=RequestContext(request))
@@ -892,6 +1005,7 @@ def dataset_edit_col(request, id=None, col_id=None):
 		context = {
 			"colform": colform,
 			"dataset": dataset,
+			"grids": grids,
 		}
 		return render(request, "dataset/edit/col.html", context, context_instance=RequestContext(request))
 
@@ -899,11 +1013,13 @@ def dataset_edit_col(request, id=None, col_id=None):
 def dataset_edit_submission(request, id=None, submission_id=None):
 	dataset = Dataset.objects.filter(id=id).first()
 	datas = Data.objects.all().filter(dataset=dataset)
+	grids = Result_Grid.objects.filter(track__dataset=dataset)
 	if check_edit_dataset_permission(request, dataset) == False:
 		context = {
 			"dataset": dataset,
 			"news": news, 		
 			"datas": datas,
+			"grids": grids,
 			"not_perm": True
 		}
 		return render(request, "dataset/desc.html", context, context_instance=RequestContext(request))
@@ -932,8 +1048,15 @@ def dataset_edit_submission(request, id=None, submission_id=None):
 			"subform": subform,
 			"roweditform": roweditform,
 			"dataset": dataset,
+			"grids": grids,
 		}
 		return render(request, "dataset/edit/submission.html", context, context_instance=RequestContext(request))
+
+@login_required(login_url='auth_login')
+def dataset_remove_submission(request, id=None, submission_id=None):
+	submission = Submission.objects.filter(id=submission_id).first()
+	submission.delete()
+	return HttpResponse(reverse('dataset_edit_results', kwargs={'id':id, 'grid_id': submission.grid.id}))
 
 @login_required(login_url='auth_login')
 def dataset_publish(request, id=None):
@@ -1323,8 +1446,9 @@ def partner_list(request):
 
 @login_required(login_url='auth_login')
 @user_passes_test(lambda u:u.is_staff, login_url='/')
-def partner_creation(request):
+def partner_creation(request, id=None):
 	partnerform = PartnerCreationForm()
+	event = Event.objects.filter(id=id).first()
 	if request.method == 'POST':
 		partnerform = PartnerCreationForm(request.POST, request.FILES)
 		if partnerform.is_valid():
@@ -1340,6 +1464,7 @@ def partner_creation(request):
 			return HttpResponseRedirect(reverse('partners_list'))
 	context = {
 		"partnerform": partnerform,
+		"event": event,
 	}
 	return render(request, "partner/creation.html", context, context_instance=RequestContext(request))
 
@@ -1371,8 +1496,7 @@ def partner_select(request, id=None):
 				return HttpResponseRedirect(reverse('home'))
 	context = {
 		"selectform": selectform,
-		"challenge": challenge,
-		"workshop": workshop,
+		"event": event,
 	}
 	return render(request, "partner/select.html", context, context_instance=RequestContext(request))
 
@@ -3298,12 +3422,14 @@ def special_issue_desc(request, id=None):
 		members2 = Profile_Event.objects.filter(event=issue,role=r)
 		if members2.count() > 0:
 			roles.append(r)
+	schedule = Schedule_Event.objects.filter(event_schedule=issue,schedule_event_parent=None).order_by('date')
 	context = {
 		"roles": roles,
 		"publications": publications,
 		"issue": issue,
 		"news": news,
-		"profile": profile_event,		
+		"profile": profile_event,	
+		"schedule": schedule,	
 	}
 	return render(request, "special_issue/desc.html", context, context_instance=RequestContext(request))
 
@@ -3320,6 +3446,7 @@ def special_issue_members(request, id=None, role_id=None):
 			roles.append(r)
 	profile_event = check_event_permission(request, issue)
 	publications = Publication.objects.filter(issue=issue)
+	schedule = Schedule_Event.objects.filter(event_schedule=issue,schedule_event_parent=None).order_by('date')
 	context = {
 		"publications": publications,
 		"issue": issue,
@@ -3328,6 +3455,7 @@ def special_issue_members(request, id=None, role_id=None):
 		"profile": profile_event,	
 		"role": role,
 		"roles": roles,
+		"schedule": schedule,
 	}
 	return render(request, "special_issue/members.html", context, context_instance=RequestContext(request))
 
@@ -3366,6 +3494,7 @@ def special_issue_associated_events(request, id=None):
 		members2 = Profile_Event.objects.filter(event=issue,role=r)
 		if members2.count() > 0:
 			roles.append(r)
+	schedule = Schedule_Event.objects.filter(event_schedule=issue,schedule_event_parent=None).order_by('date')
 	context = {
 		"roles": roles,
 		"publications": publications,
@@ -3374,6 +3503,7 @@ def special_issue_associated_events(request, id=None):
 		"relations": relations,
 		"associated": associated,
 		"profile": profile_event,	
+		"schedule": schedule,
 	}
 	return render(request, "special_issue/relations.html", context, context_instance=RequestContext(request))
 
@@ -3388,12 +3518,14 @@ def special_issue_publications(request, id=None):
 		members2 = Profile_Event.objects.filter(event=issue,role=r)
 		if members2.count() > 0:
 			roles.append(r)
+	schedule = Schedule_Event.objects.filter(event_schedule=issue,schedule_event_parent=None).order_by('date')
 	context = {
 		"roles": roles,
 		"issue": issue,
 		"news": news,
 		"profile": profile_event,
 		"publications": publications,
+		"schedule": schedule,
 	}
 	return render(request, "special_issue/publications.html", context, context_instance=RequestContext(request))
 	
@@ -3453,8 +3585,10 @@ def news_creation(request, id=None, dataset_id=None):
 	return render(request, "news/creation.html", context, context_instance=RequestContext(request))
 
 @login_required(login_url='auth_login')
-def news_edit(request, id=None, news_id=None):
+def news_edit(request, id=None, dataset_id=None, news_id=None):
 	news = News.objects.filter(id=news_id).first()
+	event = Event.objects.filter(id=id).first()
+	dataset = Dataset.objects.filter(id=dataset_id).first()
 	newsform = NewsEditForm(news=news)
 	if request.method == 'POST':
 		newsform = NewsEditForm(request.POST, news=news)
@@ -3476,6 +3610,8 @@ def news_edit(request, id=None, news_id=None):
 				return HttpResponseRedirect(reverse('home'))
 	context = {
 		"newsform": newsform,
+		"event": event,
+		"dataset": dataset,
 	}
 	return render(request, "news/edit.html", context, context_instance=RequestContext(request))
 
@@ -3695,6 +3831,8 @@ def publication_creation(request, id=None):
 				return HttpResponseRedirect(reverse('publication_list'))
 	# If it creates by challenge, workshop, special issue, dataset edit mode.
 	else:
+		event = Event.objects.filter(id=id).first()
+		dataset = Dataset.objects.filter(id=id).first()
 		form = PublicationEventCreationForm()
 		if request.method == 'POST':
 			form = PublicationEventCreationForm(request.POST)
@@ -3732,12 +3870,16 @@ def publication_creation(request, id=None):
 					return HttpResponseRedirect(reverse('dataset_edit_publications', kwargs={'id':id}))
 	context = {
 		"form": form,
+		"event": event, 
+		"dataset": dataset,
 	}
 	return render(request, "publication/creation.html", context, context_instance=RequestContext(request))
 
 @login_required(login_url='auth_login')
 def publication_edit(request, id=None, pub_id=None):
 	publication = Publication.objects.filter(id=pub_id).first()
+	event = Event.objects.filter(id=id).first()
+	dataset = Dataset.objects.filter(id=id).first()
 	form = PublicationEditForm(publication)
 	if request.method == 'POST':
 		form = PublicationEditForm(publication, request.POST)
@@ -3759,6 +3901,8 @@ def publication_edit(request, id=None, pub_id=None):
 				return HttpResponseRedirect(reverse('publication_list'))
 	context = {
 		"form": form,
+		"event": event, 
+		"dataset": dataset,
 	}
 	return render(request, "publication/edit.html", context, context_instance=RequestContext(request))
 
@@ -3817,6 +3961,14 @@ def event_detail(request, id=None):
 		return HttpResponseRedirect(reverse('workshop_desc', kwargs={'id':id}))
 	elif Special_Issue.objects.filter(id=id).count() > 0:
 		return HttpResponseRedirect(reverse('special_issue_desc', kwargs={'id':id}))
+
+def event_edit(request, id=None):
+	if Challenge.objects.filter(id=id).count() > 0:
+		return HttpResponseRedirect(reverse('challenge_edit_desc', kwargs={'id':id}))
+	elif Workshop.objects.filter(id=id).count() > 0:
+		return HttpResponseRedirect(reverse('workshop_edit_desc', kwargs={'id':id}))
+	elif Special_Issue.objects.filter(id=id).count() > 0:
+		return HttpResponseRedirect(reverse('special_issue_edit_desc', kwargs={'id':id}))
 
 def check_event_permission(request, event):
 	profile_event = None

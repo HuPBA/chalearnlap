@@ -1,7 +1,7 @@
 {% extends "dataset/edit/base.html" %}
 {% block breadcrumb %}
 	<li><a href="{% url "home" %}">Home</a></li>
-    <li>{{ dataset.title }}</li>  
+    <li>{{ dataset.title }} (Edit mode)</li>  
     <li class="active">Description</li>  
 {% endblock breadcrumb %} 
 {% block content %}
@@ -18,7 +18,7 @@
                                 {% for n in news %} 
                                     <div class="col-sm-12">
                                         <div class="top-margin"> 
-                                            <p class="text-center">{{ n.title }}&ensp;<a href="{{ n.get_absolute_url }}"><i class="fa fa-pencil" aria-hidden="true"></i></a>&ensp;<a id="{{ n.id }}" class="delete-event" value="{% url 'dataset_news_remove' dataset_id=dataset.id news_id=n.id %}" href=""><i class="fa fa-minus-circle fa" aria-hidden="true"></i></a></p>
+                                            <p class="text-center">{{ n.title }}&ensp;<a href="{% url "dataset_news_edit" dataset_id=dataset.id news_id=n.id %}"><i class="fa fa-pencil" aria-hidden="true"></i></a>&ensp;<a id="{{ n.id }}" class="delete-event" value="{% url 'dataset_news_remove' dataset_id=dataset.id news_id=n.id %}" href=""><i class="fa fa-minus-circle fa" aria-hidden="true"></i></a></p>
                                         </div>
                                     </div>
                                 {% endfor %}  

@@ -12,8 +12,8 @@
     {% endif %}
     <ol class="breadcrumb"> 
         <li> <a href="{% url "home" %}">Home</a> </li>
-        <li> <a href="{% url "event_list" %}">Events list</a> </li>                 
-        <li class="active">Workshop edit</li>                 
+        <li> <a href="{% url "workshop_edit_gallery" id=workshop.id %}">{{ workshop.title }} (Edit mode)</a> </li>                 
+        <li class="active">Picture edit</li>                 
     </ol>            
     <div class="row"> 
         <article class="col-xs-12 maincontent"> 

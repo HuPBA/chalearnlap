@@ -20,7 +20,7 @@
     {% endif %} -->
     <ol class="breadcrumb"> 
         <li><a href="{% url "home" %}">Home</a></li>
-        <li><a href="{% url "dataset_edit" id=dataset.id %}">{{ dataset.title }}</a></li>                 
+        <li><a href="{% url "dataset_edit_datas" id=dataset.id%}">{{ dataset.title }} (Edit mode)</a></li>              
         <li class="active">Data creation</li>
     </ol>            
     <div class="row"> 

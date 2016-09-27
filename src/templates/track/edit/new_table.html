@@ -9,8 +9,10 @@
             </div>
         {% endfor %} 
     {% endif %}
-    <li> <a href="{% url "home" %}">Home</a> </li>           
-    <li class="active">Result edit</li>   
+    <li> <a href="{% url "home" %}">Home</a> </li>   
+    <li><a href="{% url "challenge_edit_desc" id=challenge.id%}">{{ challenge.title }} (Edit mode)</a></li>
+    <li>{{ track.title }}</li>        
+    <li class="active">New table</li>   
 {% endblock breadcrumb %} 
 {% block content %}
     <div class="col-md-10"> 
@@ -19,7 +21,7 @@
                 <div class="panel-body"> 
                     <div class="row">
                         <div class="col-sm-12"> 
-                            <h3 class="thin text-center">Results</h3>
+                            <h3 class="thin text-center">New table</h3>
                             <hr> 
                             <div class="col-sm-3 col-sm-offset-5">
                                 <div class="top-margin"> 

@@ -34,7 +34,9 @@
                             </div>
                         </li>
                     {% endif %}
-                    <li><a href='{% url 'special_issue_schedule' id=issue.id %}'>Schedule</a></li>
+                    {% if schedule %}
+                        <li><a href='{% url 'special_issue_schedule' id=issue.id %}'>Schedule</a></li>
+                    {% endif %}
                     <li><a href='{% url 'special_issue_associated_events' id=issue.id %}'>Associated events</a></li>
                     {% if publications %}
                         <li><a href='{% url 'special_issue_publications' id=issue.id %}'>Papers published</a></li>

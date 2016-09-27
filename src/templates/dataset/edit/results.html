@@ -1,7 +1,7 @@
 {% extends "dataset/edit/base.html" %}
 {% block breadcrumb %}
 	<li><a href="{% url "home" %}">Home</a></li>
-    <li>{{ dataset.title }}</li>  
+    <li>{{ dataset.title }} (Edit mode)</li>  
     <li class="active">Description</li>  
 {% endblock breadcrumb %} 
 {% block content %}
@@ -48,7 +48,7 @@
                                 <tbody>
                                     {% for sub,scores in submission_scores %}
                                         <tr>
-                                            <td>{{ sub.user.username }}<br>&ensp;<a href="{% url "dataset_edit_submission" id=dataset.id submission_id=sub.id %}"><i class="fa fa-pencil" aria-hidden="true"></i></a></td>
+                                            <td>{{ sub.user.username }}<br>&ensp;<a href="{% url "dataset_edit_submission" id=dataset.id submission_id=sub.id %}"><i class="fa fa-pencil" aria-hidden="true"></i></a>&ensp;<a id="{{ sub.id }}" class="delete-event" value="{% url 'dataset_remove_submission' id=dataset.id submission_id=sub.id %}" href=""><i class="fa fa-minus-circle fa" aria-hidden="true"></i></a></td>
                                             {% for s in scores %}
                                                 <td>{{ s.score }}</td>
                                             {% endfor %}
