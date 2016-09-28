@@ -411,3 +411,9 @@ class CIMLBook(models.Model):
 
 	def __str__(self):
 		return unicode(self.id).encode('utf-8')
+
+class Help(models.Model):
+	help_text = RichTextField(null=True)
+
+	def __str__(self):
+		return unicode(self.id).encode('utf-8')

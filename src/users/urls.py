@@ -8,6 +8,8 @@ from django.views.generic.base import TemplateView
 urlpatterns = [
     url(r'^home/$', views.home, name="home"),
     url(r'^home-edit/$', views.home_edit, name="home_edit"),
+    url(r'^help/$', views.help, name="help"),
+    url(r'^help-edit/$', views.help_edit, name="help_edit"),
     url(r'^cimlbook/(?P<id>\d+)/$', views.cimlbook_detail, name="cimlbook_detail"),
     url(r'^cimlbook/(?P<id>\d+)/edit/$', views.cimlbook_edit, name="cimlbook_edit"),
     url(r'^cimlbook/(?P<id>\d+)/remove/$', views.cimlbook_remove, name="cimlbook_remove"),

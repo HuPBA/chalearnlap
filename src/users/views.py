@@ -1,11 +1,11 @@
 from django.shortcuts import render, get_object_or_404, redirect, render_to_response
 from django.http import HttpResponse
-from .forms import CIMLBookForm, EditHomeForm, ResultRowEditForm, ResultRowForm, HeaderEditForm, ResultNewTableForm, GalleryImageEditForm, ResultUserEditForm, ResultUserCreationForm, ProgramEditForm, ProgramCreationForm, PublicationEditForm, PublicationEventCreationForm, PublicationCreationForm, SubmissionEditForm, ColEditForm, EditChallengeResult, ProfileForm, AffiliationForm, SelectRoleForm, UserEditForm, UserRegisterForm, EditProfileForm, EditExtraForm, DatasetCreationForm, DataCreationForm, EventCreationForm, EditEventForm, RoleCreationForm, NewsCreationForm, FileCreationForm, NewsEditForm, SelectDatasetForm, MemberCreationForm, MemberSelectForm, PartnerCreationForm, PartnerSelectForm, ScheduleCreationForm, ScheduleEditForm, DatasetEditForm, DataEditForm, TrackCreationForm, GalleryImageForm, TrackEditForm, RelationCreationForm, RelationEditForm, SubmissionCreationForm, SubmissionScoresForm
+from .forms import EditHelpForm, CIMLBookForm, EditHomeForm, ResultRowEditForm, ResultRowForm, HeaderEditForm, ResultNewTableForm, GalleryImageEditForm, ResultUserEditForm, ResultUserCreationForm, ProgramEditForm, ProgramCreationForm, PublicationEditForm, PublicationEventCreationForm, PublicationCreationForm, SubmissionEditForm, ColEditForm, EditChallengeResult, ProfileForm, AffiliationForm, SelectRoleForm, UserEditForm, UserRegisterForm, EditProfileForm, EditExtraForm, DatasetCreationForm, DataCreationForm, EventCreationForm, EditEventForm, RoleCreationForm, NewsCreationForm, FileCreationForm, NewsEditForm, SelectDatasetForm, MemberCreationForm, MemberSelectForm, PartnerCreationForm, PartnerSelectForm, ScheduleCreationForm, ScheduleEditForm, DatasetEditForm, DataEditForm, TrackCreationForm, GalleryImageForm, TrackEditForm, RelationCreationForm, RelationEditForm, SubmissionCreationForm, SubmissionScoresForm
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_protect
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
-from .models import CIMLBook, Chalearn, Result_Grid, Grid_Header, Result_User, Publication_Event, Publication_Dataset, Publication, Profile_Dataset, Submission, Profile, Result, Score, Proposal, Profile_Event, Affiliation, Event, Dataset, Data, Partner, Event, Special_Issue, Workshop, Challenge, Role, News, File, Contact, Event_Partner, Schedule_Event, Track, Gallery_Image, Event_Relation
+from .models import Help, CIMLBook, Chalearn, Result_Grid, Grid_Header, Result_User, Publication_Event, Publication_Dataset, Publication, Profile_Dataset, Submission, Profile, Result, Score, Proposal, Profile_Event, Affiliation, Event, Dataset, Data, Partner, Event, Special_Issue, Workshop, Challenge, Role, News, File, Contact, Event_Partner, Schedule_Event, Track, Gallery_Image, Event_Relation
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.template import RequestContext
 from django.core.urlresolvers import reverse
@@ -90,6 +90,25 @@ def home_edit(request):
 			chalearn.save()
 			return HttpResponseRedirect(reverse('home'))
 	return render(request, "home-edit.html", {"chalearn": chalearn, "form": form}, context_instance=RequestContext(request))
+
+def help(request):
+	help = Help.objects.all().first()
+	profile = None
+	if request.user and (not request.user.is_anonymous()):
+		if request.user.is_superuser or request.user.is_staff:
+			profile = Profile.objects.filter(user=request.user)
+	return render(request, "help.html", {"help": help, "profile": profile}, context_instance=RequestContext(request))
+
+def help_edit(request):
+	help = Help.objects.all().first()
+	form = EditHelpForm(help=help)
+	if request.method == 'POST':
+		form = EditHelpForm(request.POST, help=help)
+		if form.is_valid():
+			help.help_text = form.cleaned_data['text']
+			help.save()
+			return HttpResponseRedirect(reverse('home'))
+	return render(request, "help-edit.html", {"help": help, "form": form}, context_instance=RequestContext(request))
 
 def cimlbook_detail(request, id=None):
 	book = CIMLBook.objects.filter(id=id).first()
@@ -561,7 +580,8 @@ def profile_edit(request, id=None, member_id=None):
 			country = form.cleaned_data["country"]
 			city = form.cleaned_data["city"]
 			email = form.cleaned_data["email"]
-			profile.newsletter = form.cleaned_data["newsletter"]
+			if profile.user:
+				profile.newsletter = form.cleaned_data["newsletter"]
 			affiliation.name = name
 			affiliation.country = country
 			affiliation.city = city

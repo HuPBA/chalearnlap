@@ -652,6 +652,15 @@ class EditHomeForm(forms.Form):
 	def clean(self):
 		return self.cleaned_data
 
+class EditHelpForm(forms.Form):
+	def __init__(self, *args, **kwargs):
+		help = kwargs.pop('help', None)
+		super(EditHelpForm, self).__init__(*args, **kwargs)
+		self.fields['text'] = forms.CharField(required=True, widget=CKEditorWidget(), initial=help.help_text)
+
+	def clean(self):
+		return self.cleaned_data
+
 class CIMLBookForm(forms.Form):
 	def __init__(self, *args, **kwargs):
 		book = kwargs.pop('book', None)
