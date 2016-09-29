@@ -365,7 +365,7 @@ img.pull-left
 
 .input-search
 {
-    max-width: 300px;
+    max-width: 150px;
     margin-left: 10px;
     margin-top: 10px;
     margin-right: 2px;
@@ -634,7 +634,7 @@ td.text-right {
 
 .cont-header
 {
-  max-width: 1200px;
+  max-width: 1500px;
 }
 
 .link-disabled

@@ -22,7 +22,7 @@
     <ol class="breadcrumb"> 
         <li> <a href="{% url "home" %}">Home</a> </li>
         {% if event %}
-            <li><a href="{% url "event_edit" id=event.id%}">{{ event.title }} (Edit mode)</a></li> 
+            <li><a href="{% url "event_edit" id=event.id %}">{{ event.title }} (Edit mode)</a></li> 
         {% endif %}            
         <li class="active">Add member</li>                 
     </ol>           

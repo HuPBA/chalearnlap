@@ -2038,6 +2038,7 @@ def result_edit(request, id=None, track_id=None, result_id=None):
 			"result_user": result_user,
 			"roweditform": roweditform,
 			"result": result,
+			"challenge": challenge,
 		}
 	else:
 		resultcreationform = ResultUserCreationForm()
@@ -3827,6 +3828,8 @@ def submission_creation(request, dataset_id=None, grid_id=None):
 def publication_creation(request, id=None):
 	# If it creates by the global publications list
 	if id==None:
+		event = None
+		dataset = None
 		choices = []
 		events = Event.objects.filter(is_public=True)
 		datasets = Dataset.objects.filter(is_public=True)
@@ -3989,6 +3992,8 @@ def event_edit(request, id=None):
 		return HttpResponseRedirect(reverse('workshop_edit_desc', kwargs={'id':id}))
 	elif Special_Issue.objects.filter(id=id).count() > 0:
 		return HttpResponseRedirect(reverse('special_issue_edit_desc', kwargs={'id':id}))
+	else:
+		return HttpResponseRedirect(reverse('home'))
 
 def check_event_permission(request, event):
 	profile_event = None

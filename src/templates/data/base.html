@@ -12,14 +12,18 @@
             <div class="col-md-2" id="leftCol">
                 <ul class="nav nav-stacked" id="sidebar">
                     <li><a href='{% url 'data_desc' id=data.id dataset_id=dataset.id %}'>Description</a></li>
-                    <li><a href='{% url 'data_software' id=data.id dataset_id=dataset.id %}'>Software</a></li>
+                    {% if data.software %}
+                        <li><a href='{% url 'data_software' id=data.id dataset_id=dataset.id %}'>Software</a></li>
+                    {% endif %}
+                    {% if data.metric %}
+                        <li><a href='{% url 'data_metric' id=data.id dataset_id=dataset.id %}'>Evaluation metrics</a></li>
+                    {% endif %}
                     <li><a href='{% url 'data_files' id=data.id dataset_id=dataset.id %}'>Files</a></li>
-                    <li><a href='{% url 'data_metric' id=data.id dataset_id=dataset.id %}'>Evaluation metrics</a></li>
                 </ul>
             </div>                   
             {% block content %}
             {% endblock content %}
-            <div class="col-sm-3"> 
+            <div class="col-sm-2"> 
                 <div class="thumbnail">
                     <h2 class="text-center top-space">News</h2>
                     <hr> 
