@@ -266,6 +266,19 @@ class Result(models.Model):
 	def __str__(self):
 		return unicode(self.user).encode('utf-8')
 
+def submission_path(instance, filename):
+	return 'submissions/%s/%s' % (instance.user.username, filename)
+
+class Submission(models.Model):
+	user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+	grid = models.ForeignKey(Result_Grid, on_delete=models.CASCADE, null=True)
+	# source_code = models.URLField(null=True)
+	# publication = models.URLField(null=True)
+	sub_file = models.FileField(upload_to=submission_path, null=True)
+
+	def __str__(self):
+		return unicode(self.user.username).encode('utf-8')
+
 def paper_path(instance, filename):
 	return 'results/%s/%s' % (instance.result.user, filename)
 
@@ -274,22 +287,10 @@ class Result_User(models.Model):
 	content = RichTextField(null=True)
 	paper = models.FileField(upload_to=paper_path, null=True)
 	result = models.ForeignKey(Result, on_delete=models.CASCADE, null=True)
+	submission = models.ForeignKey(Submission, on_delete=models.CASCADE, null=True)
 
 	def __str__(self):
 		return unicode(self.name).encode('utf-8')
-
-def submission_path(instance, filename):
-	return 'submissions/%s/%s' % (instance.user.username, filename)
-
-class Submission(models.Model):
-	user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
-	grid = models.ForeignKey(Result_Grid, on_delete=models.CASCADE, null=True)
-	source_code = models.URLField(null=True)
-	publication = models.URLField(null=True)
-	sub_file = models.FileField(upload_to=submission_path, null=True)
-
-	def __str__(self):
-		return unicode(self.user.username).encode('utf-8')
 
 class Score(models.Model):
 	name = models.CharField(null=True, max_length=100)

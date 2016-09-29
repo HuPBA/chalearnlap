@@ -1,7 +1,7 @@
 {% extends "track/base.html" %}
 {% block breadcrumb %}
     <li><a href="{% url "home" %}">Home</a></li>
-    <li>{{ challenge.title }}</li>
+    <li><a href="{% url "challenge_desc" id=challenge.id %}">{{ challenge.title }}</a></li>  
     <li>{{ track.title }}</li>  
     <li class="active">Results</li>  
 {% endblock breadcrumb %} 

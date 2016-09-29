@@ -20,8 +20,12 @@
                 <ul class="nav nav-stacked" id="sidebar">
                     <li><a href='{% url 'track_desc' id=challenge.id track_id=track.id %}'>Description</a></li>
                     <li><a href='{% url 'dataset_desc' id=track.dataset.id %}'>Dataset associated</a></li>
-                    <li><a href='{% url 'track_metrics' id=challenge.id track_id=track.id %}'>Evaluation metrics</a></li>
-                    <li><a href='{% url 'track_baseline' id=challenge.id track_id=track.id %}'>Baseline</a></li>
+                    {% if track.metrics %}
+                        <li><a href='{% url 'track_metrics' id=challenge.id track_id=track.id %}'>Evaluation metrics</a></li>
+                    {% endif %}
+                    {% if track.baseline %}
+                        <li><a href='{% url 'track_baseline' id=challenge.id track_id=track.id %}'>Baseline</a></li>
+                    {% endif %}
                     <li><a href='{% url 'track_result' id=challenge.id track_id=track.id %}'>Results</a></li>
                 </ul>
             </div>                   
