@@ -540,24 +540,42 @@ class ResultRowEditForm(forms.Form):
 	def clean(self):
 		return self.cleaned_data
 
-class ResultUserEditForm(forms.Form):
+# class ResultUserEditForm(forms.Form):
+# 	def __init__(self, *args, **kwargs):
+# 		result_user = kwargs.pop('result_user', None)
+# 		super(ResultUserEditForm, self).__init__(*args, **kwargs)
+# 		if result_user:
+# 			for r in result_user:
+# 				self.fields[r.name] = forms.URLField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}), initial=r.content)
+
+# 	def clean(self):
+# 		return self.cleaned_data
+
+class ResultUserForm(forms.Form):
 	def __init__(self, *args, **kwargs):
 		result_user = kwargs.pop('result_user', None)
-		super(ResultUserEditForm, self).__init__(*args, **kwargs)
+		super(ResultUserForm, self).__init__(*args, **kwargs)
 		if result_user:
-			for r in result_user:
-				self.fields[r.name] = forms.URLField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}), initial=r.link)
+			self.fields['name'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}), initial=result_user.name)
+			if result_user.content:
+				self.fields['content'] = forms.CharField(required=False, widget=CKEditorWidget(), initial=result_user.content)
+			else:
+				self.fields['content'] = forms.CharField(required=False, widget=CKEditorWidget())
+			if result_user.paper:
+				self.fields['paper'] = forms.FileField(required=False, initial=result_user.paper)
+			else:
+				self.fields['paper'] = forms.FileField(required=False)
+		else:
+			self.fields['name'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}))
+			self.fields['content'] = forms.CharField(required=False, widget=CKEditorWidget())
+			self.fields['paper'] = forms.FileField(required=False)
 
 	def clean(self):
-		return self.cleaned_data
-
-class ResultUserCreationForm(forms.Form):
-	def __init__(self, *args, **kwargs):
-		super(ResultUserCreationForm, self).__init__(*args, **kwargs)
-		self.fields['name'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}))
-		self.fields['link'] = forms.URLField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}))
-
-	def clean(self):
+		cleaned_data = super(ResultUserForm, self).clean()
+		content = cleaned_data.get("content")
+		paper = cleaned_data.get("paper")
+		if not content and not paper:
+			raise forms.ValidationError("Please enter text or upload a file.")
 		return self.cleaned_data
 
 class ColEditForm(forms.Form):

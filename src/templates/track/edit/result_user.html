@@ -42,157 +42,64 @@
             <form method="POST" action=""> {% csrf_token %}      
                 <div class="panel panel-default"> 
                     <div class="panel-body"> 
-                        <h3 class="thin text-center">{{ result.user }} result</h3>
+                        <h3 class="thin text-center">{{ result.user }} result fact</h3>
                         <hr> 
-                        {% if result_user %}
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="panel panel-default"> 
-                                        <div class="panel-body">
-                                            <h3 class="thin text-center">Scores</h3>
-                                            <hr>
-                                            {{ roweditform.as_p }} 
-                                            <div class="row">
-                                                <div class="col-md-12">
-                                                    <hr>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-lg-2 col-lg-offset-8"> 
-                                                    <button class="btn btn-action" name="edit" type="submit" value="edit">Save</button>
-                                                </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="panel panel-default"> 
+                                    <div class="panel-body">
+                                        <h3 class="thin text-center">Scores</h3>
+                                        <hr>
+                                        {{ roweditform.as_p }} 
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <hr>
                                             </div>
                                         </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="panel panel-default"> 
-                                        <div class="panel-body">
-                                            <h3 class="thin text-center">User information</h3>
-                                            <hr>
-                                            <div class="col-md-12">
-                                                <label>New user or team information link</label>
-                                                <div class="top-margin"> 
-                                                    <label>Name
-                                                        {% if resultcreationform.name.field.required %}
-                                                        <span class="text-danger">*</span>
-                                                        {% endif %}
-                                                    </label>   
-                                                    {% if resultcreationform.errors.name %}
-                                                        <div class="alert alert-danger" role="alert">{{ resultcreationform.errors.name }}</div>
-                                                    {% endif %}
-                                                    {{ resultcreationform.name }}                                      
-                                                </div>
-                                            </div>
-                                            <div class="col-md-12">
-                                                <div class="top-margin"> 
-                                                    <label>Link
-                                                        {% if resultcreationform.link.field.required %}
-                                                        <span class="text-danger">*</span>
-                                                        {% endif %}
-                                                    </label>   
-                                                    {% if resultcreationform.errors.link %}
-                                                        <div class="alert alert-danger" role="alert">{{ resultcreationform.errors.link }}</div>
-                                                    {% endif %}
-                                                    {{ resultcreationform.link }}                                      
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-md-12">
-                                                    <hr>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-12">
-                                                <div class="top-margin">
-                                                    <label>Edit user or team information link</label>
-                                                    <label>{{ r.name }}<span class="text-danger"></span></label>  
-                                                    {{ resulteditform.as_p }} 
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-md-12">
-                                                    <hr>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-lg-2 col-lg-offset-4"> 
-                                                    <button class="btn btn-action" name="edit" type="submit" value="edit">Save</button>
-                                                </div>
-                                                <div class="col-lg-2 col-lg-offset-2 text-right"> 
-                                                    <button class="btn btn-action" name="creation" type="submit" value="creation">Create</button>
-                                                </div>
+                                        <div class="row">
+                                            <div class="col-lg-2 col-lg-offset-8"> 
+                                                <button class="btn btn-action" name="edit" type="submit" value="edit">Save</button>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        {% else %}
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="panel panel-default"> 
-                                        <div class="panel-body">
-                                            <h3 class="thin text-center">Scores</h3>
-                                            <hr>
-                                            {{ roweditform.as_p }}
+                            <div class="col-md-6">
+                                <div class="panel panel-default"> 
+                                    <div class="panel-body">
+                                        <h3 class="thin text-center">User fact sheets</h3>
+                                        <hr>
+                                        {% if result_user.count > 0 %}
                                             <div class="row">
-                                                <div class="col-md-12">
-                                                    <hr>
-                                                </div>
+                                                {% for r in result_user %} 
+                                                    <div class="row">
+                                                        <div class="all-margin">
+                                                            <p class="text-center">{{ r.name }}&ensp;<a href="{% url "fact_sheet_edit" id=challenge.id track_id=track.id result_id=result.id sheet_id=r.id %}"><i class="fa fa-pencil" aria-hidden="true"></i></a></p>
+                                                        </div>
+                                                    </div>
+                                                {% endfor %}  
                                             </div>
+                                        {% else %}
                                             <div class="row">
-                                                <div class="col-lg-2 col-lg-offset-8"> 
-                                                    <button class="btn btn-action" name="edit" type="submit" value="edit">Save</button>
+                                                <div class="col-sm-12">
+                                                    <p class="text-center"> There are no fact sheets.</p>
                                                 </div>
+                                            </div> 
+                                        {% endif %}
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <hr>
                                             </div>
                                         </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="panel panel-default"> 
-                                        <div class="panel-body">
-                                            <h3 class="thin text-center">User information</h3>
-                                            <hr>
-                                            <div class="col-md-12">
-                                                <div class="top-margin"> 
-                                                    <label>Name
-                                                        {% if resultcreationform.name.field.required %}
-                                                        <span class="text-danger">*</span>
-                                                        {% endif %}
-                                                    </label>   
-                                                    {% if resultcreationform.errors.name %}
-                                                        <div class="alert alert-danger" role="alert">{{ resultcreationform.errors.name }}</div>
-                                                    {% endif %}
-                                                    {{ resultcreationform.name }}                                      
-                                                </div>
-                                            </div>
-                                            <div class="col-md-12">
-                                                <div class="top-margin"> 
-                                                    <label>Link
-                                                        {% if resultcreationform.link.field.required %}
-                                                        <span class="text-danger">*</span>
-                                                        {% endif %}
-                                                    </label>   
-                                                    {% if resultcreationform.errors.link %}
-                                                        <div class="alert alert-danger" role="alert">{{ resultcreationform.errors.link }}</div>
-                                                    {% endif %}
-                                                    {{ resultcreationform.link }}                                      
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-md-12">
-                                                    <hr>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-lg-2 col-lg-offset-8 text-right"> 
-                                                    <button class="btn btn-action" name="creation" type="submit" value="creation">Create</button>
-                                                </div>
+                                        <div class="row">
+                                            <div class="col-lg-4 col-lg-offset-6"> 
+                                                <a class="btn btn-action" href="{% url "fact_sheet_creation" id=challenge.id track_id=track.id result_id=result.id %}">Create new fact sheet</a>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        {% endif %}
+                        </div>
                     </div>                                   
                 </div> 
             </form>

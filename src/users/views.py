@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect, render_to_response
 from django.http import HttpResponse
-from .forms import EditHelpForm, CIMLBookForm, EditHomeForm, ResultRowEditForm, ResultRowForm, HeaderEditForm, ResultNewTableForm, GalleryImageEditForm, ResultUserEditForm, ResultUserCreationForm, ProgramEditForm, ProgramCreationForm, PublicationEditForm, PublicationEventCreationForm, PublicationCreationForm, SubmissionEditForm, ColEditForm, EditChallengeResult, ProfileForm, AffiliationForm, SelectRoleForm, UserEditForm, UserRegisterForm, EditProfileForm, EditExtraForm, DatasetCreationForm, DataCreationForm, EventCreationForm, EditEventForm, RoleCreationForm, NewsCreationForm, FileCreationForm, NewsEditForm, SelectDatasetForm, MemberCreationForm, MemberSelectForm, PartnerCreationForm, PartnerSelectForm, ScheduleCreationForm, ScheduleEditForm, DatasetEditForm, DataEditForm, TrackCreationForm, GalleryImageForm, TrackEditForm, RelationCreationForm, RelationEditForm, SubmissionCreationForm, SubmissionScoresForm
+from .forms import ResultUserForm, EditHelpForm, CIMLBookForm, EditHomeForm, ResultRowEditForm, ResultRowForm, HeaderEditForm, ResultNewTableForm, GalleryImageEditForm, ProgramEditForm, ProgramCreationForm, PublicationEditForm, PublicationEventCreationForm, PublicationCreationForm, SubmissionEditForm, ColEditForm, EditChallengeResult, ProfileForm, AffiliationForm, SelectRoleForm, UserEditForm, UserRegisterForm, EditProfileForm, EditExtraForm, DatasetCreationForm, DataCreationForm, EventCreationForm, EditEventForm, RoleCreationForm, NewsCreationForm, FileCreationForm, NewsEditForm, SelectDatasetForm, MemberCreationForm, MemberSelectForm, PartnerCreationForm, PartnerSelectForm, ScheduleCreationForm, ScheduleEditForm, DatasetEditForm, DataEditForm, TrackCreationForm, GalleryImageForm, TrackEditForm, RelationCreationForm, RelationEditForm, SubmissionCreationForm, SubmissionScoresForm
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_protect
 from django.contrib import messages
@@ -2009,61 +2009,56 @@ def result_edit(request, id=None, track_id=None, result_id=None):
 	result = Result.objects.filter(id=result_id).first()
 	result_user = Result_User.objects.filter(result=result)
 	scores = Score.objects.filter(result=result)
-	if result_user:
-		resulteditform = ResultUserEditForm(result_user=result_user)
-		resultcreationform = ResultUserCreationForm()
-		roweditform = ResultRowEditForm(scores=scores)
-		if request.method == 'POST':
-			if 'creation' in request.POST:
-				resultcreationform = ResultUserCreationForm(request.POST)
-				if resultcreationform.is_valid():
-					name = resultcreationform.cleaned_data['name']
-					link = resultcreationform.cleaned_data['link']
-					Result_User.objects.create(name=name, link=link, result=result)
-					return HttpResponseRedirect(reverse('track_edit_result', kwargs={'id':id, 'track_id':track_id}))
-			elif 'edit' in request.POST:
-				resulteditform = ResultUserEditForm(request.POST, result_user=result_user)
-				roweditform = ResultRowEditForm(request.POST, scores=scores)
-				if resulteditform.is_valid() and roweditform.is_valid():
-					for s in scores:
-						s.score = roweditform.cleaned_data[s.name]
-						s.save()
-					for r in result_user:
-						r.link = resulteditform.cleaned_data[r.name]
-						r.save()
-					return HttpResponseRedirect(reverse('track_edit_result', kwargs={'id':id, 'track_id':track_id}))
-		context = {
-			"resulteditform": resulteditform,
-			"resultcreationform": resultcreationform,
-			"result_user": result_user,
-			"roweditform": roweditform,
-			"result": result,
-			"challenge": challenge,
-		}
-	else:
-		resultcreationform = ResultUserCreationForm()
-		roweditform = ResultRowEditForm(scores=scores)
-		if request.method == 'POST':
-			if 'creation' in request.POST:
-				resultcreationform = ResultUserCreationForm(request.POST)
-				if resultcreationform.is_valid():
-					name = resultcreationform.cleaned_data['name']
-					link = resultcreationform.cleaned_data['link']
-					Result_User.objects.create(name=name, link=link, result=result)
-					return HttpResponseRedirect(reverse('track_edit_result', kwargs={'id':id, 'track_id':track_id}))
-			elif 'edit' in request.POST:
-				roweditform = ResultRowEditForm(request.POST, scores=scores)
-				if roweditform.is_valid():
-					for s in scores:
-						s.score = roweditform.cleaned_data[s.name]
-						s.save()
-					return HttpResponseRedirect(reverse('track_edit_result', kwargs={'id':id, 'track_id':track_id}))
-		context = {
-			"resultcreationform": resultcreationform,
-			"roweditform": roweditform,
-			"result": result,
-		}
+	roweditform = ResultRowEditForm(scores=scores)
+	if request.method == 'POST':
+		roweditform = ResultRowEditForm(request.POST, scores=scores)
+		if roweditform.is_valid():
+			for s in scores:
+				s.score = roweditform.cleaned_data[s.name]
+				s.save()
+			return HttpResponseRedirect(reverse('track_edit_result', kwargs={'id':id, 'track_id':track_id}))
+	context = {
+		"result_user": result_user,
+		"track": track,
+		"roweditform": roweditform,
+		"result": result,
+		"challenge": challenge,
+	}
 	return render(request, "track/edit/result_user.html", context, context_instance=RequestContext(request))
+
+@login_required(login_url='auth_login')
+def fact_sheet_creation(request, id=None, track_id=None, result_id=None, sheet_id=None):
+	challenge = Challenge.objects.filter(id=id).first()
+	track = Track.objects.filter(id=track_id).first()
+	result = Result.objects.filter(id=result_id).first()
+	if sheet_id==None:
+		factsheetform = ResultUserForm()
+		if request.method == 'POST':
+			factsheetform = ResultUserForm(request.POST, request.FILES)
+			if factsheetform.is_valid():
+				name = factsheetform.cleaned_data['name']
+				content = factsheetform.cleaned_data['content']
+				paper = factsheetform.cleaned_data['paper']
+				Result_User.objects.create(name=name, content=content, paper=paper, result=result)
+				return HttpResponseRedirect(reverse('track_edit_result', kwargs={'id':id, 'track_id':track_id}))
+	else:
+		result_user = Result_User.objects.filter(id=sheet_id).first()
+		factsheetform = ResultUserForm(result_user=result_user)
+		if request.method == 'POST':
+			factsheetform = ResultUserForm(request.POST, request.FILES, result_user=result_user)
+			if factsheetform.is_valid():
+				result_user.name = factsheetform.cleaned_data['name']
+				result_user.content = factsheetform.cleaned_data['content']
+				result_user.paper = factsheetform.cleaned_data['paper']
+				result_user.save()
+				return HttpResponseRedirect(reverse('track_edit_result', kwargs={'id':id, 'track_id':track_id}))
+	context = {
+		"resultcreationform": factsheetform,
+		"challenge": challenge,
+		"result": result,
+		"track": track,
+	}
+	return render(request, "track/edit/result_user_creation.html", context, context_instance=RequestContext(request))
 
 @login_required(login_url='auth_login')
 def result_remove(request, id=None, track_id=None, result_id=None):
@@ -2397,6 +2392,19 @@ def track_result(request, id=None, track_id=None):
 		"headers": headers,	
 	}
 	return render(request, "track/result.html", context, context_instance=RequestContext(request))
+
+def result_fact_sheet(request, id=None, track_id=None, f_sheet_id=None):
+	challenge = Challenge.objects.filter(id=id).first()
+	news = News.objects.filter(event_id=id).order_by('-upload_date')
+	track = Track.objects.filter(id=track_id).first()
+	result_user = Result_User.objects.filter(id=f_sheet_id).first()
+	context = {
+		"challenge": challenge,
+		"track": track,
+		"news": news,
+		"result_user": result_user,
+	}
+	return render(request, "track/fact_sheet.html", context, context_instance=RequestContext(request))
 
 @login_required(login_url='auth_login')
 def track_creation(request, id=None):

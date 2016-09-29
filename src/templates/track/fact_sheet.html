@@ -1,0 +1,19 @@
+{% extends "track/base.html" %}
+{% block breadcrumb %}
+    <li><a href="{% url "home" %}">Home</a></li>
+    <li>{{ challenge.title }}</li>
+    <li>{{ track.title }}</li>  
+    <li class="active">Fact sheet</li>  
+{% endblock breadcrumb %} 
+{% block content %}
+    <div class="col-md-8"> 
+        <div class="panel panel-default"> 
+            <div class="panel-body"> 
+                <h3 class="thin text-center">Fact sheet</h3> 
+                <hr> 
+                <h3><b>{{ result_user.name}}</b></h3>
+                {{ result_user.content | safe }}
+            </div>                             
+        </div>                         
+    </div>
+{% endblock content %}  

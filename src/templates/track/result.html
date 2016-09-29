@@ -37,7 +37,11 @@
                                                     <a class="btn dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{ r.user }} <span class="caret"></span></a>
                                                     <ul id="contextMenu" class="dropdown-menu" role="menu">
                                                         {% for e in extra %}
-                                                            <li><a href="{{ e.link }}">{{ e.name }}</a></li>
+                                                            {% if e.paper %}
+                                                                <li><a href="{{ MEDIA_URL }}{{ e.paper }}">{{ e.name }}</a></li>
+                                                            {% else %}
+                                                                <li><a href="{% url "result_fact_sheet" id=challenge.id track_id=track.id f_sheet_id=e.id %}">{{ e.name }}</a></li>
+                                                            {% endif %}
                                                         {% endfor %}
                                                     </ul>
                                                 </div>

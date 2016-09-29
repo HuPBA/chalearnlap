@@ -266,9 +266,13 @@ class Result(models.Model):
 	def __str__(self):
 		return unicode(self.user).encode('utf-8')
 
+def paper_path(instance, filename):
+	return 'results/%s/%s' % (instance.result.user, filename)
+
 class Result_User(models.Model):
 	name = models.CharField(null=True, max_length=100)
-	link = models.URLField(null=True)
+	content = RichTextField(null=True)
+	paper = models.FileField(upload_to=paper_path, null=True)
 	result = models.ForeignKey(Result, on_delete=models.CASCADE, null=True)
 
 	def __str__(self):
