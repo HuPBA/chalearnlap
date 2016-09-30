@@ -10,22 +10,26 @@
         {% endfor %} 
     {% endif %}
     <ol class="breadcrumb"> 
-        <li> <a href="{% url "home" %}">Home</a> </li>
-        <li class="active"> File creation </li>                 
-    </ol>            
+        <li><a href="{% url "home" %}">Home</a></li>
+        <li><a href="{% url "dataset_list" %}">Dataset list</a></li>
+        <li><a href="{% url "dataset_edit" id=dataset.id %}">{{ dataset.title }}</a></li>                 
+        <li><a href="{% url "data_edit" id=data.id dataset_id=dataset.id %}">{{ data.title }}</a></li>
+        <li class="active">File creation</li>               
+    </ol>           
     <div class="row"> 
         <article class="col-xs-12 maincontent"> 
             <header class="page-header"> 
                 <h1 class="page-title">File creation</h1> 
             </header>    
-            <form method="POST" action="" enctype="multipart/form-data"> {% csrf_token %}            
-                <div class="row">
-                    <div class="col-md-6 col-md-offset-3"> 
-                        <div class="panel panel-default"> 
-                            <div class="panel-body">
-                                <h3 class="thin text-center">File</h3> 
-                                <hr>
-    						    <div class="top-margin"> 
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3"> 
+                    <div class="panel panel-default"> 
+                        <div class="panel-body">
+                            <h3 class="thin text-center">File</h3> 
+                            <span>You can create a data file with an URL or a file located on your PC</span>
+                            <hr>                            
+                            <form method="POST" action="" enctype="multipart/form-data"> {% csrf_token %}
+                                <div class="top-margin"> 
                                     <label>Name 
                                         {% if fileform.name.field.required %}
                                         <span class="text-danger">*</span>
@@ -37,7 +41,19 @@
                                     {{ fileform.name }} 
                                 </div>
                                 <div class="top-margin"> 
-                                    <label>File or URL
+                                    <label>URL
+                                        {% if fileform.url.field.required %}
+                                        <span class="text-danger">*</span>
+                                        {% endif %}
+                                    </label>  
+                                    {% if fileform.errors.url %}
+                                        <div class="alert alert-danger" role="alert">{{ fileform.errors.url }}</div>
+                                    {% endif %}
+                                    <br>
+                                    {{ fileform.url }}
+                                </div>
+                                <div class="top-margin"> 
+                                    <label>File
                                         {% if fileform.file.field.required %}
                                         <span class="text-danger">*</span>
                                         {% endif %}
@@ -45,21 +61,20 @@
                                     {% if fileform.errors.file %}
                                         <div class="alert alert-danger" role="alert">{{ fileform.errors.file }}</div>
                                     {% endif %}
-                                    {{ fileform.file }} 
                                     <br>
-                                    {{ fileform.url }}
+                                    {{ fileform.file }}
                                 </div>
-                                <hr> 
+                                <hr>
                                 <div class="row">
-                                    <div class="col-lg-4 col-lg-offset-8 text-right"> 
-                                        <button class="btn btn-action" type="submit" name="signup-button">Save</button>
+                                    <div class="col-lg-3 col-lg-offset-8 text-right"> 
+                                        <button class="btn btn-action" name="save" type="submit">Save</button>
                                     </div>
-                                </div>  
-                            </div>                                   
-                        </div>                             
-                    </div>                         
-                </div>
-            </form>                                 
+                                </div>
+                            </form>
+                        </div>                                   
+                    </div>                             
+                </div>                         
+            </div>
         </article>
     </div>
 {% endblock container %}  

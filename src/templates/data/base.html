@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block container %}
+    <ol class="breadcrumb"> 
+        {% block breadcrumb %} 
+        {% endblock breadcrumb %}                
+    </ol>            
+    <div class="row"> 
+        <article class="col-xs-12 maincontent"> 
+            <header class="page-header"> 
+                <h1 class="page-title">{{ dataset.title }} - {{ data.title }}</h1> 
+            </header>   
+            <div class="col-md-2" id="leftCol">
+                <ul class="nav nav-stacked" id="sidebar">
+                    <li><a href='{% url 'data_desc' id=data.id dataset_id=dataset.id %}'>Description</a></li>
+                    {% if data.software %}
+                        <li><a href='{% url 'data_software' id=data.id dataset_id=dataset.id %}'>Software</a></li>
+                    {% endif %}
+                    {% if data.metric %}
+                        <li><a href='{% url 'data_metric' id=data.id dataset_id=dataset.id %}'>Evaluation metrics</a></li>
+                    {% endif %}
+                    <li><a href='{% url 'data_files' id=data.id dataset_id=dataset.id %}'>Files</a></li>
+                </ul>
+            </div>                   
+            {% block content %}
+            {% endblock content %}
+            <div class="col-sm-2"> 
+                <div class="thumbnail">
+                    <h2 class="text-center top-space">News</h2>
+                    <hr> 
+                    <div class="caption">
+                        {% if news.count > 0 %}
+                            {% for n in news %}
+                                <h3>{{ n.title }}</h3> 
+                                <p>{{ n.description|safe }}</p>
+                            {% endfor %}
+                        {% else %}
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <p class="text-center"> There are no news registered in {{ dataset.title }}</p>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div> 
+            </div> 
+        </article>
+    </div>
+{% endblock container %}  

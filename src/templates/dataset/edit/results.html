@@ -1,0 +1,66 @@
+{% extends "dataset/edit/base.html" %}
+{% block breadcrumb %}
+	<li><a href="{% url "home" %}">Home</a></li>
+    <li>{{ dataset.title }} (Edit mode)</li>  
+    <li class="active">Description</li>  
+{% endblock breadcrumb %} 
+{% block content %}
+<form method="POST" action=""> {% csrf_token %}  
+    <div class="col-md-10"> 
+        <div class="panel panel-default"> 
+            <div class="panel-body"> 
+                <div class="row">
+                    <div class="col-sm-12"> 
+                        <h3 class="thin text-center">Users submissions</h3> 
+                        <hr> 
+                        <div class="row">
+                            <div class="col-sm-4 col-sm-offset-4"> 
+                                <div class="all-margin">
+                                    <div class="dropdown">
+                                        <button class="btn btn-action dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Export participants
+                                            <span class="caret"></span>
+                                        </button>
+                                        <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                            <li><a href="{% url 'export_participants_csv' dataset_id=dataset.id grid_id=grid.id %}">CSV format</a></li>
+                                            <li><a href="{% url 'export_participants_xls' dataset_id=dataset.id grid_id=grid.id %}">Excel Binary File format (XLS)</a></li>
+                                            <li><a href="{% url 'export_participants_xlsx' dataset_id=dataset.id grid_id=grid.id %}">Office Open XML format (XLSX)</a></li>
+                                        </ul>
+                                    </div>
+                                </div> 
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>User</th>
+                                        {% if scores %}
+                                            {% for n in headers %}
+                                                <th>{{ n.name }}</th>
+                                            {% endfor %}
+                                        {% else %}
+                                            {% for n in headers %}
+                                                <th>{{ n.name }}</th>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for sub,scores in submission_scores %}
+                                        <tr>
+                                            <td>{{ sub.user.username }}<br>&ensp;<a href="{% url "dataset_edit_submission" id=dataset.id submission_id=sub.id %}"><i class="fa fa-pencil" aria-hidden="true"></i></a>&ensp;<a id="{{ sub.id }}" class="delete-event" value="{% url 'dataset_remove_submission' id=dataset.id submission_id=sub.id %}" href=""><i class="fa fa-minus-circle fa" aria-hidden="true"></i></a></td>
+                                            {% for s in scores %}
+                                                <td>{{ s.score }}</td>
+                                            {% endfor %}
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>  
+            </div>
+        </div>  
+    </div>   
+</form>                      
+{% endblock content %}  

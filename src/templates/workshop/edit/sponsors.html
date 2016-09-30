@@ -1,0 +1,55 @@
+{% extends "workshop/edit/base.html" %}
+{% block breadcrumb %}
+    {% if eventform.non_field_errors  %}
+        {% for e in eventform.non_field_errors %} 
+            <div class="row"> 
+                <div class="col-md-6 widget col-md-offset-3"> 
+                    <div class="alert alert-danger" role="alert">{{ e }}</div>
+                </div>
+            </div>
+        {% endfor %} 
+    {% endif %}
+	<li><a href="{% url "home" %}">Home</a></li>
+    <li>{{ workshop.title }} (Edit mode)</li>  
+    <li class="active">Sponsors</li>  
+{% endblock breadcrumb %} 
+{% block content %}
+    <div class="col-md-10"> 
+        <form method="POST" action="" enctype="multipart/form-data"> {% csrf_token %}              
+            <div class="panel panel-default"> 
+                <div class="panel-body"> 
+                    <div class="row">
+                        <div class="col-sm-12"> 
+                            <h3 class="thin text-center">Sponsors&ensp;<a href="{% url "partner_select" id=workshop.id %}"><i class="fa fa-plus-circle" aria-hidden="true"></i></a></h3>
+                            <hr>
+                            {% if sponsors.count > 0 %}
+                                <div class="row">
+                                    {% for s in sponsors %}
+                                        <div class="col-sm-4 sponsor-cell">
+                                            <p class="thin text-center"><a id="{{ s.id }}" class="delete-event" value="{% url 'workshop_partner_remove' id=workshop.id sponsor_id=s.id %}" href=""><i class="fa fa-minus-circle fa" aria-hidden="true"></i></a></p>
+                                            <a href="{{ s.partner.url }}"><img id="partner-logo" class="img-responsive img-center" src="{{ s.partner.banner.url }}"></a>
+                                        </div> 
+                                        <!-- <div class="col-sm-6 sponsor-cell">
+                                        {% if s.partner.banner %}
+                                            <h3 class="thin text-center">{{ s.partner.name }} &ensp;<a id="{{ s.id }}" class="delete-event" value="{% url 'workshop_partner_remove' id=workshop.id sponsor_id=s.id %}" href=""><i class="fa fa-minus-circle fa" aria-hidden="true"></i></a></h3>
+                                            <a href="{{ s.partner.url }}"><img id="partner-logo" class="img-responsive img-center" src="{{ s.partner.banner.url }}"></a>
+                                        {% else %}
+                                            <h3>{{ s.partner.name }}</h3>
+                                        {% endif %}
+                                        </div> -->
+                                    {% endfor %}  
+                                </div>
+                            {% else %}
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <p class="text-center"> There are no sponsors registered in {{ workshop.title }}</p>
+                                    </div>
+                                </div> 
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>  
+        </form>                           
+    </div>                         
+{% endblock content %}  

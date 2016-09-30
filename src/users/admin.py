@@ -1,8 +1,10 @@
 from django.contrib import admin
-from .models import Profile, Affiliation, Event, File, Partner, Event_Partner, Profile_Event, Schedule_Event, News, Workshop, Challenge, Special_Issue, Result, Data, Dataset, Chalearn, Publication, Contact
+from .models import Help, Chalearn, Result_User, Publication, Proposal, Role, Profile_Dataset, Submission, Result, Score, Event_Relation, Profile, Track, Gallery_Image, Affiliation, Event, File, Partner, Event_Partner, Profile_Event, Schedule_Event, News, Workshop, Challenge, Special_Issue, Result, Data, Dataset, Contact
 # Register your models here.
 
+
 admin.site.register(Profile)
+admin.site.register(Proposal)
 admin.site.register(Affiliation)
 admin.site.register(Event)
 admin.site.register(Schedule_Event)
@@ -15,8 +17,17 @@ admin.site.register(Event_Partner)
 admin.site.register(Result)
 admin.site.register(Data)
 admin.site.register(Dataset)
-admin.site.register(Chalearn)
-admin.site.register(Publication)
 admin.site.register(Contact)
 admin.site.register(Partner)
 admin.site.register(File)
+admin.site.register(Role)
+admin.site.register(Track)
+admin.site.register(Gallery_Image)
+admin.site.register(Event_Relation)
+admin.site.register(Score)
+admin.site.register(Submission)
+admin.site.register(Profile_Dataset)
+admin.site.register(Publication)
+admin.site.register(Result_User)
+admin.site.register(Chalearn)
+admin.site.register(Help)

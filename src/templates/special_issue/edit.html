@@ -12,63 +12,158 @@
     {% endif %}
     <ol class="breadcrumb"> 
         <li> <a href="{% url "home" %}">Home</a> </li>
-        <li> <a href="{% url "event_list" %}">Events list</a> </li>                 
+        {% if not profile %}
+            <li> <a href="{% url "event_list" %}">Events list</a> </li>     
+        {% endif %}            
         <li class="active"> Special Issue edit </li>                 
     </ol>            
     <div class="row"> 
         <article class="col-xs-12 maincontent"> 
             <header class="page-header"> 
                 <h1 class="page-title">Special Issue edit</h1> 
-            </header>                     
-            <div class="col-md-10 col-md-offset-1"> 
-                <div class="panel panel-default col-md-offset-1"> 
+            </header> 
+            <form method="POST" action=""> {% csrf_token %}                    
+                <div class="panel panel-default"> 
                     <div class="panel-body"> 
                         <h3 class="thin text-center">Special Issue</h3> 
                         <hr> 
-                        <form method="POST" action=""> 
-                        	{% csrf_token %}
-                            <div class="top-margin"> 
-                                <label>Title 
-                                    {% if eventform.title.field.required %}
-                                    <span class="text-danger">*</span>
+                        <div class="row">
+                            <div class="col-md-8"> 
+                                <div class="top-margin"> 
+                                    <label>Title 
+                                        {% if eventform.title.field.required %}
+                                        <span class="text-danger">*</span>
+                                        {% endif %}
+                                    </label>  
+                                    {% if eventform.errors.title %}
+                                        <div class="alert alert-danger" role="alert">{{ eventform.errors.title }}</div>
                                     {% endif %}
-                                </label>  
-                                {% if eventform.errors.title %}
-                                    <div class="alert alert-danger" role="alert">{{ eventform.errors.title }}</div>
-                                {% endif %}
-                                {{ eventform.title }} 
-                            </div>                                     
-                            <div class="top-margin"> 
-                                <label>Description 
-                                    {% if eventform.description.field.required %}
-                                    <span class="text-danger">*</span>
+                                    {{ eventform.title }} 
+                                </div>                                     
+                                <div class="top-margin"> 
+                                    <label>Description 
+                                        {% if eventform.description.field.required %}
+                                        <span class="text-danger">*</span>
+                                        {% endif %}
+                                    </label>   
+                                    {% if eventform.errors.description %}
+                                        <div class="alert alert-danger" role="alert">{{ eventform.errors.description }}</div>
                                     {% endif %}
-                                </label>   
-                                {% if eventform.errors.description %}
-                                    <div class="alert alert-danger" role="alert">{{ eventform.errors.description }}</div>
-                                {% endif %}
                                 </div>
                                 <div class="top-margin"> 
-                                {{ eventform.description }} 
-                            </div>  
-                            <hr>
-                            <h3 class="thin text-center">Members <a href="{% url "profile_select" id=issue.id %}"><img class="plus-icon" src="{% static "images/plus-icon.jpg" %}" alt="Add Member"></a></h3>
-                            {% if members.count > 0 %}
-                                <hr>
-                                <div class="row">
-                                    {% for m in members %} 
-                                        <div class="col-sm-6">
-                                            <a href='{% url 'profile_edit' id=m.profile.id %}'>{{ m.profile.first_name }} {{ m.profile.last_name }}</a></p>
-                                        </div>
-                                    {% endfor %}  
+                                    {{ eventform.description }} 
+                                </div>  
+                                <div class="top-margin">
+                                    <div class="dropdown">
+                                        <button class="btn btn-action dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Export special issue members
+                                            <span class="caret"></span>
+                                        </button>
+                                        <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                            <li><a href="{% url 'export_members_csv' event_id=issue.id %}">CSV format</a></li>
+                                            <li><a href="{% url 'export_members_xls' event_id=issue.id %}">Excel Binary File format (XLS)</a></li>
+                                            <li><a href="{% url 'export_members_xlsx' event_id=issue.id %}">Office Open XML format (XLSX)</a></li>
+                                        </ul>
+                                    </div>
                                 </div>
-                            {% endif %}
-                            <hr>
-                            <div class="row">
-                                <div class="col-lg-4 col-lg-offset-8 text-right"> 
-                                    <button class="btn btn-action" type="submit" name="signup-button">Save</button>
+                            </div>
+                            <div class="col-md-4"> 
+                                <div class="panel panel-default col-md-offset-1"> 
+                                    <div class="panel-body"> 
+                                        <h3 class="thin text-center">Schedule&ensp;<a href="{% url "schedule_creation" event_id=issue.id %}"><i class="fa fa-plus-circle" aria-hidden="true"></i></a></h3>
+                                        <hr> 
+                                        {% if schedule.count > 0 %}
+                                            <div class="row">
+                                                {% for e in schedule %} 
+                                                    <div class="col-sm-12">
+                                                        <p class="text-center"><a href="{% url 'schedule_edit' event_id=issue.id schedule_id=e.id %}">{{ e.date|date:"SHORT_DATETIME_FORMAT" }} {{ e.title }}</a>&ensp;<a id="{{ e.id }}" class="delete-event" value="{% url "event_schedule_remove" id=issue.id program_id=e.id %}" href=""><i class="fa fa-minus-circle fa" aria-hidden="true"></i></a></p>
+                                                    </div>
+                                                {% endfor %}  
+                                            </div>
+                                        {% else %}
+                                            <div class="row">
+                                                <div class="col-sm-12">
+                                                    <p class="text-center"> There are no schedule registered in {{ issue.title }}</p>
+                                                </div>
+                                            </div> 
+                                        {% endif %} 
+                                        <h3 class="thin text-center">Associated events&ensp;<a href="{% url "event_relation_creation" id=issue.id %}"><i class="fa fa-plus-circle" aria-hidden="true"></i></a></h3>
+                                        <hr> 
+                                        {% if relations.count > 0 %}
+                                            <div class="row">
+                                                {% for r in relations %} 
+                                                    <div class="col-sm-12">
+                                                        {% if r.challenge_relation %} 
+                                                            <p class="text-center">{{ r.challenge_relation.title }}&ensp;<a id="{{ r.id }}" class="delete-event" value="{% url 'event_relation_remove' id=issue.id relation_id=r.id %}" href=""><i class="fa fa-minus-circle fa" aria-hidden="true"></i></a></p>
+                                                        {% elif r.issue_relation %} 
+                                                            <p class="text-center">{{ r.issue_relation.title }}&ensp;<a id="{{ r.id }}" class="delete-event" value="{% url 'event_relation_remove' id=issue.id relation_id=r.id %}" href=""><i class="fa fa-minus-circle fa" aria-hidden="true"></i></a></p>
+                                                        {% elif r.workshop_relation %}
+                                                            <p class="text-center">{{ r.workshop_relation.title }}&ensp;<a id="{{ r.id }}" class="delete-event" value="{% url 'event_relation_remove' id=issue.id relation_id=r.id %}" href=""><i class="fa fa-minus-circle fa" aria-hidden="true"></i></a></p>
+                                                        {% elif r.dataset_relation %}
+                                                            <p class="text-center">{{ r.dataset_relation.title }}&ensp;<a id="{{ r.id }}" class="delete-event" value="{% url 'event_relation_remove' id=issue.id relation_id=r.id %}" href=""><i class="fa fa-minus-circle fa" aria-hidden="true"></i></a></p>
+                                                        {% endif %}
+                                                    </div>
+                                                {% endfor %}  
+                                            </div>
+                                        {% else %}
+                                            <div class="row">
+                                                <div class="col-sm-12">
+                                                    <p class="text-center"> There are no associated events in {{ event.title }}</p>
+                                                </div>
+                                            </div> 
+                                        {% endif %} 
+                                        <h3 class="thin text-center">News &ensp;<a href="{% url "news_creation" id=issue.id %}"><i class="fa fa-plus-circle" aria-hidden="true"></i></a></h3>
+                                        <hr>
+                                        {% if news.count > 0 %}
+                                            <div class="row">
+                                                {% for n in news %} 
+                                                    <div class="col-sm-12">
+                                                        <div class="top-margin"> 
+                                                            <p class="text-center"><a href='{{ n.get_absolute_url }}'>{{ n.title }}</a>&ensp;<a id="{{ n.id }}" class="delete-event" value="{% url 'event_news_remove' id=issue.id news_id=n.id %}" href=""><i class="fa fa-minus-circle fa" aria-hidden="true"></i></a></p>
+                                                        </div>
+                                                    </div>
+                                                {% endfor %}  
+                                            </div>
+                                        {% else %}
+                                            <div class="row">
+                                                <div class="col-sm-12">
+                                                    <p class="text-center"> There are no news registered in {{ issue.title }}</p>
+                                                </div>
+                                            </div>                                        
+                                        {% endif %}
+                                        <h3 class="thin text-center">Members &ensp;<a href="{% url "profile_select" id=issue.id %}"><i class="fa fa-plus-circle" aria-hidden="true"></i></a></h3>
+                                        <hr>
+                                        {% if members.count > 0 %}
+                                            <div class="row">
+                                                {% for m in members %} 
+                                                    <div class="col-sm-12">
+                                                        <p class="text-center"><a href='{% url 'user_edit' id=m.profile.user.id %}'>{{ m.profile.first_name }} {{ m.profile.last_name }}  ({{ m.role.name }})</a>&ensp;<a id="{{ m.id }}" class="delete-event" value="{% url 'event_member_remove' id=issue.id member_id=m.id %}" href=""><i class="fa fa-minus-circle fa" aria-hidden="true"></i></a></p>
+                                                    </div>
+                                                {% endfor %}  
+                                            </div>
+                                        {% else %}
+                                            <div class="row">
+                                                <div class="col-sm-12">
+                                                    <p class="text-center"> There are no members registered in {{ issue.title }}</p>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                    </div>
                                 </div>
-                            </div>                                     
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-lg-2 col-lg-offset-8 text-right">
+                                {% if issue.is_public %}
+                                    <a class="btn btn-action" href="{% url "special_issue_unpublish" id=issue.id %}">Unpublish</a>
+                                {% else %}
+                                    <a class="btn btn-action" href="{% url "special_issue_publish" id=issue.id %}">Publish</a>
+                                {% endif %}
+                            </div>
+                            <div class="col-lg-2 text-right"> 
+                                <button class="btn btn-action" type="submit" name="signup-button">Save</button>
+                            </div>
+                        </div>                                     
                         </form>                                 
                     </div>                             
                 </div>                         

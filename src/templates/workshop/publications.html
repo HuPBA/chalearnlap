@@ -1,0 +1,36 @@
+{% extends "workshop/base.html" %}
+{% block breadcrumb %}
+    <li><a href="{% url "home" %}">Home</a></li>
+    <li>{{ workshop.title }}</li>  
+    <li class="active">Publications</li>  
+{% endblock breadcrumb %} 
+{% block content %}
+    <div class="col-md-7"> 
+        <div class="panel panel-default"> 
+            <div class="panel-body"> 
+                <h3 class="thin text-center">Publications</h3> 
+                <hr>
+                {% if publications.count > 0 %}
+                    <div class="row">
+                        {% for p in publications %}
+                            <div class="col-sm-12">
+                                <div class="top-margin"> 
+                                    {% if p.publication.title %}
+                                        <p><b>{{ p.publication.title }}</b></p>
+                                    {% endif %}
+                                    <p>{{ p.publication.content|safe }}</p>
+                                </div>
+                            </div>
+                        {% endfor %}  
+                    </div>
+                {% else %}
+                    <div class="row">
+                        <div class="col-sm-12"> 
+                            <p class="text-center"> There are no publications registered in this workshop</p>
+                        </div>  
+                    </div>
+                {% endif %} 
+            </div>                             
+        </div>                         
+    </div>
+{% endblock content %}  

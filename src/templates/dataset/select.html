@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 {% load staticfiles %}
 {% block container %}
-    {% if form.non_field_errors  %}
-        {% for e in form.non_field_errors %} 
+    {% if selectform.non_field_errors  %}
+        {% for e in selectform.non_field_errors %} 
             <div class="row"> 
                 <div class="col-md-6 widget col-md-offset-3"> 
                     <div class="alert alert-danger" role="alert">{{ e }}</div>
@@ -12,43 +12,43 @@
     {% endif %}
     <ol class="breadcrumb"> 
         <li> <a href="{% url "home" %}">Home</a> </li>
-        <li> <a href="{% url "event_list" %}">Events list</a> </li>                 
-        <li class="active"> Select datasets </li>                 
-    </ol>            
+        {% if dataset %}
+            <li><a href="{% url "dataset_edit_members" id=dataset.id%}">{{ dataset.title }} (Edit mode)</a></li>
+        {% endif %}                 
+        <li class="active"> Select admins </li>                 
+    </ol>           
     <div class="row"> 
         <article class="col-xs-12 maincontent"> 
             <header class="page-header"> 
-                <h1 class="page-title">Select datasets</h1> 
+                <h1 class="page-title">Select dataset admins</h1> 
             </header>                     
-            <div class="col-md-6"> 
+            <div class="col-md-6 col-md-offset-3"> 
                 <div class="panel panel-default"> 
                     <div class="panel-body"> 
-                        <h3 class="thin text-center">Datasets</h3> 
+                        <h3 class="thin text-center">Select admins</h3> 
                         <hr> 
-                        <form method="POST" action=""> 
-                        	{% csrf_token %}
-                            {% if select %}
-                                <div class="top-margin"> 
-                                    {% if form.errors.select_dataset %}
-                                        <div class="alert alert-danger" role="alert">{{ form.errors.select_dataset }}</div>
+                        <form method="POST" action=""> {% csrf_token %} 
+                            <div class="top-margin"> 
+                                <label>First Name
+                                    {% if selectform.email.field.required %}
+                                    <span class="text-danger">*</span>
                                     {% endif %}
-                                    {{ form.select_dataset }} 
-                                </div> 
-                            {% else %}
-                                <div class="top-margin"> 
-                                    <p> There is no datasets in the database</p>
-                                </div>
-                            {% endif %}                                    
-                            <hr>
+                                </label>
+                                {% if selectform.errors.email %}
+                                    <div class="alert alert-danger" role="alert">{{ selectform.errors.email }}</div>
+                                {% endif %}
+                                {{ selectform.email }}                                      
+                            </div>                                     
+                            <hr> 
                             <div class="row">
                                 <div class="col-lg-4 col-lg-offset-8 text-right"> 
-                                    <button class="btn btn-action" type="submit" name="signup-button">Save</button>
+                                    <button class="btn btn-action" type="submit">Save</button>
                                 </div>
                             </div>                                     
                         </form>                                 
                     </div>                             
                 </div>                         
-            </div>
-        </article>
-    </div>
-{% endblock container %}  
+            </div>                   
+        </article>                 
+    </div> 
+{% endblock container %}            

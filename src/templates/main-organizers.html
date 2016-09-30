@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block container %}
+    <div class="row"> 
+        <div class="col-sm-12"> 
+            <h2 class="text-center top-space">Main organizers</h2> 
+            <hr>
+            {% if profiles %}
+                {% for p in profiles %} 
+                    <div class="row">
+                        <div class="all-margin">
+                            <div class="col-sm-3">
+                                {% if p.avatar %}
+                                    <img class="img-responsive profile-pic" src="{{ p.avatar.url }}"><br>
+                                {% endif %}
+                                <p><b>{{ p.first_name }} {{ p.last_name }}</b></p>
+                                <p>{{ p.affiliation }}</p> 
+                                {% if p.email %}
+                                    <p>{{ p.email }}</p>
+                                {% endif %}
+                            </div>
+                            <div class="col-sm-9">
+                                <p align="justify">{{ p.bio }}</p>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}  
+            {% else %}
+                <div class="row">
+                    <div class="col-sm-12"> 
+                        <p class="text-center">There are no main organizers</p>
+                    </div>  
+                </div>
+            {% endif %}
+        </div>                 
+    </div>    
+{% endblock container %}

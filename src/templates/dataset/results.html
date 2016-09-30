@@ -1,0 +1,135 @@
+{% extends "dataset/base.html" %}
+{% block breadcrumb %}
+    <li><a href="{% url "home" %}">Home</a></li>
+    <li>{{ dataset.title }}</li>  
+    <li class="active">Results</li>  
+{% endblock breadcrumb %} 
+{% block content %}
+    <div class="col-md-8"> 
+        <div class="panel panel-default"> 
+            <div class="panel-body"> 
+                {% if headers %}
+                    <h3 class="thin text-center">{{ grid.track.title }} competition results</h3> 
+                    <hr> 
+                    <div class="table-responsive">
+                        <table class="table table-bordered display">
+                            <thead>
+                                <tr>
+                                    <th>User</th>
+                                    {% if scores %}
+                                        {% for n in headers %}
+                                            <th>{{ n.name }}</th>
+                                        {% endfor %}
+                                    {% else %}
+                                        {% for n in headers %}
+                                            <th>{{ n.name }}&ensp;<a href="{% url "header_edit" id=challenge.id track_id=track.id header_id=n.id %}"><i class="fa fa-pencil" aria-hidden="true"></i></a></th>
+                                        {% endfor %}
+                                    {% endif %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for r,extra in results %}
+                                    <tr>
+                                        <td>
+                                            {% if extra.count > 0 %}
+                                                <div class="btn-group">
+                                                    <a class="btn dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{ r.user }} <span class="caret"></span></a>
+                                                    <ul id="contextMenu" class="dropdown-menu" role="menu">
+                                                        {% for e in extra %}
+                                                            {% if e.paper %}
+                                                                <li><a href="{{ MEDIA_URL }}{{ e.paper }}">{{ e.name }}</a></li>
+                                                            {% else %}
+                                                                <li><a href="{% url "dataset_result_fact_sheet" dataset_id=dataset.id f_sheet_id=e.id %}">{{ e.name }}</a></li>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    </ul>
+                                                </div>
+                                            {% else %}
+                                                {{ r.user }}
+                                            {% endif %}
+                                        </td>
+                                        {% for s in scores %}
+                                            {% if s.result == r %}
+                                                <td>{{ s.score }}</td>
+                                            {% endif%}
+                                        {% endfor %}
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <h3 class="thin text-center">State of the art results</h3> 
+                    <hr>
+                    <div class="table-responsive">
+                        <table class="table table-bordered display">
+                            <thead>
+                                <tr>
+                                    <th>User</th>
+                                    {% if scores %}
+                                        {% for n in headers %}
+                                            <th>{{ n.name }}</th>
+                                        {% endfor %}
+                                    {% else %}
+                                        {% for n in headers %}
+                                            <th>{{ n.name }}&ensp;<a href="{% url "header_edit" id=challenge.id track_id=track.id header_id=n.id %}"><i class="fa fa-pencil" aria-hidden="true"></i></a></th>
+                                        {% endfor %}
+                                    {% endif %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for r,extra in results %}
+                                    <tr>
+                                        <td>
+                                            {% if extra.count > 0 %}
+                                                <div class="btn-group">
+                                                    <a class="btn dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{ r.user }} <span class="caret"></span></a>
+                                                    <ul id="contextMenu" class="dropdown-menu" role="menu">
+                                                        {% for e in extra %}
+                                                            {% if e.paper %}
+                                                                <li><a href="{{ MEDIA_URL }}{{ e.paper }}">{{ e.name }}</a></li>
+                                                            {% else %}
+                                                                <li><a href="{% url "dataset_result_fact_sheet" dataset_id=dataset.id f_sheet_id=e.id %}">{{ e.name }}</a></li>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    </ul>
+                                                </div>
+                                            {% else %}
+                                                {{ r.user }}
+                                            {% endif %}
+                                        </td>
+                                        {% for s in scores %}
+                                            {% if s.result == r %}
+                                                <td>{{ s.score }}</td>
+                                            {% endif%}
+                                        {% endfor %}
+                                    </tr>
+                                {% endfor %}
+                                {% for sub,scores in submission_scores %}
+                                    <tr>
+                                        <td>{{ sub.user.username }}<br><a title="Source code" href="{{ sub.source_code }}"><i class="fa fa-code-fork fa-lg" aria-hidden="true"></i></a>&ensp;<a title="Publication" href="{{ sub.publication }}"><i class="fa fa-paperclip fa-lg" aria-hidden="true"></i></a></td>
+                                        {% for s in scores %}
+                                            <td>{{ s.score }}</td>
+                                        {% endfor %}
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-4 col-sm-offset-4">
+                            <div class="all-margin">
+                                <a class="btn btn-action" href="{% url "submission_creation" dataset_id=dataset.id grid_id=grid.id %}">Make submission</a>
+                            </div> 
+                        </div>
+                    </div> 
+                {% else %}
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <p class="text-center">There are no results</p>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>                             
+        </div>                         
+    </div>
+{% endblock content %}  

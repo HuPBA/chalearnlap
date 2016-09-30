@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% load thumbnail %}
+{% block container %}
+    {% if form.non_field_errors  %}
+        {% for e in form.non_field_errors %} 
+            <div class="row"> 
+                <div class="col-md-6 widget col-md-offset-3"> 
+                    <div class="alert alert-danger" role="alert">{{ e }}</div>
+                </div>
+            </div>
+        {% endfor %} 
+    {% endif %}
+    <ol class="breadcrumb"> 
+        <li> <a href="{% url "home" %}">Home</a> </li>
+        <li> <a href="{% url "workshop_edit_gallery" id=workshop.id %}">{{ workshop.title }} (Edit mode)</a> </li>                 
+        <li class="active">Picture edit</li>                 
+    </ol>            
+    <div class="row"> 
+        <article class="col-xs-12 maincontent"> 
+            <header class="page-header"> 
+                <h1 class="page-title">Edit caption</h1> 
+            </header>                     
+            <div class="col-md-6 col-md-offset-3"> 
+                <div class="panel panel-default"> 
+                    <div class="panel-body"> 
+                        <h3 class="thin text-center">Edit caption</h3> 
+                        <hr> 
+                        <form method="POST" action=""> 
+                            {% csrf_token %}
+                            <div class="all-margin">
+                                {% thumbnail image.image "250x250" crop="noop" as small %}
+                                    <a href="{{ image.image.url }}" title="zoom"><img class="img-responsive img-center" src="{{ small.url }}" width="{{ small.width }}" height="{{ small.height }}"></a>
+                                {% endthumbnail %}
+                            </div>
+                            <div class="top-margin"> 
+                                <label>Short description
+                                    {% if form.desc.field.required %}
+                                    <span class="text-danger">*</span>
+                                    {% endif %}
+                                </label>  
+                                {% if form.errors.desc %}
+                                    <div class="alert alert-danger" role="alert">{{ form.errors.desc }}</div>
+                                {% endif %}
+                                {{ form.desc }} 
+                                <br>
+                            </div>
+                            <hr>
+                            <div class="row">
+                                <div class="col-lg-4 col-lg-offset-8 text-right"> 
+                                    <button class="btn btn-action" type="submit" name="signup-button">Save</button>
+                                </div>
+                            </div>                                     
+                        </form>                                 
+                    </div>                             
+                </div>                         
+            </div>
+        </article>
+    </div>
+{% endblock container %}  

@@ -1,0 +1,42 @@
+{% extends "data/base.html" %}
+{% block breadcrumb %}
+    <li><a href="{% url "home" %}">Home</a></li>
+    <li><a href="{% url "dataset_desc" id=dataset.id %}">{{ dataset.title }}</a></li>  
+    <li>{{ data.title }}</li>  
+    <li class="active">Files</li>  
+{% endblock breadcrumb %} 
+{% block content %}
+    <div class="col-md-8"> 
+        <div class="panel panel-default"> 
+            <div class="panel-body"> 
+                <h3 class="thin text-center">Data files</h3> 
+                <hr>  
+                {% if files.count > 0 %}
+                    {% for f in files %} 
+                        {% if f.file %}
+                            {% if f.name%}
+                                <div class="top-margin"> 
+                                    <p class="text-center"><a href='{{ f.file.url }}'>{{ f.name }}</a></p>
+                                </div>
+                            {% else %}
+                                <div class="top-margin"> 
+                                    <p class="text-center"><a href='{{ f.file.url }}'>{{ f.filename }}</a></p>
+                                </div>
+                            {% endif %}
+                        {% else %}
+                            <div class="top-margin"> 
+                                <p class="text-center"><a href='{{ f.url }}'>{{ f.name }}</a></p>
+                            </div>
+                        {% endif %}
+                    {% endfor %}  
+                {% else %}
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <p class="text-center"> There are no files registered in {{ data.title }}</p>
+                        </div>
+                    </div>
+                {% endif %}  
+            </div>                             
+        </div>                         
+    </div>
+{% endblock content %}  

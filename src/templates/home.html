@@ -3,37 +3,28 @@
 {% block container %}
     <div class="row"> 
         <div class="col-sm-9"> 
-            <h2 class="text-center top-space">Information</h2> 
-            <hr>
-            <br>
-            <div class="row"> 
-                <div class="col-sm-6 col-sm-offset-4"> 
-                    <img src="{% static "images/info-icon.png" %}">
-                </div>
-            </div>
-            <br><br>
-            <br><p><b>What is the challenge exactly?</b></p>
-            <p>See.4C will define a set of analytics tasks (the principal task being forecasting electricity grid traffic) and design a specially tailored competition (more specifically, a coopetition).</p>
-            <p>See.4C is funded by the European Commission under Horizon 2020.</p>
-            <br>
-            <img class="img-responsive img-center" src="{% static "images/ec.png" %}">
-            <br>
-            <p>Participants and teams will submit algorithms to be evaluated on an special cloud-based computational environment. Some of the data will be hidden from participants, as in previous competitions.</p>
-            <br><p><b>What type of data is provided?</b></p>
-            <p>The general task we are interested in is spatiotemporal forecasting. We access big open data (predictors including satellite imagery of Europe and the Atlantic, weather forecasts etc.,) and private data which is the target of the prediction (the flows across the electrical grid linking generation to load or usage, especially prepared for this project) to challenge participants to beat the best forecasting methods now available.</p>
-            <br><p><b>Using which methods?</b></p>
-            <p>That is up to you! We believe that a blend of forecasting and analysis in (normal) video and geo-spatial images forecasting energy data would get maximal community involvement and cross-disciplinary convergence/emergence. Stay tuned!</p>
-        </div>               
+            {{ chalearn.home_text | safe }} 
+        </div>                
         <div class="col-sm-3"> 
             <div class="thumbnail">
-                <h2 class="text-center top-space">News</h2> 
+                <h2 class="text-center top-space">News</h2>
+                <hr> 
                 <div class="caption">
-                    {% for n in news %}
-                        <h3>{{ n.title }}</h3> 
-                        <p>{{ n.description|safe }}</p>
-                    {% endfor %}
+                    {% if news.count > 0 %}
+                        {% for n in news %}
+                            <h3>{{ n.title }}</h3> 
+                            <p>{{ n.description|safe }}</p>
+                            <hr>
+                        {% endfor %}
+                    {% else %}
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <p class="text-center"> There are no news</p>
+                            </div>
+                        </div>
+                    {% endif %}
                 </div>
             </div> 
-        </div>  
+        </div> 
     </div>    
 {% endblock container %}

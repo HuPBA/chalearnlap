@@ -21,8 +21,10 @@
     {% endif %}
     <ol class="breadcrumb"> 
         <li> <a href="{% url "home" %}">Home</a> </li>
-        <li> <a href="{% url "event_list" %}">Events list</a> </li>                 
-        <li class="active"> Select members </li>                 
+        {% if event %}
+            <li><a href="{% url "event_edit" id=event.id %}">{{ event.title }} (Edit mode)</a></li> 
+        {% endif %}            
+        <li class="active">Add member</li>                 
     </ol>           
     <div class="row"> 
         <article class="col-xs-12 maincontent"> 
@@ -47,11 +49,11 @@
                                 </div>
                             </div>
                             <div class="top-margin"> 
-                                <label>First Name
+                                <label>Name
                                     {% if selectform.email.field.required %}
                                     <span class="text-danger">*</span>
                                     {% endif %}
-                                </label>   <a href="{% url "profile_creation" %}"><img class="plus-icon" src="{% static "images/plus-icon.jpg" %}" alt="Create Member"></a>
+                                </label>&ensp;<a href="{% url "event_profile_creation" id=event.id %}"><i class="fa fa-plus-circle" aria-hidden="true"></i></a>
                                 {% if selectform.errors.email %}
                                     <div class="alert alert-danger" role="alert">{{ selectform.errors.email }}</div>
                                 {% endif %}

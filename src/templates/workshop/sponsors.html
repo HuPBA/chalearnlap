@@ -1,0 +1,39 @@
+{% extends "workshop/base.html" %}
+{% block breadcrumb %}
+    <li><a href="{% url "home" %}">Home</a></li>
+    <li>{{ workshop.title }}</li>  
+    <li class="active">Description</li>  
+{% endblock breadcrumb %} 
+{% block content %}
+    <div class="col-md-7"> 
+        <div class="panel panel-default"> 
+            <div class="panel-body"> 
+                <h3 class="thin text-center">Sponsors</h3> 
+                <hr> 
+                {% if sponsors.count > 0 %}
+                    <div class="row">
+                        {% for s in sponsors %} 
+                            <div class="col-sm-4 sponsor-cell">
+                                <a href="{{ s.partner.url }}"><img id="partner-logo" class="img-responsive img-center" src="{{ s.partner.banner.url }}"></a>
+                            </div>
+                            <!-- <div class="col-sm-6 sponsor-cell">
+                            {% if s.partner.banner %}
+                                <h3 class="thin text-center">{{ s.partner.name }}</h3>
+                                <a href="{{ s.partner.url }}"><img id="partner-logo" class="img-responsive img-center" src="{{ s.partner.banner.url }}"></a>
+                            {% else %}
+                                <h3>{{ s.partner.name }}</h3>
+                            {% endif %}
+                            </div> -->
+                        {% endfor %}  
+                    </div>
+                {% else %}
+                    <div class="row">
+                        <div class="col-sm-12"> 
+                            <p class="text-center"> There are no partners registered in {{ challenge.title }}</p>
+                        </div>  
+                    </div>
+                {% endif %}
+            </div>                             
+        </div>                         
+    </div>
+{% endblock content %}  

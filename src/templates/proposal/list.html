@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% block container %}
+    <ol class="breadcrumb"> 
+        <li>
+            <a href="{% url "home" %}">Home</a>
+        </li>                 
+        <li class="active">Events proposals list</li>                 
+    </ol> 
+    <div class="row"> 
+        <article class="col-xs-12 maincontent"> 
+            <header class="page-header"> 
+                <h1 class="page-title">Event proposals</h1> 
+            </header>   
+            {% csrf_token %}                  
+            <div class="col-sm-4">
+                <div class="panel panel-default"> 
+                    <div class="panel-body"> 
+                        <h3 class="thin text-center">Challenges</h3> 
+                        <hr>
+                        {% if challenge_proposals.count > 0 %}
+                            {% for c in challenge_proposals %}
+                                <p><a href="{% url "event_proposal_detail" id=c.id %}">{{ c.title }}</a></p>
+                            {% endfor %} 
+                        {% else %}
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <p class="text-center"> There are no challenges proposals</p>
+                                </div>
+                            </div>
+                        {% endif %} 
+                    </div>
+                </div>    
+            </div>                          
+            <div class="col-sm-4">
+                <div class="panel panel-default"> 
+                    <div class="panel-body">
+                        <h3 class="thin text-center">Workshops</h3> 
+                        <hr>
+                        {% if workshop_proposals.count > 0 %}
+                            {% for w in workshop_proposals %}
+                                <p><a href="{% url "event_proposal_detail" id=w.id %}">{{ w.title }}</a></p>
+                            {% endfor %}
+                        {% else %}
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <p class="text-center"> There are no workshops proposals</p>
+                                </div>
+                            </div>
+                        {% endif %}   
+                    </div>
+                </div>            
+            </div>                 
+            <div class="col-sm-4">
+                <div class="panel panel-default"> 
+                    <div class="panel-body">
+                        <h3 class="thin text-center">Special issues</h3> 
+                        <hr>
+                        {% if issue_proposals.count > 0 %}
+                            {% for s in issue_proposals %}
+                                <p><a href="{% url "event_proposal_detail" id=s.id %}">{{ s.title }}</a></p>
+                            {% endfor %} 
+                        {% else %}
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <p class="text-center">There are no special issues proposals</p>
+                                </div>
+                            </div>
+                        {% endif %}  
+                    </div>
+                </div>  
+            </div>                           
+        </article>
+    </div>                      
+{% endblock container %}   

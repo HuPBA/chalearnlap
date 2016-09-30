@@ -199,9 +199,17 @@ ul.list-spaces li
     margin-top: 20px;
 }
 
+.all-margin
+{
+    margin-top: 20px;
+    margin-left: 20px;
+    margin-right: 20px;
+    margin-bottom: 20px;
+}
+
 img
 {
-    max-width: 75%;
+    max-width: 100%;
 }
 
 img.pull-right
@@ -350,16 +358,16 @@ img.pull-left
 
 .content
 {
-    margin-top: 140px;
+    margin-top: 30px;
     margin-bottom: 30px;
 }
 
 
 .input-search
 {
-    width: 120px;
+    max-width: 150px;
     margin-left: 10px;
-    margin-top: 22px;
+    margin-top: 10px;
     margin-right: 2px;
 }
 
@@ -434,8 +442,10 @@ img.pull-left
 
 #partner-logo
 {
-    width: auto;
-    height: auto;
+    max-width: 150px;
+    max-width: 150px;
+    /*width: auto;
+    height: auto;*/
 }
 
 #header-icon
@@ -523,7 +533,7 @@ th:last-child {
   border-right:none;
 }
   
-tr {
+/*tr {
   border-top: 1px solid #C1C3D1;
   border-bottom-: 1px solid #C1C3D1;
   color:#666B85;
@@ -562,7 +572,7 @@ tr:last-child td:first-child {
 tr:last-child td:last-child {
   border-bottom-right-radius:3px;
 }
- 
+ */
 td {
   background:#FFFFFF;
   padding:20px;
@@ -610,4 +620,37 @@ td.text-right {
 .img-center
 {
   margin: 0 auto;
+}
+
+.thumbnail-gallery
+{
+  height: 200px;
+}
+
+.sponsor-cell
+{
+  height: 250px;
+}
+
+.cont-header
+{
+  max-width: 1400px;
+}
+
+.link-disabled
+{
+  pointer-events: none;
+  cursor: default;
+}
+
+.profile-pic
+{
+  max-width: 150px;
+  max-height: 150px;
+}
+
+.vertical-margin
+{
+  margin-top: 20px;
+  margin-bottom: 20px;
 }

@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block container %}
+    <ol class="breadcrumb"> 
+        {% block breadcrumb %} 
+        {% endblock breadcrumb %}   
+        {% if not_perm %}
+            <div class="row"> 
+                <div class="col-md-6 widget col-md-offset-3"> 
+                    <div class="alert alert-danger" role="alert">You don't have permission to edit</div>
+                </div>
+            </div>
+        {% endif %}              
+    </ol>            
+    <div class="row"> 
+        <article class="col-xs-12 maincontent"> 
+            <header class="page-header"> 
+                <h1 class="page-title">{{ dataset.title }}
+                    {% if profile %}
+                        <a href="{% url 'dataset_edit_desc' id=dataset.id %}"><i class="fa fa-pencil" aria-hidden="true"></i></a>
+                    {% endif %}
+                </h1> 
+            </header>   
+            <div class="col-md-2" id="leftCol">
+                <ul class="nav nav-stacked" id="sidebar">
+                    <li><a href='{% url 'dataset_desc' id=dataset.id %}'>Description</a></li>
+                    <li><a href='{% url 'dataset_schedule' id=dataset.id %}'>Schedule</a></li>
+                    <li><a href='{% url 'dataset_associated_events' dataset_id=dataset.id %}'>Associated events</a></li>
+                    {% if datas %}
+                        <li><a href="#" data-toggle="collapse" data-target="#drilldown-1">Data <b class="caret"></b></a>
+                            <div style="padding-left:0px;">
+                                <ul id="drilldown-1" class="nav nav-pills nav-stacked collapse">
+                                    {% for d in datas %}
+                                        <li><a href='{% url 'data_desc' id=d.id dataset_id=dataset.id %}'>{{ d.title }}</a></li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </li>
+                    {% endif %}
+                    {% if grids %}
+                        <li><a href="#" data-toggle="collapse" data-target="#drilldown-2">Results <b class="caret"></b></a>
+                            <div style="padding-left:0px;">
+                                <ul id="drilldown-2" class="nav nav-pills nav-stacked collapse">
+                                    {% for g in grids %}
+                                        <li><a href='{% url 'dataset_results' dataset_id=dataset.id grid_id=g.id %}'>{{ g.track.title }}</a></li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </li>
+                    {% endif %}
+                    {% if publications %}
+                        <li><a href='{% url 'dataset_publications' id=dataset.id %}'>Publications</a></li>
+                    {% endif %}
+                </ul>
+            </div>                  
+            {% block content %}
+            {% endblock content %}
+            <div class="col-sm-2"> 
+                <div class="thumbnail">
+                    <h2 class="text-center top-space">News</h2>
+                    <hr> 
+                    <div class="caption">
+                        {% if news.count > 0 %}
+                            {% for n in news %}
+                                <h3>{{ n.title }}</h3> 
+                                <p>{{ n.description|safe }}</p>
+                                <hr>  
+                            {% endfor %}
+                        {% else %}
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <p class="text-center"> There are no news registered in {{ dataset.title }}</p>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div> 
+            </div> 
+        </article>
+    </div>
+{% endblock container %}  

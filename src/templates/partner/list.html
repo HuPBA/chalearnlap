@@ -2,50 +2,42 @@
 {% block container %}
 	<ol class="breadcrumb"> 
         <li> <a href="{% url "home" %}">Home</a> </li>
-        <li class="active"> Partners list </li>                 
+        <li class="active">Sponsors list</li>                 
     </ol> 
     <div class="row"> 
-        <article class="col-xs-12 maincontent"> 
-            <header class="page-header"> 
-                <h1 class="page-title">Partners</h1> 
-            </header>    
-            {% if partners.count > 0 %}
-                <div class="row">
-                    {% for p in partners %} 
-                        <div class="panel panel-default"> 
-                            <div class="panel-body">
-                                {% if p.banner %}
-                                    <div class="col-sm-3">
-                                        <h3 class="thin text-center">{{ p.name }}</h3>
-                                        <br>
-                                        <a href="{{ p.url }}"><img id="partner-logo" class="img-responsive img-center" src="{{ p.banner.url }}"></a>
-                                    </div>
-                                    <div class="col-sm-9">
-                                        <p><b>Contact:</b> </p>
-                                        <p>{{ p.contact.first_name }} {{ p.contact.last_name }}</p>
-                                        <p>{{ p.contact.email }}</p>
-                                        <p>{{ p.contact.bio }}</p>
-                                    </div>
-                                {% else %}
-                                    <div class="col-sm-2">
-                                        <h3>{{ p.name }}</h3>
-                                    </div>
-                                    <div class="col-sm-10">
-                                        <p><b>Contact:</b> </p>
-                                        <p>{{ p.contact.first_name }} {{ p.contact.last_name }}</p>
-                                        <p>{{ p.contact.email }}</p>
-                                        <p>{{ p.contact.bio }}</p>
-                                    </div>
-                                {% endif %}
+        <article class="col-xs-12 maincontent">    
+            {% if global_partners.count > 0 or event_partners.count > 0 %}
+                {% if global_partners.count > 0 %}
+                    <div class="row">
+                        <h1 class="thin text-center">General Sponsors</h1>
+                        {% for p in global_partners %} 
+                            <div class="col-sm-3 sponsor-cell">
+                                <br>
+                                <a href="{{ p.url }}"><img id="partner-logo" class="img-responsive img-center" src="{{ p.banner.url }}"></a>
                             </div>
+                        {% endfor %}  
+                    </div>
+                {% endif %}
+                {% if event_partners.count > 0 %}
+                    <hr>
+                    {% for event,partners in event_partners %}
+                        <div class="row">
+                            <a href="{% url "event_detail" id=event.id %}"><h1 class="thin text-center">{{ event.title }} Sponsors</h1> </a>
+                            {% for p in partners %}
+                                <div class="col-sm-3 sponsor-cell">
+                                    <br>
+                                    <a href="{{ p.url }}"><img id="partner-logo" class="img-responsive img-center" src="{{ p.banner.url }}"></a>
+                                </div>
+                            {% endfor %} 
                         </div>
+                        <hr>
                     {% endfor %}  
-                </div>
+                {% endif %}
             {% else %}
                 <div class="row">
-                    <div class="col-sm-12"> 
-                        <p> There is no sponsor registered in this challenge</p>
-                    </div>  
+                    <div class="col-sm-12">
+                        <p class="text-center"> There are no partners registered</p>
+                    </div>
                 </div>
             {% endif %}                     
         </article>

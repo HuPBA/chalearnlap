@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block container %}
+    <ol class="breadcrumb"> 
+        {% block breadcrumb %}
+        {% endblock breadcrumb %}            
+    </ol>            
+    <div class="row"> 
+        <article class="col-xs-12 maincontent"> 
+            <header class="page-header"> 
+                <h1 class="page-title">{{ dataset.title }} 
+                    {% if dataset.is_public %}
+                        <a title="Unpublish" href="{% url "dataset_unpublish" id=dataset.id %}"><i class="fa fa-cloud-download" aria-hidden="true"></i></a>
+                    {% else %}
+                        <a title="Publish" href="{% url "dataset_publish" id=dataset.id %}"><i class="fa fa-cloud-upload" aria-hidden="true"></i></a>
+                    {% endif %}
+                </h1>
+            </header> 
+            <div class="col-md-2" id="leftCol">
+                <ul class="nav nav-stacked" id="sidebar">
+                    <li><a href='{% url 'dataset_edit_desc' id=dataset.id %}'>Description</a></li>
+                    <li><a href='{% url 'dataset_edit_schedule' id=dataset.id %}'>Schedule</a></li>
+                    <li><a href='{% url 'dataset_edit_relations' id=dataset.id %}'>Associated events</a></li>
+                    <li><a href='{% url 'dataset_edit_datas' id=dataset.id %}'>Datas</a></li>
+                    <li><a href='{% url 'dataset_edit_members' id=dataset.id %}'>Admins</a></li>
+                    <li><a href="#" data-toggle="collapse" data-target="#drilldown-2">Results <b class="caret"></b></a>
+                        <div style="padding-left:0px;">
+                            <ul id="drilldown-2" class="nav nav-pills nav-stacked collapse">
+                                {% for g in grids %}
+                                    <li><a href='{% url 'dataset_edit_results' id=dataset.id grid_id=g.id %}'>{{ g.track.title }}</a></li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </li>
+                    <li><a href='{% url 'dataset_edit_news' id=dataset.id %}'>News</a></li>  
+                    <li><a href='{% url 'dataset_edit_publications' id=dataset.id %}'>Publications</a></li>  
+                </ul>
+            </div>
+            {% block content %}
+            {% endblock content %}
+        </article>
+    </div>
+{% endblock container %}  

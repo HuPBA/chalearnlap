@@ -12,8 +12,7 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 
 import os
 from django.contrib.messages import constants as message_constants
-
-
+from django.conf import settings
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -28,7 +27,7 @@ SECRET_KEY = 'sba*=3mn4m+)+!tr&yr#+3kh!tv#hh%qgh=ox&nnx!oto3d^^s'
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
+DIRECTORY = getattr(settings, "FILEBROWSER_DIRECTORY", '')
 # Application definition
 
 INSTALLED_APPS = [
@@ -45,6 +44,9 @@ INSTALLED_APPS = [
     'ckeditor_uploader',
     'datetimewidget',
     'watson',
+    'jfu',
+    'sorl.thumbnail',
+    'django_extensions',
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -67,11 +69,14 @@ TEMPLATES = [
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
+                "django.core.context_processors.media",
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'users.context_processors.base_context'
+                'users.context_processors.base_context',
+                'django.core.context_processors.request',
+                'django.core.context_processors.static',
             ],
         },
     },
@@ -156,7 +161,7 @@ MESSAGE_TAGS = {
 
 ACCOUNT_ACTIVATION_DAYS = 7 # One-week activation window; you may, of course, use a different value.
 REGISTRATION_EMAIL_HTML = False
-SITE_ID = 1
+SITE_ID = 2
 
 # GMAIL SMTP settings
 
@@ -175,7 +180,7 @@ LOGIN_REDIRECT_URL = '/'
 CKEDITOR_CONFIGS = {
     'default': {
         'toolbar': 'full',
-        'height': '300px',
+        'height': '400px',
         'width': 'auto',
     },
 }

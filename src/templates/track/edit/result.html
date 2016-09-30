@@ -1,0 +1,96 @@
+{% extends "track/edit/base.html" %}
+{% block breadcrumb %}
+    {% if eventform.non_field_errors  %}
+        {% for e in eventform.non_field_errors %} 
+            <div class="row"> 
+                <div class="col-md-6 widget col-md-offset-3"> 
+                    <div class="alert alert-danger" role="alert">{{ e }}</div>
+                </div>
+            </div>
+        {% endfor %} 
+    {% endif %}
+    <li><a href="{% url "home" %}">Home</a></li>
+    <li><a href="{% url "challenge_edit_desc" id=challenge.id%}">{{ challenge.title }} (Edit mode)</a></li>
+    <li>{{ track.title }}</li>
+    <li class="active">Result</li>  
+{% endblock breadcrumb %} 
+{% block content %}
+    <div class="col-md-10"> 
+        <form method="POST" action="" enctype="multipart/form-data"> {% csrf_token %}              
+            <div class="panel panel-default"> 
+                <div class="panel-body"> 
+                    <div class="row">
+                        <div class="col-sm-12"> 
+                            <h3 class="thin text-center">Results</h3>
+                            <hr> 
+                            <div class="col-sm-12">
+                                {% if headers %}
+                                    <div class="table-responsive">
+                                        <table class="table table-striped table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th>User</th>
+                                                    {% if scores %}
+                                                        {% for n in headers %}
+                                                            <th>{{ n.name }}</th>
+                                                        {% endfor %}
+                                                    {% else %}
+                                                        {% for n in headers %}
+                                                            <th>{{ n.name }}&ensp;<a href="{% url "header_edit" id=challenge.id track_id=track.id header_id=n.id %}"><i class="fa fa-pencil" aria-hidden="true"></i></a></th>
+                                                        {% endfor %}
+                                                    {% endif %}
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for r in results %}
+                                                    <tr>
+                                                        <td>{{ r.user }} <a href="{% url "result_edit" id=challenge.id track_id=track.id result_id=r.id %}"><i class="fa fa-pencil" aria-hidden="true"></i></a>&ensp;<a id="{{ e.id }}" class="delete-event" value="{% url "result_remove" id=challenge.id track_id=track.id result_id=r.id %}" href=""><i class="fa fa-minus-circle fa" aria-hidden="true"></i></a></td>
+                                                        {% for s in scores %}
+                                                            {% if s.result == r %}
+                                                                <td>{{ s.score }}</td>
+                                                            {% endif%}
+                                                        {% endfor %}
+                                                    </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-2 col-sm-offset-5 text-right"> 
+                                            <div class="all-margin">
+                                                <a class="btn btn-action" href="{% url "result_new_row" id=challenge.id track_id=track.id %}">Add new row</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% else %}
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <p class="text-center">There are no results</p>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-sm-5">
+                                <span>Import CSV file with the competition results</span> 
+                                {% if eventform.errors.file %}
+                                    <div class="alert alert-danger" role="alert">{{ eventform.errors.file }}</div>
+                                {% endif %}
+                                {{ eventform.file }} 
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12"> 
+                            <hr>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-2 col-lg-offset-9 text-right"> 
+                            <button class="btn btn-action" type="submit" name="signup-button">Create new table</button>
+                        </div>
+                    </div>  
+                </div>
+            </div>  
+        </form>                           
+    </div>                         
+{% endblock content %}  
