@@ -2393,18 +2393,37 @@ def track_result(request, id=None, track_id=None):
 	}
 	return render(request, "track/result.html", context, context_instance=RequestContext(request))
 
-def result_fact_sheet(request, id=None, track_id=None, f_sheet_id=None):
-	challenge = Challenge.objects.filter(id=id).first()
-	news = News.objects.filter(event_id=id).order_by('-upload_date')
-	track = Track.objects.filter(id=track_id).first()
-	result_user = Result_User.objects.filter(id=f_sheet_id).first()
-	context = {
-		"challenge": challenge,
-		"track": track,
-		"news": news,
-		"result_user": result_user,
-	}
-	return render(request, "track/fact_sheet.html", context, context_instance=RequestContext(request))
+def result_fact_sheet(request, id=None, dataset_id=None, track_id=None, f_sheet_id=None):
+	if dataset_id==None:
+		challenge = Challenge.objects.filter(id=id).first()
+		news = News.objects.filter(event_id=id).order_by('-upload_date')
+		track = Track.objects.filter(id=track_id).first()
+		result_user = Result_User.objects.filter(id=f_sheet_id).first()
+		context = {
+			"challenge": challenge,
+			"track": track,
+			"news": news,
+			"result_user": result_user,
+		}
+		return render(request, "track/fact_sheet.html", context, context_instance=RequestContext(request))
+	else:
+		dataset = Dataset.objects.filter(id=dataset_id).first()
+		grids = Result_Grid.objects.filter(track__dataset=dataset)
+		news = News.objects.filter(dataset=dataset)
+		datas = Data.objects.all().filter(dataset=dataset)	
+		publications = Publication_Dataset.objects.filter(dataset=dataset)
+		result_user = Result_User.objects.filter(id=f_sheet_id).first()
+		profile_dataset = check_dataset_permission(request, dataset)
+		context = {
+			"grids": grids,
+			"publications": publications,
+			"dataset": dataset,
+			"datas": datas,
+			"news": news,
+			"result_user": result_user,
+			"profile": profile_dataset,
+		}
+		return render(request, "dataset/fact_sheet.html", context, context_instance=RequestContext(request))
 
 @login_required(login_url='auth_login')
 def track_creation(request, id=None):

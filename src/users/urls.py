@@ -69,6 +69,7 @@ urlpatterns = [
     url(r'^dataset/(?P<dataset_id>\d+)/data/(?P<id>\d+)/files/$', views.data_files, name="data_files"),
     url(r'^dataset/(?P<dataset_id>\d+)/data/(?P<id>\d+)/metric/$', views.data_metric, name="data_metric"),
     url(r'^dataset/(?P<dataset_id>\d+)/results/(?P<grid_id>\d+)/$', views.dataset_results, name="dataset_results"),
+    url(r'^dataset/(?P<dataset_id>\d+)/results/fact-sheet/(?P<f_sheet_id>\d+)/$', views.result_fact_sheet, name="dataset_result_fact_sheet"),
     url(r'^dataset/(?P<dataset_id>\d+)/data/(?P<id>\d+)/edit/$', views.data_edit, name="data_edit"),
     url(r'^dataset/(?P<dataset_id>\d+)/data/(?P<id>\d+)/edit/description$', views.data_edit_desc, name="data_edit_desc"),
     url(r'^dataset/(?P<dataset_id>\d+)/data/(?P<id>\d+)/edit/files$', views.data_edit_files, name="data_edit_files"),
