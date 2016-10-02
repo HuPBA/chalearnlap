@@ -297,6 +297,10 @@ class DatasetCreationForm(forms.Form):
 		super(DatasetCreationForm, self).__init__(*args, **kwargs)
 		self.fields['dataset_title'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}))
 		self.fields['description'] = forms.CharField(required=True, widget=CKEditorWidget())
+		self.fields['evaluation_file'] = forms.FileField(required=False)
+		self.fields['gt_file'] = forms.FileField(required=False)
+		self.fields['threshold'] = forms.FloatField(required=False, widget=forms.NumberInput(attrs={'class': "form-control"}))
+		self.fields['threshold_extra'] = forms.ChoiceField(widget=forms.Select(attrs={'class': "form-control"}), required=True, choices=[('1','<'),('2','>')])
 
 	def clean(self):
 		return self.cleaned_data
@@ -307,7 +311,23 @@ class DatasetEditForm(forms.Form):
 		super(DatasetEditForm, self).__init__(*args, **kwargs)
 		self.fields['dataset_title'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}), initial=dataset.title)
 		self.fields['description'] = forms.CharField(required=True, widget=CKEditorWidget(), initial=dataset.description)
-		# self.fields['file'] = forms.FileField()
+		if dataset.evaluation_file:
+			self.fields['evaluation_file'] = forms.FileField(required=False, initial=dataset.evaluation_file)
+		else:
+			self.fields['evaluation_file'] = forms.FileField(required=False)
+		if dataset.gt_file:
+			self.fields['gt_file'] = forms.FileField(required=False, initial=dataset.gt_file)
+		else:
+			self.fields['gt_file'] = forms.FileField(required=False)
+		if dataset.threshold:
+			if dataset.threshold < 0:
+				self.fields['threshold'] = forms.FloatField(required=False, widget=forms.NumberInput(attrs={'class': "form-control"}), initial=-dataset.threshold)
+			else:
+				self.fields['threshold'] = forms.FloatField(required=False, widget=forms.NumberInput(attrs={'class': "form-control"}), initial=dataset.threshold)
+			self.fields['threshold_extra'] = forms.ChoiceField(widget=forms.Select(attrs={'class': "form-control"}), required=True, choices=[('1','<'),('2','>')])
+		else:
+			self.fields['threshold'] = forms.FloatField(required=False, widget=forms.NumberInput(attrs={'class': "form-control"}))
+			self.fields['threshold_extra'] = forms.ChoiceField(widget=forms.Select(attrs={'class': "form-control"}), required=True, choices=[('1','<'),('2','>')])
 
 	def clean(self):
 		return self.cleaned_data
@@ -502,9 +522,19 @@ class RelationEditForm(forms.Form):
 class SubmissionCreationForm(forms.Form):
 	def __init__(self, *args, **kwargs):
 		super(SubmissionCreationForm, self).__init__(*args, **kwargs)
-		self.fields['source_code'] = forms.URLField(required=True, widget=forms.TextInput(attrs={'class': "form-control", 'placeholder': "URL"}))
-		self.fields['publication'] = forms.URLField(required=True, widget=forms.TextInput(attrs={'class': "form-control", 'placeholder': "DOI/URL"}))
-		self.fields['sub_file'] = forms.FileField(required=False)
+		self.fields['prediction_file'] = forms.FileField(required=True)
+
+	def clean(self):
+		return self.cleaned_data
+
+class SubmissionInstructionsForm(forms.Form):
+	def __init__(self, *args, **kwargs):
+		result_grid = kwargs.pop('result_grid', None)
+		super(SubmissionInstructionsForm, self).__init__(*args, **kwargs)
+		if result_grid:
+			self.fields['text'] = forms.CharField(required=False, widget=CKEditorUploadingWidget(), initial=result_grid.instructions)
+		else:
+			self.fields['text'] = forms.CharField(required=False, widget=CKEditorUploadingWidget())
 
 	def clean(self):
 		return self.cleaned_data

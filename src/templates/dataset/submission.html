@@ -29,51 +29,37 @@
             <header class="page-header"> 
                 <h1 class="page-title">Create Submission</h1> 
             </header>  
-            <form method="POST" action="" enctype="multipart/form-data">                    
+            <form method="POST" action="" enctype="multipart/form-data"> {% csrf_token %}                 
                 <div class="row">
-                    <div class="col-md-6 col-md-offset-3"> 
+                    <div class="col-md-6"> 
+                        <div class="panel panel-default"> 
+                            <div class="panel-body">
+                                <h3 class="thin text-center">Instructions &ensp;<a href="{% url "submission_instructions_edit" dataset_id=dataset.id grid_id=grid.id %}"><i class="fa fa-pencil" aria-hidden="true"></i></a></h3> 
+                                <hr>
+                                {{ grid.instructions | safe }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6"> 
                         <div class="panel panel-default"> 
                             <div class="panel-body">
                                 <h3 class="thin text-center">Submission</h3> 
-                            	{% csrf_token %}
                                 <hr> 
                                 <div class="top-margin"> 
-                                    <label>Source code
-                                        {% if form.source_code.field.required %}
+                                    <label>Prediction file
+                                        {% if form.prediction_file.field.required %}
                                             <span class="text-danger">*</span>
                                         {% endif %}
                                     </label>  
-                                    {% if form.errors.source_code %}
-                                        <div class="alert alert-danger" role="alert">{{ form.errors.source_code }}</div>
+                                    {% if form.errors.prediction_file %}
+                                        <div class="alert alert-danger" role="alert">{{ form.errors.prediction_file }}</div>
                                     {% endif %}
-                                    {{ form.source_code }} 
+                                    {{ form.prediction_file }} 
                                 </div>
-                                <div class="top-margin"> 
-                                    <label>Paper
-                                        {% if form.publication.field.required %}
-                                            <span class="text-danger">*</span>
-                                        {% endif %}
-                                    </label>  
-                                    {% if form.errors.publication %}
-                                        <div class="alert alert-danger" role="alert">{{ form.errors.publication }}</div>
-                                    {% endif %}
-                                    {{ form.publication }} 
-                                </div>
-                                <div class="top-margin"> 
-                                    <label>Submission file
-                                        {% if form.sub_file.field.required %}
-                                            <span class="text-danger">*</span>
-                                        {% endif %}
-                                    </label>  
-                                    {% if form.errors.sub_file %}
-                                        <div class="alert alert-danger" role="alert">{{ form.errors.sub_file }}</div>
-                                    {% endif %}
-                                    {{ form.sub_file }} 
-                                </div>
-                                <div class="top-margin"> 
+                                <!-- <div class="top-margin"> 
                                     <label>Scores<span class="text-danger">*</span></label>  
                                     {{ scoresform.as_p }} 
-                                </div>
+                                </div> -->
                                 <hr>
                                 <div class="row">
                                     <div class="col-lg-4 col-lg-offset-8 text-right"> 

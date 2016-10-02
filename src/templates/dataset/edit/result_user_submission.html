@@ -12,19 +12,18 @@
     {% endif %}
     <ol class="breadcrumb"> 
         <li> <a href="{% url "home" %}">Home</a> </li>
-        <li><a href="{% url "challenge_edit_desc" id=challenge.id %}">{{ challenge.title }} (Edit mode)</a></li>
-        <li>{{ track.title }}</li>           
-        <li class="active">Result edit</li>                 
+        <li><a href="{% url "dataset_edit_desc" id=dataset.id %}">{{ dataset.title }} (Edit mode)</a></li>
+        <li class="active">Submission resume</li>                 
     </ol>            
     <div class="row"> 
         <article class="col-xs-12 maincontent"> 
             <header class="page-header"> 
-                <h1 class="page-title">Result edit</h1> 
+                <h1 class="page-title">Submission resume</h1> 
             </header> 
             <form method="POST" action=""> {% csrf_token %}      
                 <div class="panel panel-default"> 
                     <div class="panel-body"> 
-                        <h3 class="thin text-center">{{ result.user }} result fact</h3>
+                        <h3 class="thin text-center">{{ submission.user.username }} submission</h3>
                         <hr> 
                         <div class="row">
                             <div class="col-md-6">
@@ -56,7 +55,7 @@
                                                 {% for r in result_user %} 
                                                     <div class="row">
                                                         <div class="all-margin">
-                                                            <p class="text-center">{{ r.name }}&ensp;<a href="{% url "fact_sheet_edit" id=challenge.id track_id=track.id result_id=result.id sheet_id=r.id %}"><i class="fa fa-pencil" aria-hidden="true"></i></a></p>
+                                                            <p class="text-center">{{ r.name }}&ensp;<a href="{% url "submission_fact_sheet_edit" dataset_id=dataset.id sub_id=submission.id sheet_id=r.id %}"><i class="fa fa-pencil" aria-hidden="true"></i></a></p>
                                                         </div>
                                                     </div>
                                                 {% endfor %}  
@@ -75,10 +74,15 @@
                                         </div>
                                         <div class="row">
                                             <div class="col-lg-4 col-lg-offset-6"> 
-                                                <a class="btn btn-action" href="{% url "fact_sheet_creation" id=challenge.id track_id=track.id result_id=result.id %}">Create new fact sheet</a>
+                                                <a class="btn btn-action" href="{% url "submission_fact_sheet_creation" dataset_id=dataset.id sub_id=submission.id %}">Create new fact sheet</a>
                                             </div>
                                         </div>
                                     </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-2 col-lg-offset-10"> 
+                                    <a class="btn btn-action" href="{% url "dataset_results" dataset_id=dataset.id grid_id=submission.grid.id %}">Done</a>
                                 </div>
                             </div>
                         </div>

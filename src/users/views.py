@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect, render_to_response
 from django.http import HttpResponse
-from .forms import ResultUserForm, EditHelpForm, CIMLBookForm, EditHomeForm, ResultRowEditForm, ResultRowForm, HeaderEditForm, ResultNewTableForm, GalleryImageEditForm, ProgramEditForm, ProgramCreationForm, PublicationEditForm, PublicationEventCreationForm, PublicationCreationForm, SubmissionEditForm, ColEditForm, EditChallengeResult, ProfileForm, AffiliationForm, SelectRoleForm, UserEditForm, UserRegisterForm, EditProfileForm, EditExtraForm, DatasetCreationForm, DataCreationForm, EventCreationForm, EditEventForm, RoleCreationForm, NewsCreationForm, FileCreationForm, NewsEditForm, SelectDatasetForm, MemberCreationForm, MemberSelectForm, PartnerCreationForm, PartnerSelectForm, ScheduleCreationForm, ScheduleEditForm, DatasetEditForm, DataEditForm, TrackCreationForm, GalleryImageForm, TrackEditForm, RelationCreationForm, RelationEditForm, SubmissionCreationForm, SubmissionScoresForm
+from .forms import SubmissionInstructionsForm, ResultUserForm, EditHelpForm, CIMLBookForm, EditHomeForm, ResultRowEditForm, ResultRowForm, HeaderEditForm, ResultNewTableForm, GalleryImageEditForm, ProgramEditForm, ProgramCreationForm, PublicationEditForm, PublicationEventCreationForm, PublicationCreationForm, SubmissionEditForm, ColEditForm, EditChallengeResult, ProfileForm, AffiliationForm, SelectRoleForm, UserEditForm, UserRegisterForm, EditProfileForm, EditExtraForm, DatasetCreationForm, DataCreationForm, EventCreationForm, EditEventForm, RoleCreationForm, NewsCreationForm, FileCreationForm, NewsEditForm, SelectDatasetForm, MemberCreationForm, MemberSelectForm, PartnerCreationForm, PartnerSelectForm, ScheduleCreationForm, ScheduleEditForm, DatasetEditForm, DataEditForm, TrackCreationForm, GalleryImageForm, TrackEditForm, RelationCreationForm, RelationEditForm, SubmissionCreationForm, SubmissionScoresForm
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_protect
 from django.contrib import messages
@@ -19,7 +19,10 @@ from registration import signals
 from django.views.decorators.http import require_POST
 from jfu.http import upload_receive, UploadResponse, JFUResponse
 from django.conf import settings
+from django.core.files.base import ContentFile
 import csv
+import os 
+from os.path import abspath, dirname
 import xlwt
 import xlsxwriter
 import StringIO
@@ -720,11 +723,21 @@ def dataset_list(request):
 def dataset_creation(request):
 	datasetform = DatasetCreationForm()
 	if request.method == 'POST':
-		datasetform = DatasetCreationForm(request.POST)
+		datasetform = DatasetCreationForm(request.POST, request.FILES)
 		if datasetform.is_valid():
 			dataset_title = datasetform.cleaned_data['dataset_title']
 			desc = datasetform.cleaned_data['description']
-			new_dataset = Dataset.objects.create(title=dataset_title, description=desc)
+			threshold = datasetform.cleaned_data['threshold']
+			threshold_extra = datasetform.cleaned_data['threshold_extra']
+			evaluation_file = datasetform.cleaned_data['evaluation_file']
+			gt_file = datasetform.cleaned_data['gt_file']
+			if threshold and threshold_extra:
+				if threshold_extra == '1':
+					threshold=-threshold
+			new_dataset = Dataset.objects.create(title=dataset_title, description=desc, threshold=threshold)
+			new_dataset.evaluation_file = evaluation_file
+			new_dataset.gt_file = gt_file
+			new_dataset.save()
 			return HttpResponseRedirect(reverse('data_creation', kwargs={'id':new_dataset.id}))
 	context = {
 		"datasetform": datasetform,
@@ -760,12 +773,22 @@ def dataset_edit(request, id=None):
 	news = News.objects.filter(dataset_id=id)
 	members = Profile_Dataset.objects.filter(dataset=dataset)
 	if request.method == 'POST':
-		datasetform = DatasetEditForm(request.POST, dataset=dataset)
+		datasetform = DatasetEditForm(request.POST, request.FILES, dataset=dataset)
 		if datasetform.is_valid():
 			dataset_title = datasetform.cleaned_data['dataset_title']
 			desc = datasetform.cleaned_data['description']
+			threshold = datasetform.cleaned_data['threshold']
+			threshold_extra = datasetform.cleaned_data['threshold_extra']
+			evaluation_file = datasetform.cleaned_data['evaluation_file']
+			gt_file = datasetform.cleaned_data['gt_file']
+			if threshold and threshold_extra:
+				if threshold_extra == '1':
+					threshold=-threshold
+				dataset.threshold = threshold
 			dataset.title = dataset_title
 			dataset.description = desc
+			dataset.evaluation_file = evaluation_file
+			dataset.gt_file = gt_file
 			dataset.save()
 			return HttpResponseRedirect(reverse('dataset_list'))
 	context = {
@@ -798,10 +821,20 @@ def dataset_edit_desc(request, id=None):
 	else:
 		datasetform = DatasetEditForm(dataset=dataset)
 		if request.method == 'POST':
-			datasetform = DatasetEditForm(request.POST, dataset=dataset)
+			datasetform = DatasetEditForm(request.POST, request.FILES, dataset=dataset)
 			if datasetform.is_valid():
 				dataset_title = datasetform.cleaned_data['dataset_title']
 				desc = datasetform.cleaned_data['description']
+				threshold = datasetform.cleaned_data['threshold']
+				threshold_extra = datasetform.cleaned_data['threshold_extra']
+				evaluation_file = datasetform.cleaned_data['evaluation_file']
+				gt_file = datasetform.cleaned_data['gt_file']
+				if threshold and threshold_extra:
+					if threshold_extra == '1':
+						threshold=-threshold
+					dataset.threshold = threshold
+				dataset.evaluation_file = evaluation_file
+				dataset.gt_file = gt_file
 				dataset.title = dataset_title
 				dataset.description = desc
 				dataset.save()
@@ -1422,11 +1455,29 @@ def dataset_results(request, dataset_id=None, grid_id=None):
 	else:
 		headers = header
 
-	submission_scores = []
-	submissions = Submission.objects.filter(grid=grid)
-	for s in submissions:
-		sub_scores = Score.objects.filter(submission=s)
-		submission_scores.append((s,sub_scores))
+
+	submissions = None
+	scores_submissions = None
+	headers_submissions = []
+	scores_submissions = Score.objects.filter(submission__grid=grid)
+	header = Grid_Header.objects.filter(grid=grid)
+	submissions2 = Submission.objects.filter(grid=grid)
+	submissions = []
+	for s in submissions2:
+		extra = Result_User.objects.filter(submission=s)
+		submissions.append((s,extra))
+	if scores_submissions.count() > 0:
+		for h in header:
+			if Score.objects.filter(name=h.name, submission__grid=grid).count() > 0:
+				headers_submissions.append(h)
+	else:
+		headers_submissions = header
+
+	# submission_scores = []
+	# submissions = Submission.objects.filter(grid=grid)
+	# for s in submissions:
+	# 	sub_scores = Score.objects.filter(submission=s)
+	# 	submission_scores.append((s,sub_scores))
 	profile_dataset = check_dataset_permission(request, dataset)
 	context = {
 		"grids": grids,
@@ -1438,7 +1489,8 @@ def dataset_results(request, dataset_id=None, grid_id=None):
 		"results": results,
 		"scores": scores,
 		"headers": headers,
-		"submission_scores": submission_scores,
+		"scores_submissions": scores_submissions,
+		"submissions": submissions,
 		"profile": profile_dataset,
 	}
 	return render(request, "dataset/results.html", context, context_instance=RequestContext(request))
@@ -2059,6 +2111,63 @@ def fact_sheet_creation(request, id=None, track_id=None, result_id=None, sheet_i
 		"track": track,
 	}
 	return render(request, "track/edit/result_user_creation.html", context, context_instance=RequestContext(request))
+
+@login_required(login_url='auth_login')
+def result_user_submission(request, dataset_id=None, sub_id=None):
+	dataset = Dataset.objects.filter(id=dataset_id).first()
+	submission = Submission.objects.filter(id=sub_id).first()
+	result_user = Result_User.objects.filter(submission=submission)
+	scores = Score.objects.filter(submission=submission)
+	roweditform = ResultRowEditForm(scores=scores)
+	if request.method == 'POST':
+		roweditform = ResultRowEditForm(request.POST, scores=scores)
+		if roweditform.is_valid():
+			for s in scores:
+				s.score = roweditform.cleaned_data[s.name]
+				s.save()
+			# return HttpResponseRedirect(reverse('track_edit_result', kwargs={'id':id, 'track_id':track_id}))
+	context = {
+		"result_user": result_user,
+		"roweditform": roweditform,
+		"dataset": dataset,
+		"submission": submission,
+	}
+	return render(request, "dataset/edit/result_user_submission.html", context, context_instance=RequestContext(request))
+
+@login_required(login_url='auth_login')
+def result_user_submission_edit(request, dataset_id=None, sub_id=None, sheet_id=None):
+	dataset = Dataset.objects.filter(id=dataset_id).first()
+	submission = Submission.objects.filter(id=sub_id).first()
+	if sheet_id==None:
+		factsheetform = ResultUserForm()
+		if request.method == 'POST':
+			factsheetform = ResultUserForm(request.POST, request.FILES)
+			if factsheetform.is_valid():
+				name = factsheetform.cleaned_data['name']
+				content = factsheetform.cleaned_data['content']
+				paper = factsheetform.cleaned_data['paper']
+				r_user = Result_User.objects.create(name=name, content=content, submission=submission)
+				r_user.paper = paper
+				r_user.save()
+				return HttpResponseRedirect(reverse('submission_resume', kwargs={'dataset_id':dataset_id, 'sub_id':sub_id}))
+	else:
+		result_user = Result_User.objects.filter(id=sheet_id).first()
+		factsheetform = ResultUserForm(result_user=result_user)
+		if request.method == 'POST':
+			factsheetform = ResultUserForm(request.POST, request.FILES, result_user=result_user)
+			if factsheetform.is_valid():
+				result_user.name = factsheetform.cleaned_data['name']
+				result_user.content = factsheetform.cleaned_data['content']
+				result_user.paper = factsheetform.cleaned_data['paper']
+				result_user.save()
+				return HttpResponseRedirect(reverse('submission_resume', kwargs={'dataset_id':dataset_id, 'sub_id':sub_id}))
+	context = {
+		"resultcreationform": factsheetform,
+		"dataset": dataset,
+		"submission": submission,
+	}
+	return render(request, "dataset/edit/result_user_submission_edit.html", context, context_instance=RequestContext(request))
+
 
 @login_required(login_url='auth_login')
 def result_remove(request, id=None, track_id=None, result_id=None):
@@ -3829,27 +3938,70 @@ def submission_creation(request, dataset_id=None, grid_id=None):
 	else:
 		headers = header
 	form = SubmissionCreationForm()
-	scoresform = SubmissionScoresForm(headers=headers)
 	if request.method == 'POST':
 		form = SubmissionCreationForm(request.POST, request.FILES)
-		scoresform = SubmissionScoresForm(request.POST, headers=headers)
-		if form.is_valid() and scoresform.is_valid():
-			source_code = form.cleaned_data['source_code']
-			publication = form.cleaned_data['publication']
-			sub_file = form.cleaned_data['sub_file']
-			if sub_file:
-				new_submission = Submission.objects.create(source_code=source_code, publication=publication, sub_file=sub_file, user=request.user, grid=grid)
-			else:
-				new_submission = Submission.objects.create(source_code=source_code, publication=publication, user=request.user, grid=grid)
-			for h in headers: 
-				new_score = scoresform.cleaned_data[h.name]
-				Score.objects.create(score=new_score, name=h.name, submission=new_submission)
-			return HttpResponseRedirect(reverse('dataset_results', kwargs={'dataset_id':dataset_id, 'grid_id': grid_id}))
+		if form.is_valid():
+			prediction_file = form.cleaned_data['prediction_file']
+			new_submission = Submission.objects.create(user=request.user, grid=grid)
+			new_submission.prediction_file = prediction_file
+			new_submission.output.save('scores.txt', ContentFile(""), save=True)
+			source_attachment = dataset.gt_file
+			filecontent = ContentFile(source_attachment.file.read())
+			filename = os.path.split(source_attachment.file.name)[-1]
+			new_submission.ground_truth.save(filename, filecontent)
+			new_submission.save()
+			source_attachment.file.close()
+			command = 'python ../media_cdn/'+str(dataset.evaluation_file)+' ../media_cdn/submissions/'+str(new_submission.pk)+'/input'+' ../media_cdn/submissions/'+str(new_submission.pk)+'/output'
+			os.system(command)
+			lines = new_submission.output.readlines()
+			for l in lines:
+				name=l.split(':')[0]
+				for h in headers: 
+					if h.name.lower() == name.lower():
+						try:
+							new_score = float(l.split(':')[1])
+							Score.objects.create(score=new_score, name=h.name, submission=new_submission)
+						except ValueError:
+							continue
+			return HttpResponseRedirect(reverse('submission_score', kwargs={'dataset_id':dataset_id, 'sub_id': new_submission.id}))
 	context = {
 		"form": form,
-		"scoresform": scoresform,
+		"grid": grid,
+		"dataset": dataset,
 	}
 	return render(request, "dataset/submission.html", context, context_instance=RequestContext(request))
+
+@login_required(login_url='auth_login')
+def submission_score(request, dataset_id=None, sub_id=None):
+	dataset = Dataset.objects.filter(id=dataset_id).first()
+	scores = Score.objects.filter(submission__id=sub_id)
+	datas = Data.objects.all().filter(dataset=dataset,is_public=True)
+	news = News.objects.filter(dataset=dataset)
+	context = {
+		"datas": datas,
+		"dataset": dataset,
+		"news": news,
+		"scores": scores,
+		"sub_id": sub_id
+	}
+	return render(request, "dataset/score.html", context, context_instance=RequestContext(request))
+
+@login_required(login_url='auth_login')
+def submission_instructions_edit(request, dataset_id=None, grid_id=None):
+	result_grid = Result_Grid.objects.filter(id=grid_id).first()
+	form = SubmissionInstructionsForm(result_grid=result_grid)
+	if request.method == 'POST':
+		form = SubmissionInstructionsForm(request.POST, result_grid=result_grid)
+		if form.is_valid():
+			text = form.cleaned_data['text']
+			result_grid.instructions = text
+			result_grid.save()
+			return HttpResponseRedirect(reverse('submission_creation', kwargs={'dataset_id':dataset_id, 'grid_id': grid_id}))
+	context = {
+		"form": form,
+		"result_grid": result_grid,
+	}
+	return render(request, "dataset/edit/instructions.html", context, context_instance=RequestContext(request))
 
 @login_required(login_url='auth_login')
 def publication_creation(request, id=None):

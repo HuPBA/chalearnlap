@@ -124,11 +124,17 @@ class Challenge(Event):
 	def get_absolute_url(self):
 		return reverse("challenge_desc", kwargs={"id": self.id})
 
+def dataset_path(instance, filename):
+	return 'datasets/%s/%s' % (str(instance.pk), filename)
+
 class Dataset(models.Model):
 	title = models.CharField(max_length=100, null=True)
 	description = RichTextField()
 	tracks = models.ManyToManyField(Challenge, through='Track')
 	is_public = models.BooleanField(default=False)
+	evaluation_file = models.FileField(upload_to=dataset_path, null=True)
+	gt_file = models.FileField(upload_to=dataset_path, null=True)
+	threshold = models.FloatField(null=True)
 
 	def __str__(self):
 		return unicode(self.title).encode('utf-8')
@@ -253,6 +259,7 @@ class Track(models.Model):
 
 class Result_Grid(models.Model):
 	track = models.OneToOneField(Track, on_delete=models.CASCADE, null=True)
+	instructions = RichTextField(null=True)
 
 class Grid_Header(models.Model):
 	grid = models.ForeignKey(Result_Grid, on_delete=models.CASCADE, null=True)
@@ -267,20 +274,32 @@ class Result(models.Model):
 		return unicode(self.user).encode('utf-8')
 
 def submission_path(instance, filename):
-	return 'submissions/%s/%s' % (instance.user.username, filename)
+	return 'submissions/%s/input/res/%s' % (instance.pk, filename)
+
+def prediction_path(instance, filename):
+	print 'submissions/%s/input/res/%s' % (str(instance.pk), filename)
+	return 'submissions/%s/input/res/%s' % (str(instance.pk), filename)
+
+def gt_path(instance, filename):
+	print 'submissions/%s/input/ref/%s' % (str(instance.pk), filename)
+	return 'submissions/%s/input/ref/%s' % (str(instance.pk), filename)
+
+def output_path(instance, filename):
+	print 'submissions/%s/output/%s' % (str(instance.pk), filename)
+	return 'submissions/%s/output/%s' % (str(instance.pk), filename)
 
 class Submission(models.Model):
 	user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
 	grid = models.ForeignKey(Result_Grid, on_delete=models.CASCADE, null=True)
-	# source_code = models.URLField(null=True)
-	# publication = models.URLField(null=True)
-	sub_file = models.FileField(upload_to=submission_path, null=True)
+	prediction_file = models.FileField(upload_to=prediction_path, null=True)
+	ground_truth = models.FileField(upload_to=gt_path, null=True)
+	output = models.FileField(upload_to=output_path, null=True)
 
 	def __str__(self):
 		return unicode(self.user.username).encode('utf-8')
 
 def paper_path(instance, filename):
-	return 'results/%s/%s' % (instance.result.user, filename)
+	return 'results/%s/%s' % (instance.pk, filename)
 
 class Result_User(models.Model):
 	name = models.CharField(null=True, max_length=100)

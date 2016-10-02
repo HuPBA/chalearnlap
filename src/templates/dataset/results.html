@@ -77,12 +77,12 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for r,extra in results %}
+                                {% for sub,extra in submissions %}
                                     <tr>
                                         <td>
                                             {% if extra.count > 0 %}
                                                 <div class="btn-group">
-                                                    <a class="btn dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{ r.user }} <span class="caret"></span></a>
+                                                    <a class="btn dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{ sub.user.username }} <span class="caret"></span></a>
                                                     <ul id="contextMenu" class="dropdown-menu" role="menu">
                                                         {% for e in extra %}
                                                             {% if e.paper %}
@@ -94,21 +94,13 @@
                                                     </ul>
                                                 </div>
                                             {% else %}
-                                                {{ r.user }}
+                                                {{ sub.user.username }}
                                             {% endif %}
                                         </td>
-                                        {% for s in scores %}
-                                            {% if s.result == r %}
+                                        {% for s in scores_submissions %}
+                                            {% if s.submission == sub %}
                                                 <td>{{ s.score }}</td>
                                             {% endif%}
-                                        {% endfor %}
-                                    </tr>
-                                {% endfor %}
-                                {% for sub,scores in submission_scores %}
-                                    <tr>
-                                        <td>{{ sub.user.username }}<br><a title="Source code" href="{{ sub.source_code }}"><i class="fa fa-code-fork fa-lg" aria-hidden="true"></i></a>&ensp;<a title="Publication" href="{{ sub.publication }}"><i class="fa fa-paperclip fa-lg" aria-hidden="true"></i></a></td>
-                                        {% for s in scores %}
-                                            <td>{{ s.score }}</td>
                                         {% endfor %}
                                     </tr>
                                 {% endfor %}
