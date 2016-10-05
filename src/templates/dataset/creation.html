@@ -44,28 +44,6 @@
                                     </div>
                                 </div> 
                                 <div class="row">
-                                    <div class="col-md-4"> 
-                                        <div class="top-margin"> 
-                                            <label>Threshold
-                                                {% if datasetform.threshold.field.required %}
-                                                <span class="text-danger">*</span>
-                                                {% endif %}
-                                            </label>   
-                                            {% if datasetform.errors.threshold %}
-                                                <div class="alert alert-danger" role="alert">{{ datasetform.errors.threshold }}</div>
-                                            {% endif %}
-                                            <div class="row">
-                                                <div class="col-md-9">
-                                                    {{ datasetform.threshold }}
-                                                </div>
-                                                <div class="col-md-3">
-                                                    {{ datasetform.threshold_extra }}
-                                                </div>
-                                            </div>
-                                        </div> 
-                                    </div> 
-                                </div>
-                                <div class="row">
                                     <div class="col-md-11">                                   
                                         <div class="top-margin"> 
                                             <label>Description 
