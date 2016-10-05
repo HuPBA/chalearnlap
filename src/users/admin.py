@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Help, Chalearn, Result_User, Publication, Proposal, Role, Profile_Dataset, Submission, Result, Score, Event_Relation, Profile, Track, Gallery_Image, Affiliation, Event, File, Partner, Event_Partner, Profile_Event, Schedule_Event, News, Workshop, Challenge, Special_Issue, Result, Data, Dataset, Contact
+from .models import Result_Grid, Help, Chalearn, Result_User, Publication, Proposal, Role, Profile_Dataset, Submission, Result, Score, Event_Relation, Profile, Track, Gallery_Image, Affiliation, Event, File, Partner, Event_Partner, Profile_Event, Schedule_Event, News, Workshop, Challenge, Special_Issue, Result, Data, Dataset, Contact
 # Register your models here.
 
 
@@ -31,3 +31,4 @@ admin.site.register(Publication)
 admin.site.register(Result_User)
 admin.site.register(Chalearn)
 admin.site.register(Help)
+admin.site.register(Result_Grid)

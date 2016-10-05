@@ -23,107 +23,135 @@
     <body class="home"> 
         <div class="navbar navbar-inverse"> 
             <div class="container-fluid cont-header"> 
-                <div class="navbar-header"> 
-                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-                        <span class="sr-only">Toggle navigation</span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </button>             
-                    <a class="navbar-brand" href="{% url "home" %}">
-                        <img class="img-responsive" src="{% static "images/icon.png" %}" alt="ChaLearn">
-                    </a>             
-                </div>
-                <div class="navbar-collapse collapse" id="bs-example-navbar-collapse-1"> 
-                    <ul class="nav navbar-nav pull-right navbar-header"> 
-                        <li class="dropdown"> 
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Challenges <b class="caret"></b></a> 
-                            {% if challenges.count > 0 %}
-                                <ul class="dropdown-menu"> 
-                                    {% for c in challenges %}
-                                        <li><a href='{% url 'challenge_desc' id=c.id %}'>{{ c.title }}</a></li>
-                                    {% endfor %}                               
-                                </ul>   
-                            {% endif %}                           
-                        </li>
-                        <li class="dropdown"> 
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dataset<b class="caret"></b></a> 
-                            {% if datasets.count > 0 %}
-                                <ul class="dropdown-menu"> 
-                                    {% for d in datasets %}
-                                        <li><a href='{% url 'dataset_desc' id=d.id %}'>{{ d.title }}</a></li>
-                                    {% endfor %}                                
-                                </ul>        
-                            {% endif %}                     
-                        </li> 
-                        <li class="dropdown"> 
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Workshops <b class="caret"></b></a> 
-                            {% if workshops.count > 0 %}
-                                <ul class="dropdown-menu"> 
-                                    {% for w in workshops %}
-                                        <li><a href='{% url 'workshop_desc' id=w.id %}'>{{ w.title }}</a></li>
-                                    {% endfor %}                                 
-                                </ul>  
-                            {% endif %}                            
-                        </li>
-                        <li class="dropdown"> 
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Special issues <b class="caret"></b></a> 
-                            {% if special_issues.count > 0 %}
-                                <ul class="dropdown-menu"> 
-                                    {% for s in special_issues %}
-                                        <li><a href='{% url 'special_issue_desc' id=s.id %}'>{{ s.title }}</a></li>
-                                    {% endfor %}                              
-                                </ul>   
-                            {% endif %}                           
-                        </li>
-                        <li><a href="{% url "main_organizers" %}">Main organizers</a></li>
-                        <li class="dropdown"> 
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">CIML Book series <b class="caret"></b></a> 
-                            {% if cimlbooks.count > 0 %}
-                                <ul class="dropdown-menu"> 
-                                    {% for c in cimlbooks %}
-                                        <li><a href='{% url 'cimlbook_detail' id=c.id %}'>{{ c.name }}</a></li>
-                                    {% endfor %}                              
-                                </ul>   
-                            {% endif %}                           
-                        </li>
-                        <li><a href="{% url "partners_list" %}">Sponsors</a></li>
-                        <li><a href="{% url "publication_list" %}">Publications</a></li>
-                        {% if user.is_authenticated %}
-                            <li>
-                                <a class="btn" data-toggle="dropdown">{{ user.username }} <span class="caret"></span></a>
-                                <ul class="dropdown-menu multi-level">
-                                    {% if user.is_superuser or user.is_staff %}
-                                        <li class="dropdown-submenu">
-                                        <a>Admin site</a>
-                                            <ul class="dropdown-menu">
-                                                <li><a href="{% url "user_list" %}">Users zone</a></li> 
-                                                <li><a href="{% url "dataset_list" %}">Dataset zone</a></li> 
-                                                <li><a href="{% url "event_list" %}">Event zone</a></li> 
-                                                <li><a href="{% url "general_partner_creation" %}">Create general sponsor</a></li> 
-                                                <li><a href="{% url "event_proposal_list" %}">Event proposals list</a></li>
-                                                <li><a href="{% url "home_edit" %}">Edit home page</a></li> 
-                                                <li><a href="{% url "cimlbook_creation" %}">Create new CIML book</a></li> 
-                                            </ul>
-                                        </li>
-                                    {% endif %} 
-                                    <li><a href="{% url "event_proposal_creation" %}">Propose event</a></li> 
-                                    <li><a href="{% url "user_edit" id=user.id %}">Edit profile</a></li>
-                                    <li><a href="{% url "help" %}">Help</a></li> 
-                                    <li><a href="{% url "auth_logout" %}">Log out</a></li> 
-                                </ul>  
-                            </li>                       
-                        {% else %}
-                            <li> <a class="btn" href="{% url "auth_login" %}">SIGN IN</a> </li>
-                            <li> <a class="btn" href="{% url "register" %}">SIGN UP</a> </li>
-                        {% endif %} 
-                        <li>
-                            <form id="search-form" action="{% url 'watson:search' %}">
-                                <input id="search-input" type="text" class="form-control input-search" name="q" value="{{request.GET.q}}" placeholder="search">
-                            </form>
-                        </li>
-                    </ul>
-                </div>                 
+                <div class="row"> 
+                    <div class="col-sm-1 hidden-sm-down">
+                        <div class="navbar-header"> 
+                            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                                <span class="sr-only">Toggle navigation</span>
+                                <span class="icon-bar"></span>
+                                <span class="icon-bar"></span>
+                                <span class="icon-bar"></span>
+                            </button>   
+                                <a  href="{% url "home" %}">
+                                    <img class="img-responsive" src="{% static "images/icon.png" %}" alt="ChaLearn">
+                                </a>  
+                            <!-- <div class="col-sm-9">
+                                <a class="navbar-brand" href="{% url "home" %}">
+                                    <img class="img-responsive" src="{% static "images/icon2.png" %}" alt="ChaLearn">
+                                </a>  
+                            </div>  -->        
+                        </div>
+                    </div>
+                    <div class="col-sm-11 hidden-sm-down">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <!-- <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                                    <span class="sr-only">Toggle navigation</span>
+                                    <span class="icon-bar"></span>
+                                    <span class="icon-bar"></span>
+                                    <span class="icon-bar"></span>
+                                </button> -->
+                                <a class="navbar-brand" href="{% url "home" %}">
+                                    <img class="img-responsive" src="{% static "images/icon2.png" %}" alt="ChaLearn">
+                                </a>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                        <div class="row navbar-collapse collapse" id="bs-example-navbar-collapse-1"> 
+                            <ul class="nav navbar-nav pull-right navbar-header"> 
+                                <li class="dropdown"> 
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Challenges <b class="caret"></b></a> 
+                                    {% if challenges.count > 0 %}
+                                        <ul class="dropdown-menu"> 
+                                            {% for c in challenges %}
+                                                <li><a href='{% url 'challenge_desc' id=c.id %}'>{{ c.title }}</a></li>
+                                            {% endfor %}                               
+                                        </ul>   
+                                    {% endif %}                           
+                                </li>
+                                <li class="dropdown"> 
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dataset<b class="caret"></b></a> 
+                                    {% if datasets.count > 0 %}
+                                        <ul class="dropdown-menu"> 
+                                            {% for d in datasets %}
+                                                <li><a href='{% url 'dataset_desc' id=d.id %}'>{{ d.title }}</a></li>
+                                            {% endfor %}                                
+                                        </ul>        
+                                    {% endif %}                     
+                                </li> 
+                                <li class="dropdown"> 
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Workshops <b class="caret"></b></a> 
+                                    {% if workshops.count > 0 %}
+                                        <ul class="dropdown-menu"> 
+                                            {% for w in workshops %}
+                                                <li><a href='{% url 'workshop_desc' id=w.id %}'>{{ w.title }}</a></li>
+                                            {% endfor %}                                 
+                                        </ul>  
+                                    {% endif %}                            
+                                </li>
+                                <li class="dropdown"> 
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Special issues <b class="caret"></b></a> 
+                                    {% if special_issues.count > 0 %}
+                                        <ul class="dropdown-menu"> 
+                                            {% for s in special_issues %}
+                                                <li><a href='{% url 'special_issue_desc' id=s.id %}'>{{ s.title }}</a></li>
+                                            {% endfor %}                              
+                                        </ul>   
+                                    {% endif %}                           
+                                </li>
+                                <li><a href="{% url "main_organizers" %}">Main organizers</a></li>
+                                <li class="dropdown"> 
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">CIML Book series <b class="caret"></b></a> 
+                                    {% if cimlbooks.count > 0 %}
+                                        <ul class="dropdown-menu"> 
+                                            {% for c in cimlbooks %}
+                                                <li><a href='{% url 'cimlbook_detail' id=c.id %}'>{{ c.name }}</a></li>
+                                            {% endfor %}                              
+                                        </ul>   
+                                    {% endif %}                           
+                                </li>
+                                <li><a href="{% url "partners_list" %}">Sponsors</a></li>
+                                <li><a href="{% url "publication_list" %}">Publications</a></li>
+                                {% if user.is_authenticated %}
+                                    <li>
+                                        <a class="btn" data-toggle="dropdown">{{ user.username }} <span class="caret"></span></a>
+                                        <ul class="dropdown-menu multi-level">
+                                            {% if user.is_superuser or user.is_staff %}
+                                                <li class="dropdown-submenu">
+                                                <a>Admin site</a>
+                                                    <ul class="dropdown-menu">
+                                                        <li><a href="{% url "user_list" %}">Users zone</a></li> 
+                                                        <li><a href="{% url "dataset_list" %}">Dataset zone</a></li> 
+                                                        <li><a href="{% url "event_list" %}">Event zone</a></li> 
+                                                        <li><a href="{% url "general_partner_creation" %}">Create general sponsor</a></li> 
+                                                        <li><a href="{% url "event_proposal_list" %}">Event proposals list</a></li>
+                                                        <li><a href="{% url "home_edit" %}">Edit home page</a></li> 
+                                                        <li><a href="{% url "cimlbook_creation" %}">Create new CIML book</a></li> 
+                                                    </ul>
+                                                </li>
+                                            {% endif %} 
+                                            <li><a href="{% url "event_proposal_creation" %}">Propose event</a></li> 
+                                            <li><a href="{% url "user_edit" id=user.id %}">Edit profile</a></li>
+                                            <li><a href="{% url "help" %}">Help</a></li> 
+                                            <li><a href="{% url "auth_logout" %}">Log out</a></li> 
+                                        </ul>  
+                                    </li>                       
+                                {% else %}
+                                    <li> <a class="btn" href="{% url "auth_login" %}">SIGN IN</a> </li>
+                                    <li> <a class="btn" href="{% url "register" %}">SIGN UP</a> </li>
+                                {% endif %} 
+                                <li>
+                                    <form id="search-form" action="{% url 'watson:search' %}">
+                                        <input id="search-input" type="text" class="form-control input-search" name="q" value="{{request.GET.q}}" placeholder="search">
+                                    </form>
+                                </li>
+                            </ul>
+                        </div> 
+                        </div>
+                        </div> 
+                    </div>  
+                </div>             
             </div>             
         </div>                
         <div id="container-height" class="container content"> 

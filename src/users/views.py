@@ -727,13 +727,10 @@ def dataset_creation(request):
 		if datasetform.is_valid():
 			dataset_title = datasetform.cleaned_data['dataset_title']
 			desc = datasetform.cleaned_data['description']
-			threshold = datasetform.cleaned_data['threshold']
-			threshold_extra = datasetform.cleaned_data['threshold_extra']
+			# threshold = datasetform.cleaned_data['threshold']
+			# threshold_extra = datasetform.cleaned_data['threshold_extra']
 			evaluation_file = datasetform.cleaned_data['evaluation_file']
 			gt_file = datasetform.cleaned_data['gt_file']
-			if threshold and threshold_extra:
-				if threshold_extra == '1':
-					threshold=-threshold
 			new_dataset = Dataset.objects.create(title=dataset_title, description=desc, threshold=threshold)
 			new_dataset.evaluation_file = evaluation_file
 			new_dataset.gt_file = gt_file
@@ -825,14 +822,8 @@ def dataset_edit_desc(request, id=None):
 			if datasetform.is_valid():
 				dataset_title = datasetform.cleaned_data['dataset_title']
 				desc = datasetform.cleaned_data['description']
-				threshold = datasetform.cleaned_data['threshold']
-				threshold_extra = datasetform.cleaned_data['threshold_extra']
 				evaluation_file = datasetform.cleaned_data['evaluation_file']
 				gt_file = datasetform.cleaned_data['gt_file']
-				if threshold and threshold_extra:
-					if threshold_extra == '1':
-						threshold=-threshold
-					dataset.threshold = threshold
 				dataset.evaluation_file = evaluation_file
 				dataset.gt_file = gt_file
 				dataset.title = dataset_title
@@ -1078,32 +1069,27 @@ def dataset_edit_submission(request, id=None, submission_id=None):
 		return render(request, "dataset/desc.html", context, context_instance=RequestContext(request))
 	else:
 		submission = Submission.objects.filter(id=submission_id).first()
+		result_user = Result_User.objects.filter(submission=submission)
 		scores = Score.objects.filter(submission=submission)
-		roweditform = ResultRowEditForm(scores=scores)
-		subform = SubmissionEditForm(submission=submission)
+		headers = Grid_Header.objects.filter(grid__id=submission.grid.id)
+		roweditform = ResultRowEditForm(submission=submission, headers=headers)
 		if request.method == 'POST':
-			subform = SubmissionEditForm(request.POST, submission=submission)
-			roweditform = ResultRowEditForm(request.POST, scores=scores)
-			if subform.is_valid() and roweditform.is_valid():
-				source_code = subform.cleaned_data['source_code']
-				publication = subform.cleaned_data['publication']
-				sub_file = subform.cleaned_data['sub_file']
-				submission.source_code = source_code
-				submission.publication = publication
-				if sub_file:
-					submission.sub_file = sub_file
-				for s in scores:
-					s.score = roweditform.cleaned_data[s.name]
+			roweditform = ResultRowEditForm(request.POST, submission=submission, headers=headers)
+			if roweditform.is_valid():
+				for h in headers:
+					new_score = roweditform.cleaned_data[h.name]
+					s, created = Score.objects.get_or_create(submission=submission, name=h.name)
+					s.score = new_score
 					s.save()
-				submission.save()
 				return HttpResponseRedirect(reverse('dataset_edit_results', kwargs={'id':id, 'grid_id': submission.grid.id}))
 		context = {
-			"subform": subform,
 			"roweditform": roweditform,
+			"result_user": result_user,
 			"dataset": dataset,
+			"submission": submission,
 			"grids": grids,
 		}
-		return render(request, "dataset/edit/submission.html", context, context_instance=RequestContext(request))
+		return render(request, "dataset/edit/result_user_submission.html", context, context_instance=RequestContext(request))
 
 @login_required(login_url='auth_login')
 def dataset_remove_submission(request, id=None, submission_id=None):
@@ -1454,8 +1440,6 @@ def dataset_results(request, dataset_id=None, grid_id=None):
 				headers.append(h)
 	else:
 		headers = header
-
-
 	submissions = None
 	scores_submissions = None
 	headers_submissions = []
@@ -2061,12 +2045,15 @@ def result_edit(request, id=None, track_id=None, result_id=None):
 	result = Result.objects.filter(id=result_id).first()
 	result_user = Result_User.objects.filter(result=result)
 	scores = Score.objects.filter(result=result)
-	roweditform = ResultRowEditForm(scores=scores)
+	headers = Grid_Header.objects.filter(grid__id=result.grid.id)
+	roweditform = ResultRowEditForm(result=result, headers=headers)
 	if request.method == 'POST':
-		roweditform = ResultRowEditForm(request.POST, scores=scores)
+		roweditform = ResultRowEditForm(request.POST, result=result, headers=headers)
 		if roweditform.is_valid():
-			for s in scores:
-				s.score = roweditform.cleaned_data[s.name]
+			for h in headers:
+				new_score = roweditform.cleaned_data[h.name]
+				s, created = Score.objects.get_or_create(result=result, name=h.name)
+				s.score = new_score
 				s.save()
 			return HttpResponseRedirect(reverse('track_edit_result', kwargs={'id':id, 'track_id':track_id}))
 	context = {
@@ -2118,17 +2105,8 @@ def result_user_submission(request, dataset_id=None, sub_id=None):
 	submission = Submission.objects.filter(id=sub_id).first()
 	result_user = Result_User.objects.filter(submission=submission)
 	scores = Score.objects.filter(submission=submission)
-	roweditform = ResultRowEditForm(scores=scores)
-	if request.method == 'POST':
-		roweditform = ResultRowEditForm(request.POST, scores=scores)
-		if roweditform.is_valid():
-			for s in scores:
-				s.score = roweditform.cleaned_data[s.name]
-				s.save()
-			# return HttpResponseRedirect(reverse('track_edit_result', kwargs={'id':id, 'track_id':track_id}))
 	context = {
 		"result_user": result_user,
-		"roweditform": roweditform,
 		"dataset": dataset,
 		"submission": submission,
 	}
@@ -2664,6 +2642,32 @@ def track_edit_result(request, id=None, track_id=None):
 				else:
 					return HttpResponseRedirect(reverse('result_new_table', kwargs={'id':id,'track_id':track_id}))
 				return HttpResponseRedirect(reverse('track_edit_result', kwargs={'id':id,'track_id':track_id}))
+		if grid:
+			max_rank = 0
+			max_result = None
+			prev_result = None
+			tmp = None
+			results = Result.objects.filter(grid=grid)
+			for r in results:
+				s = Score.objects.filter(result=r,name__icontains='rank').first()
+				if s:
+					if s.score > max_rank:
+						max_rank = s.score
+						max_result = r
+						prev_result = tmp
+				tmp = r
+			if max_result:
+				s = Score.objects.filter(result=max_result).first()
+				if s:
+					if max_rank > 1:
+						prev_s = Score.objects.filter(result=prev_result).first()
+						if prev_s.score >= s.score:
+							grid.threshold = s.score
+						elif prev_s.score < s.score:
+							grid.threshold = -s.score
+						grid.save()
+					else:
+						grid.threshold = s.score
 		context = {
 			"eventform": eventform,
 			"challenge": c, 
@@ -3938,26 +3942,29 @@ def submission_creation(request, dataset_id=None, grid_id=None):
 	else:
 		headers = header
 	form = SubmissionCreationForm()
+	profile_dataset = check_dataset_permission(request, dataset)
 	if request.method == 'POST':
 		form = SubmissionCreationForm(request.POST, request.FILES)
 		if form.is_valid():
 			prediction_file = form.cleaned_data['prediction_file']
 			new_submission = Submission.objects.create(user=request.user, grid=grid)
 			new_submission.prediction_file = prediction_file
-			new_submission.output.save('scores.txt', ContentFile(""), save=True)
+			new_submission.output.save('scores.txt', ContentFile(""), save=False)
+			new_submission.output.mode='w+'
+			new_submission.save()
 			source_attachment = dataset.gt_file
 			filecontent = ContentFile(source_attachment.file.read())
 			filename = os.path.split(source_attachment.file.name)[-1]
 			new_submission.ground_truth.save(filename, filecontent)
 			new_submission.save()
 			source_attachment.file.close()
-			command = 'python ../media_cdn/'+str(dataset.evaluation_file)+' ../media_cdn/submissions/'+str(new_submission.pk)+'/input'+' ../media_cdn/submissions/'+str(new_submission.pk)+'/output'
+			command = 'python '+os.path.join(settings.MEDIA_ROOT,str(dataset.evaluation_file))+' '+(settings.MEDIA_ROOT)+'/submissions/'+str(new_submission.pk)+'/input '+(settings.MEDIA_ROOT)+'/submissions/'+str(new_submission.pk)+'/output'
 			os.system(command)
 			lines = new_submission.output.readlines()
 			for l in lines:
 				name=l.split(':')[0]
 				for h in headers: 
-					if h.name.lower() == name.lower():
+					if name.lower() in h.name.lower():
 						try:
 							new_score = float(l.split(':')[1])
 							Score.objects.create(score=new_score, name=h.name, submission=new_submission)
@@ -3968,13 +3975,29 @@ def submission_creation(request, dataset_id=None, grid_id=None):
 		"form": form,
 		"grid": grid,
 		"dataset": dataset,
+		"profile": profile_dataset,
 	}
 	return render(request, "dataset/submission.html", context, context_instance=RequestContext(request))
 
 @login_required(login_url='auth_login')
 def submission_score(request, dataset_id=None, sub_id=None):
 	dataset = Dataset.objects.filter(id=dataset_id).first()
-	scores = Score.objects.filter(submission__id=sub_id)
+	scores = []
+	scores_list = Score.objects.filter(submission__id=sub_id)
+	for s in scores_list:
+		scores.append((s.name,s.score))
+	submission = Submission.objects.filter(id=sub_id).first()
+	grid_id = submission.grid.id
+	passed = False
+	s = Score.objects.filter(submission__id=sub_id).first()
+	if submission.grid.threshold < 0:
+		if s.score <= -submission.grid.threshold:
+			passed = True
+	else:
+		if s.score >= submission.grid.threshold:
+			passed = True
+	if not passed:
+		submission.delete()
 	datas = Data.objects.all().filter(dataset=dataset,is_public=True)
 	news = News.objects.filter(dataset=dataset)
 	context = {
@@ -3982,7 +4005,9 @@ def submission_score(request, dataset_id=None, sub_id=None):
 		"dataset": dataset,
 		"news": news,
 		"scores": scores,
-		"sub_id": sub_id
+		"submission": submission,
+		"grid_id": grid_id,
+		"passed": passed,
 	}
 	return render(request, "dataset/score.html", context, context_instance=RequestContext(request))
 

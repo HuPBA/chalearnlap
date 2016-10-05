@@ -33,7 +33,7 @@
                                         <td>
                                             {% if extra.count > 0 %}
                                                 <div class="btn-group">
-                                                    <a class="btn dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{ r.user }} <span class="caret"></span></a>
+                                                    <a class="btn dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{ r.user }}<span class="caret"></span></a>
                                                     <ul id="contextMenu" class="dropdown-menu" role="menu">
                                                         {% for e in extra %}
                                                             {% if e.paper %}
@@ -83,6 +83,9 @@
                                             {% if extra.count > 0 %}
                                                 <div class="btn-group">
                                                     <a class="btn dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{ sub.user.username }} <span class="caret"></span></a>
+                                                    {% if request.user.is_authenticated and request.user.username == sub.user.username %}
+                                                        &ensp;<a href="{% url "submission_resume" dataset_id=dataset.id sub_id=sub.id %}"><i class="fa fa-pencil" aria-hidden="true"></i></a>&ensp;<a id="{{ sub.id }}" class="delete-event" value="{% url 'dataset_remove_submission' id=dataset.id submission_id=sub.id %}" href=""><i class="fa fa-minus-circle fa" aria-hidden="true"></i></a>
+                                                    {% endif %}
                                                     <ul id="contextMenu" class="dropdown-menu" role="menu">
                                                         {% for e in extra %}
                                                             {% if e.paper %}
@@ -95,6 +98,9 @@
                                                 </div>
                                             {% else %}
                                                 {{ sub.user.username }}
+                                                {% if request.user.is_authenticated and request.user.username == sub.user.username %}
+                                                    &ensp;<a href="{% url "submission_resume" dataset_id=dataset.id sub_id=sub.id %}"><i class="fa fa-pencil" aria-hidden="true"></i></a>&ensp;<a id="{{ sub.id }}" class="delete-event" value="{% url 'dataset_remove_submission' id=dataset.id submission_id=sub.id %}" href=""><i class="fa fa-minus-circle fa" aria-hidden="true"></i></a>
+                                                {% endif %}
                                             {% endif %}
                                         </td>
                                         {% for s in scores_submissions %}
@@ -107,13 +113,15 @@
                             </tbody>
                         </table>
                     </div>
-                    <div class="row">
-                        <div class="col-sm-4 col-sm-offset-4">
-                            <div class="all-margin">
-                                <a class="btn btn-action" href="{% url "submission_creation" dataset_id=dataset.id grid_id=grid.id %}">Make submission</a>
-                            </div> 
-                        </div>
-                    </div> 
+                    {% if grid.threshold and dataset.gt_file and dataset.evaluation_file %}
+                        <div class="row">
+                            <div class="col-sm-4 col-sm-offset-4">
+                                <div class="all-margin">
+                                    <a class="btn btn-action" href="{% url "submission_creation" dataset_id=dataset.id grid_id=grid.id %}">Make submission</a>
+                                </div> 
+                            </div>
+                        </div> 
+                    {% endif %}
                 {% else %}
                     <div class="row">
                         <div class="col-sm-12">

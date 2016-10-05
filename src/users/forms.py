@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.models import User
-from .models import Gallery_Image, Profile, Affiliation, Dataset, Data, Partner, Event
+from .models import Score, Gallery_Image, Profile, Affiliation, Dataset, Data, Partner, Event
 from registration.forms import RegistrationForm
 from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm, PasswordResetForm, SetPasswordForm
 from ckeditor.widgets import CKEditorWidget
@@ -299,8 +299,6 @@ class DatasetCreationForm(forms.Form):
 		self.fields['description'] = forms.CharField(required=True, widget=CKEditorWidget())
 		self.fields['evaluation_file'] = forms.FileField(required=False)
 		self.fields['gt_file'] = forms.FileField(required=False)
-		self.fields['threshold'] = forms.FloatField(required=False, widget=forms.NumberInput(attrs={'class': "form-control"}))
-		self.fields['threshold_extra'] = forms.ChoiceField(widget=forms.Select(attrs={'class': "form-control"}), required=True, choices=[('1','<'),('2','>')])
 
 	def clean(self):
 		return self.cleaned_data
@@ -319,15 +317,6 @@ class DatasetEditForm(forms.Form):
 			self.fields['gt_file'] = forms.FileField(required=False, initial=dataset.gt_file)
 		else:
 			self.fields['gt_file'] = forms.FileField(required=False)
-		if dataset.threshold:
-			if dataset.threshold < 0:
-				self.fields['threshold'] = forms.FloatField(required=False, widget=forms.NumberInput(attrs={'class': "form-control"}), initial=-dataset.threshold)
-			else:
-				self.fields['threshold'] = forms.FloatField(required=False, widget=forms.NumberInput(attrs={'class': "form-control"}), initial=dataset.threshold)
-			self.fields['threshold_extra'] = forms.ChoiceField(widget=forms.Select(attrs={'class': "form-control"}), required=True, choices=[('1','<'),('2','>')])
-		else:
-			self.fields['threshold'] = forms.FloatField(required=False, widget=forms.NumberInput(attrs={'class': "form-control"}))
-			self.fields['threshold_extra'] = forms.ChoiceField(widget=forms.Select(attrs={'class': "form-control"}), required=True, choices=[('1','<'),('2','>')])
 
 	def clean(self):
 		return self.cleaned_data
@@ -562,10 +551,24 @@ class ResultRowForm(forms.Form):
 
 class ResultRowEditForm(forms.Form):
 	def __init__(self, *args, **kwargs):
-		scores = kwargs.pop('scores', None)
+		submission = kwargs.pop('submission', None)
+		result = kwargs.pop('result', None)
+		headers = kwargs.pop('headers', None)
 		super(ResultRowEditForm, self).__init__(*args, **kwargs)
-		for s in scores:
-			self.fields[s.name] = forms.FloatField(required=True, widget=forms.NumberInput(attrs={'class': "form-control"}), initial=s.score)
+		if submission:
+			for h in headers:
+				s = Score.objects.filter(name__icontains=h.name, submission=submission).first()
+				if s:
+					self.fields[h.name] = forms.FloatField(required=True, widget=forms.NumberInput(attrs={'class': "form-control"}), initial=s.score)
+				else:
+					self.fields[h.name] = forms.FloatField(required=False, widget=forms.NumberInput(attrs={'class': "form-control"}))
+		elif result:
+			for h in headers:
+				s = Score.objects.filter(name__icontains=h.name, result=result).first()
+				if s:
+					self.fields[h.name] = forms.FloatField(required=True, widget=forms.NumberInput(attrs={'class': "form-control"}), initial=s.score)
+				else:
+					self.fields[h.name] = forms.FloatField(required=False, widget=forms.NumberInput(attrs={'class': "form-control"}))
 
 	def clean(self):
 		return self.cleaned_data

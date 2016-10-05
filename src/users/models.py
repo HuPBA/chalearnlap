@@ -134,7 +134,6 @@ class Dataset(models.Model):
 	is_public = models.BooleanField(default=False)
 	evaluation_file = models.FileField(upload_to=dataset_path, null=True)
 	gt_file = models.FileField(upload_to=dataset_path, null=True)
-	threshold = models.FloatField(null=True)
 
 	def __str__(self):
 		return unicode(self.title).encode('utf-8')
@@ -260,6 +259,7 @@ class Track(models.Model):
 class Result_Grid(models.Model):
 	track = models.OneToOneField(Track, on_delete=models.CASCADE, null=True)
 	instructions = RichTextField(null=True)
+	threshold = models.FloatField(null=True)
 
 class Grid_Header(models.Model):
 	grid = models.ForeignKey(Result_Grid, on_delete=models.CASCADE, null=True)

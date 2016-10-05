@@ -34,7 +34,11 @@
                     <div class="col-md-6"> 
                         <div class="panel panel-default"> 
                             <div class="panel-body">
-                                <h3 class="thin text-center">Instructions &ensp;<a href="{% url "submission_instructions_edit" dataset_id=dataset.id grid_id=grid.id %}"><i class="fa fa-pencil" aria-hidden="true"></i></a></h3> 
+                                <h3 class="thin text-center">Instructions 
+                                    {% if profile %}
+                                        &ensp;<a href="{% url "submission_instructions_edit" dataset_id=dataset.id grid_id=grid.id %}"><i class="fa fa-pencil" aria-hidden="true"></i></a>
+                                    {% endif %}
+                                </h3> 
                                 <hr>
                                 {{ grid.instructions | safe }}
                             </div>
