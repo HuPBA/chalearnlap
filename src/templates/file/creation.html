@@ -11,9 +11,8 @@
     {% endif %}
     <ol class="breadcrumb"> 
         <li><a href="{% url "home" %}">Home</a></li>
-        <li><a href="{% url "dataset_list" %}">Dataset list</a></li>
-        <li><a href="{% url "dataset_edit" id=dataset.id %}">{{ dataset.title }}</a></li>                 
-        <li><a href="{% url "data_edit" id=data.id dataset_id=dataset.id %}">{{ data.title }}</a></li>
+        <li><a href="{% url "dataset_edit_desc" id=dataset.id %}">{{ dataset.title }} (Edit mode)</a></li>                 
+        <li><a href="{% url "data_edit_desc" id=data.id dataset_id=dataset.id %}">{{ data.title }} (Edit mode)</a></li>
         <li class="active">File creation</li>               
     </ol>           
     <div class="row"> 

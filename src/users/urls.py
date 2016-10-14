@@ -42,7 +42,7 @@ urlpatterns = [
     # Dataset urls
     url(r'^dataset/list/$', views.dataset_list, name="dataset_list"),
     url(r'^dataset/creation/$', views.dataset_creation, name="dataset_creation"),
-    url(r'^dataset/(?P<id>\d+)/edit/$', views.dataset_edit, name="dataset_edit"),
+    # url(r'^dataset/(?P<id>\d+)/edit/$', views.dataset_edit, name="dataset_edit"),
     url(r'^dataset/(?P<id>\d+)/edit/description$', views.dataset_edit_desc, name="dataset_edit_desc"),
     url(r'^dataset/(?P<id>\d+)/edit/schedule$', views.dataset_edit_schedule, name="dataset_edit_schedule"),
     url(r'^dataset/(?P<id>\d+)/edit/associated-events$', views.dataset_edit_relations, name="dataset_edit_relations"),
@@ -70,7 +70,7 @@ urlpatterns = [
     url(r'^dataset/(?P<dataset_id>\d+)/data/(?P<id>\d+)/metric/$', views.data_metric, name="data_metric"),
     url(r'^dataset/(?P<dataset_id>\d+)/results/(?P<grid_id>\d+)/$', views.dataset_results, name="dataset_results"),
     url(r'^dataset/(?P<dataset_id>\d+)/results/fact-sheet/(?P<f_sheet_id>\d+)/$', views.result_fact_sheet, name="dataset_result_fact_sheet"),
-    url(r'^dataset/(?P<dataset_id>\d+)/data/(?P<id>\d+)/edit/$', views.data_edit, name="data_edit"),
+    # url(r'^dataset/(?P<dataset_id>\d+)/data/(?P<id>\d+)/edit/$', views.data_edit, name="data_edit"),
     url(r'^dataset/(?P<dataset_id>\d+)/data/(?P<id>\d+)/edit/description$', views.data_edit_desc, name="data_edit_desc"),
     url(r'^dataset/(?P<dataset_id>\d+)/data/(?P<id>\d+)/edit/files$', views.data_edit_files, name="data_edit_files"),
     url(r'^dataset/(?P<dataset_id>\d+)/data/(?P<id>\d+)/file/creation/$', views.file_creation, name="file_creation"),
@@ -170,7 +170,7 @@ urlpatterns = [
     # Workshop urls
     url(r'^workshop/(?P<id>\d+)/publish/$', views.workshop_publish, name="workshop_publish"),
     url(r'^workshop/(?P<id>\d+)/unpublish/$', views.workshop_unpublish, name="workshop_unpublish"),
-    url(r'^workshop/(?P<id>\d+)/edit/$', views.workshop_edit, name="workshop_edit"),
+    # url(r'^workshop/(?P<id>\d+)/edit/$', views.workshop_edit, name="workshop_edit"),
     url(r'^workshop/(?P<id>\d+)/edit/description$', views.workshop_edit_desc, name="workshop_edit_desc"),
     url(r'^workshop/(?P<id>\d+)/edit/schedule$', views.workshop_edit_schedule, name="workshop_edit_schedule"),
     url(r'^workshop/(?P<id>\d+)/edit/associated-events$', views.workshop_edit_relations, name="workshop_edit_relations"),
@@ -216,7 +216,7 @@ urlpatterns = [
     # Special issues urls
     url(r'^special-issue/(?P<id>\d+)/publish/$', views.special_issue_publish, name="special_issue_publish"),
     url(r'^special-issue/(?P<id>\d+)/unpublish/$', views.special_issue_unpublish, name="special_issue_unpublish"),
-    url(r'^special-issue/(?P<id>\d+)/edit/$', views.special_issue_edit, name="special_issue_edit"),
+    # url(r'^special-issue/(?P<id>\d+)/edit/$', views.special_issue_edit, name="special_issue_edit"),
     url(r'^special-issue/(?P<id>\d+)/edit/description$', views.special_issue_edit_desc, name="special_issue_edit_desc"),
     url(r'^special-issue/(?P<id>\d+)/edit/associated-events$', views.special_issue_edit_relations, name="special_issue_edit_relations"),
     url(r'^special-issue/(?P<id>\d+)/edit/schedule$', views.special_issue_edit_schedule, name="special_issue_edit_schedule"),

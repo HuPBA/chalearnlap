@@ -731,7 +731,7 @@ def dataset_creation(request):
 			# threshold_extra = datasetform.cleaned_data['threshold_extra']
 			evaluation_file = datasetform.cleaned_data['evaluation_file']
 			gt_file = datasetform.cleaned_data['gt_file']
-			new_dataset = Dataset.objects.create(title=dataset_title, description=desc, threshold=threshold)
+			new_dataset = Dataset.objects.create(title=dataset_title, description=desc)
 			new_dataset.evaluation_file = evaluation_file
 			new_dataset.gt_file = gt_file
 			new_dataset.save()
@@ -741,64 +741,64 @@ def dataset_creation(request):
 	}
 	return render(request, "dataset/creation.html", context, context_instance=RequestContext(request))
 
-@login_required(login_url='auth_login')
-def dataset_edit(request, id=None):
-	dataset = Dataset.objects.filter(id=id).first()
-	if not request.user.is_staff:
-		profile = Profile.objects.filter(user=request.user)
-		profile_dataset = Profile_Dataset.objects.filter(dataset=dataset, profile=profile)
-		if len(profile_dataset) > 0:
-			profile_dataset = Profile_Dataset.objects.filter(dataset=dataset, profile=profile).first()
-			if not profile_dataset.is_admin():
-				return HttpResponseRedirect(reverse('home'))
-		else:
-			return HttpResponseRedirect(reverse('home'))
-	profile_dataset = None
-	if request.user and (not request.user.is_anonymous()):
-		profile = Profile.objects.filter(user=request.user)
-		profile_dataset = Profile_Dataset.objects.filter(dataset=dataset, profile=profile)
-		if len(profile_dataset) > 0:
-			profile_dataset = Profile_Dataset.objects.filter(dataset=dataset, profile=profile).first()
-			if not profile_dataset.is_admin():
-				profile_dataset = None
-		else:
-			profile_dataset = None
-	datas = Data.objects.all().filter(dataset=dataset)
-	datasetform = DatasetEditForm(dataset=dataset)
-	schedule = Schedule_Event.objects.filter(dataset_schedule=dataset).order_by('date')
-	relations = Event_Relation.objects.filter(dataset_associated=id)
-	news = News.objects.filter(dataset_id=id)
-	members = Profile_Dataset.objects.filter(dataset=dataset)
-	if request.method == 'POST':
-		datasetform = DatasetEditForm(request.POST, request.FILES, dataset=dataset)
-		if datasetform.is_valid():
-			dataset_title = datasetform.cleaned_data['dataset_title']
-			desc = datasetform.cleaned_data['description']
-			threshold = datasetform.cleaned_data['threshold']
-			threshold_extra = datasetform.cleaned_data['threshold_extra']
-			evaluation_file = datasetform.cleaned_data['evaluation_file']
-			gt_file = datasetform.cleaned_data['gt_file']
-			if threshold and threshold_extra:
-				if threshold_extra == '1':
-					threshold=-threshold
-				dataset.threshold = threshold
-			dataset.title = dataset_title
-			dataset.description = desc
-			dataset.evaluation_file = evaluation_file
-			dataset.gt_file = gt_file
-			dataset.save()
-			return HttpResponseRedirect(reverse('dataset_list'))
-	context = {
-		"datasetform": datasetform,
-		"dataset": dataset,
-		"datas": datas,
-		"schedule": schedule,
-		"relations": relations,
-		"news": news,
-		"members": members,
-		"profile_dataset": profile_dataset,
-	}
-	return render(request, "dataset/edit.html", context, context_instance=RequestContext(request))
+# @login_required(login_url='auth_login')
+# def dataset_edit(request, id=None):
+# 	dataset = Dataset.objects.filter(id=id).first()
+# 	if not request.user.is_staff:
+# 		profile = Profile.objects.filter(user=request.user)
+# 		profile_dataset = Profile_Dataset.objects.filter(dataset=dataset, profile=profile)
+# 		if len(profile_dataset) > 0:
+# 			profile_dataset = Profile_Dataset.objects.filter(dataset=dataset, profile=profile).first()
+# 			if not profile_dataset.is_admin():
+# 				return HttpResponseRedirect(reverse('home'))
+# 		else:
+# 			return HttpResponseRedirect(reverse('home'))
+# 	profile_dataset = None
+# 	if request.user and (not request.user.is_anonymous()):
+# 		profile = Profile.objects.filter(user=request.user)
+# 		profile_dataset = Profile_Dataset.objects.filter(dataset=dataset, profile=profile)
+# 		if len(profile_dataset) > 0:
+# 			profile_dataset = Profile_Dataset.objects.filter(dataset=dataset, profile=profile).first()
+# 			if not profile_dataset.is_admin():
+# 				profile_dataset = None
+# 		else:
+# 			profile_dataset = None
+# 	datas = Data.objects.all().filter(dataset=dataset)
+# 	datasetform = DatasetEditForm(dataset=dataset)
+# 	schedule = Schedule_Event.objects.filter(dataset_schedule=dataset).order_by('date')
+# 	relations = Event_Relation.objects.filter(dataset_associated=id)
+# 	news = News.objects.filter(dataset_id=id)
+# 	members = Profile_Dataset.objects.filter(dataset=dataset)
+# 	if request.method == 'POST':
+# 		datasetform = DatasetEditForm(request.POST, request.FILES, dataset=dataset)
+# 		if datasetform.is_valid():
+# 			dataset_title = datasetform.cleaned_data['dataset_title']
+# 			desc = datasetform.cleaned_data['description']
+# 			threshold = datasetform.cleaned_data['threshold']
+# 			threshold_extra = datasetform.cleaned_data['threshold_extra']
+# 			evaluation_file = datasetform.cleaned_data['evaluation_file']
+# 			gt_file = datasetform.cleaned_data['gt_file']
+# 			if threshold and threshold_extra:
+# 				if threshold_extra == '1':
+# 					threshold=-threshold
+# 				dataset.threshold = threshold
+# 			dataset.title = dataset_title
+# 			dataset.description = desc
+# 			dataset.evaluation_file = evaluation_file
+# 			dataset.gt_file = gt_file
+# 			dataset.save()
+# 			return HttpResponseRedirect(reverse('dataset_list'))
+# 	context = {
+# 		"datasetform": datasetform,
+# 		"dataset": dataset,
+# 		"datas": datas,
+# 		"schedule": schedule,
+# 		"relations": relations,
+# 		"news": news,
+# 		"members": members,
+# 		"profile_dataset": profile_dataset,
+# 	}
+# 	return render(request, "dataset/edit.html", context, context_instance=RequestContext(request))
 
 @login_required(login_url='auth_login')
 def dataset_edit_desc(request, id=None):
@@ -1272,34 +1272,34 @@ def data_remove(request, id=None, dataset_id=None):
 	data.delete()
 	return HttpResponse(reverse('dataset_edit_datas', kwargs={'id':dataset_id}))
 
-@login_required(login_url='auth_login')
-# @user_passes_test(lambda u:u.is_staff, login_url='/')
-def data_edit(request, id=None, dataset_id=None):
-	data = Data.objects.filter(id=id).first()
-	files = File.objects.filter(data=data)
-	dataform = DataEditForm(data=data)
-	dataset = Dataset.objects.filter(id=dataset_id).first()
-	if request.method == 'POST':
-		dataform = DataEditForm(request.POST, data=data)
-		if dataform.is_valid():
-			data_title = dataform.cleaned_data['data_title']
-			data_desc = dataform.cleaned_data['data_desc']
-			software = dataform.cleaned_data['data_software']
-			metric = dataform.cleaned_data['data_metric']
-			data.title = data_title
-			data.description = data_desc
-			data.software = software
-			data.metric = metric
-			data.save()
-			return HttpResponseRedirect(reverse('dataset_edit_datas', kwargs={'id':dataset_id}))
-	context = {
-		"dataform": dataform,
-		"data": data,
-		"files": files,
-		"dataset_id": dataset_id,
-		"dataset": dataset,
-	}
-	return render(request, "data/edit.html", context, context_instance=RequestContext(request))
+# @login_required(login_url='auth_login')
+# # @user_passes_test(lambda u:u.is_staff, login_url='/')
+# def data_edit(request, id=None, dataset_id=None):
+# 	data = Data.objects.filter(id=id).first()
+# 	files = File.objects.filter(data=data)
+# 	dataform = DataEditForm(data=data)
+# 	dataset = Dataset.objects.filter(id=dataset_id).first()
+# 	if request.method == 'POST':
+# 		dataform = DataEditForm(request.POST, data=data)
+# 		if dataform.is_valid():
+# 			data_title = dataform.cleaned_data['data_title']
+# 			data_desc = dataform.cleaned_data['data_desc']
+# 			software = dataform.cleaned_data['data_software']
+# 			metric = dataform.cleaned_data['data_metric']
+# 			data.title = data_title
+# 			data.description = data_desc
+# 			data.software = software
+# 			data.metric = metric
+# 			data.save()
+# 			return HttpResponseRedirect(reverse('dataset_edit_datas', kwargs={'id':dataset_id}))
+# 	context = {
+# 		"dataform": dataform,
+# 		"data": data,
+# 		"files": files,
+# 		"dataset_id": dataset_id,
+# 		"dataset": dataset,
+# 	}
+# 	return render(request, "data/edit.html", context, context_instance=RequestContext(request))
 
 @login_required(login_url='auth_login')
 # @user_passes_test(lambda u:u.is_staff, login_url='/')
@@ -1553,6 +1553,8 @@ def partner_select(request, id=None):
 	context = {
 		"selectform": selectform,
 		"event": event,
+		"workshop": workshop,
+		"challenge": challenge,
 	}
 	return render(request, "partner/select.html", context, context_instance=RequestContext(request))
 
@@ -2819,47 +2821,47 @@ def challenge_publications(request, id=None):
 	}
 	return render(request, "challenge/publications.html", context, context_instance=RequestContext(request))
 
-@login_required(login_url='auth_login')
-def workshop_edit(request, id=None):
-	workshop = Workshop.objects.filter(id=id).first()
-	if not request.user.is_staff:
-		profile = Profile.objects.filter(user=request.user)
-		profile_event = Profile_Event.objects.filter(event=workshop, profile=profile)
-		if len(profile_event) > 0:
-			profile_event = Profile_Event.objects.filter(event=workshop, profile=profile).first()
-			if not profile_event.is_admin():
-				return HttpResponseRedirect(reverse('home'))
-		else:
-			return HttpResponseRedirect(reverse('home'))
-	profile_event = check_event_permission(request, workshop)
-	members = Profile_Event.objects.filter(event=workshop)
-	eventform = EditEventForm(event=workshop)
-	program = Schedule_Event.objects.filter(event_program=workshop,schedule_event_parent=None).order_by('date')
-	news = News.objects.filter(event_id=id)
-	images = Gallery_Image.objects.filter(workshop=workshop)
-	schedule = Schedule_Event.objects.filter(event_schedule=workshop,schedule_event_parent=None).order_by('date')
-	relations = Event_Relation.objects.filter(event_associated__id=id)
-	if request.method == 'POST':
-		eventform = EditEventForm(request.POST, event=workshop)
-		if eventform.is_valid():
-			title = eventform.cleaned_data["title"]
-			desc = eventform.cleaned_data["description"]
-			workshop.title = title
-			workshop.description = desc
-			workshop.save()
-			return HttpResponseRedirect(reverse('event_list'))
-	context = {
-		"eventform": eventform,
-		"members": members,
-		"workshop": workshop,
-		"program": program,
-		"news": news,
-		"images": images, 
-		"schedule": schedule,
-		"relations": relations,
-		"profile": profile_event,
-	}
-	return render(request, "workshop/edit.html", context, context_instance=RequestContext(request))
+# @login_required(login_url='auth_login')
+# def workshop_edit(request, id=None):
+# 	workshop = Workshop.objects.filter(id=id).first()
+# 	if not request.user.is_staff:
+# 		profile = Profile.objects.filter(user=request.user)
+# 		profile_event = Profile_Event.objects.filter(event=workshop, profile=profile)
+# 		if len(profile_event) > 0:
+# 			profile_event = Profile_Event.objects.filter(event=workshop, profile=profile).first()
+# 			if not profile_event.is_admin():
+# 				return HttpResponseRedirect(reverse('home'))
+# 		else:
+# 			return HttpResponseRedirect(reverse('home'))
+# 	profile_event = check_event_permission(request, workshop)
+# 	members = Profile_Event.objects.filter(event=workshop)
+# 	eventform = EditEventForm(event=workshop)
+# 	program = Schedule_Event.objects.filter(event_program=workshop,schedule_event_parent=None).order_by('date')
+# 	news = News.objects.filter(event_id=id)
+# 	images = Gallery_Image.objects.filter(workshop=workshop)
+# 	schedule = Schedule_Event.objects.filter(event_schedule=workshop,schedule_event_parent=None).order_by('date')
+# 	relations = Event_Relation.objects.filter(event_associated__id=id)
+# 	if request.method == 'POST':
+# 		eventform = EditEventForm(request.POST, event=workshop)
+# 		if eventform.is_valid():
+# 			title = eventform.cleaned_data["title"]
+# 			desc = eventform.cleaned_data["description"]
+# 			workshop.title = title
+# 			workshop.description = desc
+# 			workshop.save()
+# 			return HttpResponseRedirect(reverse('event_list'))
+# 	context = {
+# 		"eventform": eventform,
+# 		"members": members,
+# 		"workshop": workshop,
+# 		"program": program,
+# 		"news": news,
+# 		"images": images, 
+# 		"schedule": schedule,
+# 		"relations": relations,
+# 		"profile": profile_event,
+# 	}
+# 	return render(request, "workshop/edit.html", context, context_instance=RequestContext(request))
 
 @login_required(login_url='auth_login')
 def workshop_edit_desc(request, id=None):
@@ -3381,52 +3383,52 @@ def speaker_creation(request, id=None):
 	}
 	return render(request, "speaker/creation.html", context, context_instance=RequestContext(request))
 
-@login_required(login_url='auth_login')
-def special_issue_edit(request, id=None):
-	issue = Special_Issue.objects.filter(id=id).first()
-	if not request.user.is_staff:
-		profile = Profile.objects.filter(user=request.user)
-		profile_event = Profile_Event.objects.filter(event=issue, profile=profile)
-		if len(profile_event) > 0:
-			profile_event = Profile_Event.objects.filter(event=issue, profile=profile).first()
-			if not profile_event.is_admin():
-				return HttpResponseRedirect(reverse('home'))
-		else:
-			return HttpResponseRedirect(reverse('home'))
-	profile_event = None
-	if request.user and (not request.user.is_anonymous()):
-		profile = Profile.objects.filter(user=request.user)
-		profile_event = Profile_Event.objects.filter(event=issue, profile=profile)
-		if len(profile_event) > 0:
-			profile_event = Profile_Event.objects.filter(event=issue, profile=profile).first()
-			if not profile_event.is_admin():
-				profile_event = None
-		else:
-			profile_event = None
-	news = News.objects.filter(event_id=id)
-	members = Profile_Event.objects.filter(event=issue)
-	schedule = Schedule_Event.objects.filter(event_schedule=issue,schedule_event_parent=None).order_by('date')
-	eventform = EditEventForm(event=issue)
-	relations = Event_Relation.objects.filter(event_associated__id=id) 
-	if request.method == 'POST':
-		eventform = EditEventForm(request.POST, event=issue)
-		if eventform.is_valid():
-			title = eventform.cleaned_data["title"]
-			desc = eventform.cleaned_data["description"]
-			issue.title = title
-			issue.description = desc
-			issue.save()
-			return HttpResponseRedirect(reverse('event_list'))
-	context = {
-		"eventform": eventform,
-		"issue": issue,
-		"news": news,
-		"members": members,
-		"schedule": schedule,
-		"relations": relations,
-		"profile": profile_event,
-	}
-	return render(request, "special_issue/edit.html", context, context_instance=RequestContext(request))
+# @login_required(login_url='auth_login')
+# def special_issue_edit(request, id=None):
+# 	issue = Special_Issue.objects.filter(id=id).first()
+# 	if not request.user.is_staff:
+# 		profile = Profile.objects.filter(user=request.user)
+# 		profile_event = Profile_Event.objects.filter(event=issue, profile=profile)
+# 		if len(profile_event) > 0:
+# 			profile_event = Profile_Event.objects.filter(event=issue, profile=profile).first()
+# 			if not profile_event.is_admin():
+# 				return HttpResponseRedirect(reverse('home'))
+# 		else:
+# 			return HttpResponseRedirect(reverse('home'))
+# 	profile_event = None
+# 	if request.user and (not request.user.is_anonymous()):
+# 		profile = Profile.objects.filter(user=request.user)
+# 		profile_event = Profile_Event.objects.filter(event=issue, profile=profile)
+# 		if len(profile_event) > 0:
+# 			profile_event = Profile_Event.objects.filter(event=issue, profile=profile).first()
+# 			if not profile_event.is_admin():
+# 				profile_event = None
+# 		else:
+# 			profile_event = None
+# 	news = News.objects.filter(event_id=id)
+# 	members = Profile_Event.objects.filter(event=issue)
+# 	schedule = Schedule_Event.objects.filter(event_schedule=issue,schedule_event_parent=None).order_by('date')
+# 	eventform = EditEventForm(event=issue)
+# 	relations = Event_Relation.objects.filter(event_associated__id=id) 
+# 	if request.method == 'POST':
+# 		eventform = EditEventForm(request.POST, event=issue)
+# 		if eventform.is_valid():
+# 			title = eventform.cleaned_data["title"]
+# 			desc = eventform.cleaned_data["description"]
+# 			issue.title = title
+# 			issue.description = desc
+# 			issue.save()
+# 			return HttpResponseRedirect(reverse('event_list'))
+# 	context = {
+# 		"eventform": eventform,
+# 		"issue": issue,
+# 		"news": news,
+# 		"members": members,
+# 		"schedule": schedule,
+# 		"relations": relations,
+# 		"profile": profile_event,
+# 	}
+# 	return render(request, "special_issue/edit.html", context, context_instance=RequestContext(request))
 
 @login_required(login_url='auth_login')
 def special_issue_edit_desc(request, id=None):

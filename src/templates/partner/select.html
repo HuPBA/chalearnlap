@@ -33,7 +33,14 @@
                                     {% if selectform.partner.field.required %}
                                     <span class="text-danger">*</span>
                                     {% endif %}
-                                </label>&ensp;<a href="{% url "partner_creation" id=event.id %}"><i class="fa fa-plus-circle" aria-hidden="true"></i></a>
+                                </label>&ensp;
+                                {% if challenge %}
+                                    <a href="{% url "challenge_sponsors_creation" id=challenge.id %}"><i class="fa fa-plus-circle" aria-hidden="true"></i></a>
+                                {% elif workshop %}
+                                    <a href="{% url "workshop_sponsors_creation" id=workshop.id %}"><i class="fa fa-plus-circle" aria-hidden="true"></i></a>
+                                {% else %}
+                                    <a href="{% url "partner_creation" id=event.id %}"><i class="fa fa-plus-circle" aria-hidden="true"></i></a>
+                                {% endif %}
                                 {% if selectform.errors.partner %}
                                     <div class="alert alert-danger" role="alert">{{ selectform.errors.partner }}</div>
                                 {% endif %}
@@ -41,16 +48,7 @@
                             </div>                                     
                             <hr> 
                             <div class="row">
-                            {% if challenge %}
-                                <div class="col-lg-4 col-lg-offset-3 text-right"> 
-                                    <a class="btn btn-action" href="{% url "challenge_sponsors_creation" id=challenge.id %}">Create new sponsor</a>
-                                </div>
-                            {% elif workshop %}
-                                <div class="col-lg-4 col-lg-offset-3 text-right"> 
-                                    <a class="btn btn-action" href="{% url "workshop_sponsors_creation" id=workshop.id %}">Create new sponsor</a>
-                                </div>
-                            {% endif %}
-                                <div class="col-lg-2 col-lg-offset-2 text-right"> 
+                                <div class="col-lg-2 col-lg-offset-9 text-right"> 
                                     <button class="btn btn-action" type="submit">Save</button>
                                 </div>
                             </div>                                     

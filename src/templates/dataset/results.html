@@ -77,6 +77,33 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                {% for r,extra in results %}
+                                    <tr>
+                                        <td>
+                                            {% if extra.count > 0 %}
+                                                <div class="btn-group">
+                                                    <a class="btn dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{ r.user }}<span class="caret"></span></a>
+                                                    <ul id="contextMenu" class="dropdown-menu" role="menu">
+                                                        {% for e in extra %}
+                                                            {% if e.paper %}
+                                                                <li><a href="{{ MEDIA_URL }}{{ e.paper }}">{{ e.name }}</a></li>
+                                                            {% else %}
+                                                                <li><a href="{% url "dataset_result_fact_sheet" dataset_id=dataset.id f_sheet_id=e.id %}">{{ e.name }}</a></li>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    </ul>
+                                                </div>
+                                            {% else %}
+                                                {{ r.user }}
+                                            {% endif %}
+                                        </td>
+                                        {% for s in scores %}
+                                            {% if s.result == r %}
+                                                <td>{{ s.score }}</td>
+                                            {% endif%}
+                                        {% endfor %}
+                                    </tr>
+                                {% endfor %}
                                 {% for sub,extra in submissions %}
                                     <tr>
                                         <td>

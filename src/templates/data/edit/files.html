@@ -1,7 +1,8 @@
 {% extends "data/edit/base.html" %}
 {% block breadcrumb %}
     <li><a href="{% url "home" %}">Home</a></li>
-    <li><a href="{% url "dataset_edit_datas" id=dataset.id%}">{{ dataset.title }} (Edit mode)</a></li> 
+    <li><a href="{% url "dataset_edit_datas" id=dataset.id %}">{{ dataset.title }} (Edit mode)</a></li>
+    <li>{{ data.title }}</li>
     <li class="active">Description</li>  
 {% endblock breadcrumb %} 
 {% block content %}
