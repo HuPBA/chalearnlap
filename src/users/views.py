@@ -1095,7 +1095,11 @@ def dataset_edit_submission(request, id=None, submission_id=None):
 def dataset_remove_submission(request, id=None, submission_id=None):
 	submission = Submission.objects.filter(id=submission_id).first()
 	submission.delete()
-	return HttpResponse(reverse('dataset_edit_results', kwargs={'id':id, 'grid_id': submission.grid.id}))
+	dataset = Dataset.objects.filter(id=id).first()
+	if check_edit_dataset_permission(request, dataset) == False:
+		return HttpResponse(reverse('dataset_results', kwargs={'id':id, 'grid_id': submission.grid.id}))
+	else:
+		return HttpResponse(reverse('dataset_edit_results', kwargs={'id':id, 'grid_id': submission.grid.id}))
 
 @login_required(login_url='auth_login')
 def dataset_publish(request, id=None):
@@ -1440,28 +1444,23 @@ def dataset_results(request, dataset_id=None, grid_id=None):
 				headers.append(h)
 	else:
 		headers = header
+
 	submissions = None
 	scores_submissions = None
 	headers_submissions = []
 	scores_submissions = Score.objects.filter(submission__grid=grid)
-	header = Grid_Header.objects.filter(grid=grid)
+	header = Grid_Header.objects.filter(grid=grid).first()
 	submissions2 = Submission.objects.filter(grid=grid)
 	submissions = []
+	scores2 = Score.objects.filter(name=header.name, result__in=results2)
 	for s in submissions2:
 		extra = Result_User.objects.filter(submission=s)
 		submissions.append((s,extra))
 	if scores_submissions.count() > 0:
-		for h in header:
-			if Score.objects.filter(name=h.name, submission__grid=grid).count() > 0:
-				headers_submissions.append(h)
+		if Score.objects.filter(name=header.name, submission__grid=grid).count() > 0:
+			headers_submissions.append(header)
 	else:
 		headers_submissions = header
-
-	# submission_scores = []
-	# submissions = Submission.objects.filter(grid=grid)
-	# for s in submissions:
-	# 	sub_scores = Score.objects.filter(submission=s)
-	# 	submission_scores.append((s,sub_scores))
 	profile_dataset = check_dataset_permission(request, dataset)
 	context = {
 		"grids": grids,
@@ -1473,7 +1472,9 @@ def dataset_results(request, dataset_id=None, grid_id=None):
 		"results": results,
 		"scores": scores,
 		"headers": headers,
+		"scores2": scores2,
 		"scores_submissions": scores_submissions,
+		"headers_submissions": headers_submissions,
 		"submissions": submissions,
 		"profile": profile_dataset,
 	}
@@ -3992,13 +3993,14 @@ def submission_score(request, dataset_id=None, sub_id=None):
 	grid_id = submission.grid.id
 	passed = False
 	s = Score.objects.filter(submission__id=sub_id).first()
-	if submission.grid.threshold < 0:
-		if s.score <= -submission.grid.threshold:
-			passed = True
-	else:
-		if s.score >= submission.grid.threshold:
-			passed = True
-	if not passed:
+	if s:
+		if submission.grid.threshold < 0:
+			if s.score <= -submission.grid.threshold:
+				passed = True
+		else:
+			if s.score >= submission.grid.threshold:
+				passed = True
+	if not passed or not s:
 		submission.delete()
 	datas = Data.objects.all().filter(dataset=dataset,is_public=True)
 	news = News.objects.filter(dataset=dataset)
