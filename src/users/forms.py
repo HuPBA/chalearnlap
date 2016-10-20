@@ -542,6 +542,7 @@ class ResultRowForm(forms.Form):
 	def __init__(self, *args, **kwargs):
 		headers = kwargs.pop('headers', None)
 		super(ResultRowForm, self).__init__(*args, **kwargs)
+		self.fields['rank'] = forms.IntegerField(required=True, widget=forms.NumberInput(attrs={'class': "form-control"}))
 		self.fields['username'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}))
 		for h in headers:
 			self.fields[h.name] = forms.FloatField(required=False, widget=forms.NumberInput(attrs={'class': "form-control"}))
@@ -563,6 +564,7 @@ class ResultRowEditForm(forms.Form):
 				else:
 					self.fields[h.name] = forms.FloatField(required=False, widget=forms.NumberInput(attrs={'class': "form-control"}))
 		elif result:
+			self.fields['rank'] = forms.IntegerField(required=True, widget=forms.NumberInput(attrs={'class': "form-control"}), initial=result.rank)
 			for h in headers:
 				s = Score.objects.filter(name__icontains=h.name, result=result).first()
 				if s:

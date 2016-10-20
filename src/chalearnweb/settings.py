@@ -92,7 +92,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'chalearnwebdb',
-	'USER': 'oriols',
+	'USER': 'oriol',
 	'PASSWORD': 'oriol',
 	'HOST': 'localhost',
 	'PORT': '',

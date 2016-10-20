@@ -29,6 +29,7 @@
                                         <table class="table table-striped table-bordered">
                                             <thead>
                                                 <tr>
+                                                    <th>Rank</th>
                                                     <th>User</th>
                                                     {% if scores %}
                                                         {% for n in headers %}
@@ -44,6 +45,7 @@
                                             <tbody>
                                                 {% for r in results %}
                                                     <tr>
+                                                        <td>{{ r.rank }}</td>
                                                         <td>{{ r.user }} <a href="{% url "result_edit" id=challenge.id track_id=track.id result_id=r.id %}"><i class="fa fa-pencil" aria-hidden="true"></i></a>&ensp;<a id="{{ e.id }}" class="delete-event" value="{% url "result_remove" id=challenge.id track_id=track.id result_id=r.id %}" href=""><i class="fa fa-minus-circle fa" aria-hidden="true"></i></a></td>
                                                         {% for s in scores %}
                                                             {% if s.result == r %}

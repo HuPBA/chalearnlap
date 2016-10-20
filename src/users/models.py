@@ -269,6 +269,8 @@ class Result(models.Model):
 	user = models.CharField(null=True, max_length=100)
 	# track = models.ForeignKey(Track, on_delete=models.CASCADE, null=True)
 	grid = models.ForeignKey(Result_Grid, on_delete=models.CASCADE, null=True)
+	rank = models.IntegerField(null=True)
+	sub_rank = models.IntegerField(null=True)
 
 	def __str__(self):
 		return unicode(self.user).encode('utf-8')
@@ -294,6 +296,7 @@ class Submission(models.Model):
 	prediction_file = models.FileField(upload_to=prediction_path, null=True)
 	ground_truth = models.FileField(upload_to=gt_path, null=True)
 	output = models.FileField(upload_to=output_path, null=True)
+	rank = models.IntegerField(null=True)
 
 	def __str__(self):
 		return unicode(self.user.username).encode('utf-8')

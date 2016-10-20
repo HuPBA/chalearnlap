@@ -16,6 +16,7 @@
                         <table class="table table-bordered display">
                             <thead>
                                 <tr>
+                                    <th>Rank</th>
                                     <th>User</th>
                                     {% if scores %}
                                         {% for n in headers %}
@@ -31,6 +32,7 @@
                             <tbody>
                                 {% for r,extra in results %}
                                     <tr>
+                                        <td>{{ r.rank }}</td>
                                         <td>
                                             {% if extra.count > 0 %}
                                                 <div class="btn-group">

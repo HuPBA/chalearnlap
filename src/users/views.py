@@ -1091,15 +1091,44 @@ def dataset_edit_submission(request, id=None, submission_id=None):
 		}
 		return render(request, "dataset/edit/result_user_submission.html", context, context_instance=RequestContext(request))
 
-@login_required(login_url='auth_login')
+# @login_required(login_url='auth_login')
 def dataset_remove_submission(request, id=None, submission_id=None):
 	submission = Submission.objects.filter(id=submission_id).first()
+	sub_score = Score.objects.filter(submission=submission).first()
+	if submission.grid.threshold < 0: #ascendent
+		if sub_score <= -submission.grid.threshold:
+			results = Result.objects.filter(grid=submission.grid).order_by('-sub_rank')
+			submissions = Submission.objects.filter(grid=submission.grid).order_by('-rank').exclude(id=submission.id)
+			scores_list = Score.objects.filter(Q(result__in=results) | Q(submission__in=submissions)).order_by('score')
+			for aux_score in scores_list:
+				if aux_score.result:
+					if submission.rank <= (aux_score.result.sub_rank-1):
+						aux_score.result.sub_rank -= 1
+						aux_score.result.save()
+				elif aux_score.submission:
+					if submission.rank <= (aux_score.submission.rank-1):
+						aux_score.submission.rank -= 1
+						aux_score.submission.save()
+	else: #descendent
+		if sub_score >= submission.grid.threshold:
+			results = Result.objects.filter(grid=submission.grid).order_by('-sub_rank')
+			submissions = Submission.objects.filter(grid=submission.grid).order_by('-rank').exclude(id=submission.id)
+			scores_list = Score.objects.filter(Q(result__in=results) | Q(submission__in=submissions)).order_by('-score')
+			for aux_score in scores_list:
+				if aux_score.result:
+					if submission.rank <= (aux_score.result.sub_rank-1):
+						aux_score.result.sub_rank -= 1
+						aux_score.result.save()
+				elif aux_score.submission:
+					if submission.rank <= (aux_score.submission.rank-1):
+						aux_score.submission.rank -= 1
+						aux_score.submission.save()
 	submission.delete()
 	dataset = Dataset.objects.filter(id=id).first()
-	if check_edit_dataset_permission(request, dataset) == False:
-		return HttpResponse(reverse('dataset_results', kwargs={'id':id, 'grid_id': submission.grid.id}))
-	else:
-		return HttpResponse(reverse('dataset_edit_results', kwargs={'id':id, 'grid_id': submission.grid.id}))
+	# if check_edit_dataset_permission(request, dataset) == False:
+	return HttpResponse(reverse('dataset_results', kwargs={'id':dataset.id, 'grid_id': submission.grid.id}))
+	# else:
+	# 	return HttpResponse(reverse('dataset_edit_results', kwargs={'id':id, 'grid_id': submission.grid.id}))
 
 @login_required(login_url='auth_login')
 def dataset_publish(request, id=None):
@@ -2053,6 +2082,9 @@ def result_edit(request, id=None, track_id=None, result_id=None):
 	if request.method == 'POST':
 		roweditform = ResultRowEditForm(request.POST, result=result, headers=headers)
 		if roweditform.is_valid():
+			result.rank = roweditform.cleaned_data['rank']
+			result.sub_rank = roweditform.cleaned_data['rank']
+			result.save()
 			for h in headers:
 				new_score = roweditform.cleaned_data[h.name]
 				s, created = Score.objects.get_or_create(result=result, name=h.name)
@@ -2188,11 +2220,11 @@ def result_new_table(request, id=None, track_id=None):
 			if Result_Grid.objects.filter(track=track).count > 0:
 				Result_Grid.objects.filter(track=track).delete()
 				grid = Result_Grid.objects.create(track=track)
-				i = 1
-				while i <= cols:
-					Grid_Header.objects.create(grid=grid, name='col'+str(i))
-					i+=1
-			return HttpResponseRedirect(reverse('track_edit_result', kwargs={'id':id, 'track_id':track_id}))
+			i = 1
+			while i <= cols:
+				Grid_Header.objects.create(grid=grid, name='Score'+str(i))
+				i+=1
+		return HttpResponseRedirect(reverse('track_edit_result', kwargs={'id':id, 'track_id':track_id}))
 	context = {
 		"form": form,
 		"track": track,
@@ -2222,7 +2254,8 @@ def result_new_row(request, id=None, track_id=None):
 		form = ResultRowForm(request.POST, headers=headers)
 		if form.is_valid():
 			username = form.cleaned_data['username']
-			result = Result.objects.create(user=username, grid=grid)
+			rank = form.cleaned_data['rank']
+			result = Result.objects.create(user=username, grid=grid, rank=rank, sub_rank=rank)
 			for h in headers: 
 				new_score = form.cleaned_data[h.name]
 				Score.objects.create(score=new_score, name=h.name, result=result)
@@ -2646,31 +2679,19 @@ def track_edit_result(request, id=None, track_id=None):
 					return HttpResponseRedirect(reverse('result_new_table', kwargs={'id':id,'track_id':track_id}))
 				return HttpResponseRedirect(reverse('track_edit_result', kwargs={'id':id,'track_id':track_id}))
 		if grid:
-			max_rank = 0
-			max_result = None
-			prev_result = None
-			tmp = None
-			results = Result.objects.filter(grid=grid)
+			results = Result.objects.filter(grid=grid).order_by('-rank')
+			aux_score = None
 			for r in results:
-				s = Score.objects.filter(result=r,name__icontains='rank').first()
-				if s:
-					if s.score > max_rank:
-						max_rank = s.score
-						max_result = r
-						prev_result = tmp
-				tmp = r
-			if max_result:
-				s = Score.objects.filter(result=max_result).first()
-				if s:
-					if max_rank > 1:
-						prev_s = Score.objects.filter(result=prev_result).first()
-						if prev_s.score >= s.score:
-							grid.threshold = s.score
-						elif prev_s.score < s.score:
-							grid.threshold = -s.score
-						grid.save()
-					else:
-						grid.threshold = s.score
+				s = Score.objects.filter(result=r).first()
+				print s.score
+				if aux_score:
+					if aux_score > s.score:
+						grid.threshold = -aux_score
+					elif aux_score < s.score:
+						grid.threshold = aux_score
+					break
+				aux_score = s.score
+			grid.save()
 		context = {
 			"eventform": eventform,
 			"challenge": c, 
@@ -3994,12 +4015,56 @@ def submission_score(request, dataset_id=None, sub_id=None):
 	passed = False
 	s = Score.objects.filter(submission__id=sub_id).first()
 	if s:
-		if submission.grid.threshold < 0:
+		if submission.grid.threshold < 0: #ascendent
 			if s.score <= -submission.grid.threshold:
 				passed = True
-		else:
+				results = Result.objects.filter(grid__id=grid_id).order_by('-sub_rank')
+				submissions = Submission.objects.filter(grid__id=grid_id).order_by('-rank').exclude(id=sub_id)
+				scores_list = Score.objects.filter(Q(result__in=results) | Q(submission__in=submissions)).order_by('-score')
+				for aux_score in scores_list:
+					if s.score < aux_score.score:
+						if aux_score.result:
+							aux_score.result.sub_rank += 1
+							aux_score.result.save()
+						elif aux_score.submission:
+							aux_score.submission.rank += 1
+							aux_score.submission.save()
+					else:
+						if aux_score.result:
+							submission.rank = (aux_score.result.sub_rank+1)
+							submission.save()
+						elif aux_score.submission:
+							submission.rank = (aux_score.submission.rank+1)
+							submission.save()
+						break
+				if submission.rank == None:
+					submission.rank = 1
+					submission.save()
+		else: #descendent
 			if s.score >= submission.grid.threshold:
 				passed = True
+				results = Result.objects.filter(grid__id=grid_id).order_by('-sub_rank')
+				submissions = Submission.objects.filter(grid__id=grid_id).order_by('-rank').exclude(id=sub_id)
+				scores_list = Score.objects.filter(Q(result__in=results) | Q(submission__in=submissions)).order_by('score')
+				for aux_score in scores_list:
+					if s.score > aux_score.score:
+						if aux_score.result:
+							aux_score.result.sub_rank += 1
+							aux_score.result.save()
+						elif aux_score.submission:
+							aux_score.submission.rank += 1
+							aux_score.submission.save()
+					else:
+						if aux_score.result:
+							submission.rank = (aux_score.result.sub_rank+1)
+							submission.save()
+						elif aux_score.submission:
+							submission.rank = (aux_score.submission.rank+1)
+							submission.save()
+						break
+				if submission.rank == None:
+					submission.rank = 1
+					submission.save()
 	if not passed or not s:
 		submission.delete()
 	datas = Data.objects.all().filter(dataset=dataset,is_public=True)

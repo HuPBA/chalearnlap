@@ -48,5 +48,8 @@ jQuery(document).ready(function($) {
 	    $("#dialog").dialog("open");
 	    return false;
 	});
-	$('table.display').DataTable();
+	// $('table.display').DataTable();
+	$('table.display').DataTable({
+        "order": [[ 0, "asc" ]]
+    });
 });

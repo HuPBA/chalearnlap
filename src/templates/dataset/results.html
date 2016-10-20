@@ -16,6 +16,7 @@
                         <table class="table table-bordered display">
                             <thead>
                                 <tr>
+                                    <th>Rank</th>
                                     <th>User</th>
                                     {% if scores %}
                                         {% for n in headers %}
@@ -31,6 +32,7 @@
                             <tbody>
                                 {% for r,extra in results %}
                                     <tr>
+                                        <td>{{ r.rank }}</td>
                                         <td>
                                             {% if extra.count > 0 %}
                                                 <div class="btn-group">
@@ -65,17 +67,23 @@
                         <table class="table table-bordered display">
                             <thead>
                                 <tr>
+                                    <th>Rank</th>
                                     <th>User</th>
                                     {% if scores %}
-                                        <th>{{ headers_submissions.name }}</th>
+                                        {% for n in headers %}
+                                            <th>{{ n.name }}</th>
+                                        {% endfor %}
                                     {% else %}
-                                        <th>{{ headers_submissions.name }}&ensp;<a href="{% url "header_edit" id=challenge.id track_id=track.id header_id=headers_submissions.id %}"><i class="fa fa-pencil" aria-hidden="true"></i></a></th>
+                                        {% for n in headers %}
+                                            <th>{{ n.name }}&ensp;<a href="{% url "header_edit" id=challenge.id track_id=track.id header_id=n.id %}"><i class="fa fa-pencil" aria-hidden="true"></i></a></th>
+                                        {% endfor %}
                                     {% endif %}
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for r,extra in results %}
                                     <tr>
+                                        <td>{{ r.sub_rank }}</td>
                                         <td>
                                             {% if extra.count > 0 %}
                                                 <div class="btn-group">
@@ -103,6 +111,7 @@
                                 {% endfor %}
                                 {% for sub,extra in submissions %}
                                     <tr>
+                                        <td>{{ sub.rank }}</td>
                                         <td>
                                             {% if extra.count > 0 %}
                                                 <div class="btn-group">
@@ -137,7 +146,7 @@
                             </tbody>
                         </table>
                     </div>
-                    {% if grid.threshold and dataset.gt_file and dataset.evaluation_file %}
+                    <!-- {% if grid.threshold and dataset.gt_file and dataset.evaluation_file %} -->
                         <div class="row">
                             <div class="col-sm-4 col-sm-offset-4">
                                 <div class="all-margin">
@@ -145,7 +154,7 @@
                                 </div> 
                             </div>
                         </div> 
-                    {% endif %}
+                    <!-- {% endif %} -->
                 {% else %}
                     <div class="row">
                         <div class="col-sm-12">
