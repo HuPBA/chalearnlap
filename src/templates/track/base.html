@@ -19,7 +19,9 @@
             <div class="col-md-2" id="leftCol">
                 <ul class="nav nav-stacked" id="sidebar">
                     <li><a href='{% url 'track_desc' id=challenge.id track_id=track.id %}'>Description</a></li>
-                    <li><a href='{% url 'dataset_desc' id=track.dataset.id %}'>Dataset associated</a></li>
+                    {% if track.dataset %}
+                        <li><a href='{% url 'dataset_desc' id=track.dataset.id %}'>Dataset associated</a></li>
+                    {% endif %}
                     {% if track.metrics %}
                         <li><a href='{% url 'track_metrics' id=challenge.id track_id=track.id %}'>Evaluation metrics</a></li>
                     {% endif %}

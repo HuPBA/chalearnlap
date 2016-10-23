@@ -30,9 +30,10 @@
                             </div>
                         </div>
                         <div class="table-responsive">
-                            <table class="table table-bordered">
+                            <table class="table table-bordered display">
                                 <thead>
                                     <tr>
+                                        <th>Rank</th>
                                         <th>User</th>
                                         {% if scores %}
                                             {% for n in headers %}
@@ -40,7 +41,7 @@
                                             {% endfor %}
                                         {% else %}
                                             {% for n in headers %}
-                                                <th>{{ n.name }}</th>
+                                                <th>{{ n.name }}</i></a></th>
                                             {% endfor %}
                                         {% endif %}
                                     </tr>
@@ -48,6 +49,7 @@
                                 <tbody>
                                     {% for sub,scores in submission_scores %}
                                         <tr>
+                                            <td>{{ sub.rank }}</td>
                                             <td>{{ sub.user.username }}<br>&ensp;<a href="{% url "dataset_edit_submission" id=dataset.id submission_id=sub.id %}"><i class="fa fa-pencil" aria-hidden="true"></i></a>&ensp;<a id="{{ sub.id }}" class="delete-event" value="{% url 'dataset_remove_submission' id=dataset.id submission_id=sub.id %}" href=""><i class="fa fa-minus-circle fa" aria-hidden="true"></i></a></td>
                                             {% for s in scores %}
                                                 <td>{{ s.score }}</td>

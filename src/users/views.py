@@ -3986,14 +3986,20 @@ def submission_creation(request, dataset_id=None, grid_id=None):
 			os.system(command)
 			lines = new_submission.output.readlines()
 			for l in lines:
-				name=l.split(':')[0]
-				for h in headers: 
-					if name.lower() in h.name.lower():
-						try:
-							new_score = float(l.split(':')[1])
-							Score.objects.create(score=new_score, name=h.name, submission=new_submission)
-						except ValueError:
-							continue
+				try:
+					new_score = float(l.split(':')[1])
+					Score.objects.create(score=new_score, name=h.name, submission=new_submission)
+				except ValueError:
+					continue
+				break
+				# name=l.split(':')[0]
+				# for h in headers: 
+				# 	if name.lower() in h.name.lower():
+				# 		try:
+				# 			new_score = float(l.split(':')[1])
+				# 			Score.objects.create(score=new_score, name=h.name, submission=new_submission)
+				# 		except ValueError:
+				# 			continue
 			return HttpResponseRedirect(reverse('submission_score', kwargs={'dataset_id':dataset_id, 'sub_id': new_submission.id}))
 	context = {
 		"form": form,
