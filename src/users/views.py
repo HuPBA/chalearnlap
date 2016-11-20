@@ -224,7 +224,7 @@ def export_user_csv(request):
 	response['Content-Disposition'] = 'attachment; filename="all-users.csv"'
 	writer = csv.writer(response)
 	# response.write(u'\ufeff'.encode('utf8'))
-	writer.writerow(['ID','Username','First name','Last name','Email','Affiliation','Events'])
+	writer.writerow(['ID','Username','First name','Last name','Email','Affiliation','Newsletter','Events'])
 	for u in users:
 		events = ''
 		profile_events = Profile_Event.objects.filter(profile=u).exclude(event=None)
@@ -236,9 +236,15 @@ def export_user_csv(request):
 				events += (p.event.title.encode('utf8')+'('+p.role.name.encode('utf8')+'), ')
 			i+=1
 		if u.user:
-			writer.writerow([u.pk,unicode(u.user.username),unicode(u.first_name).encode('utf-8'),unicode(u.last_name).encode('utf-8'),unicode(u.user.email).encode('utf-8'),(u.affiliation),events])
+			if u.newsletter:
+				writer.writerow([u.pk,unicode(u.user.username),unicode(u.first_name).encode('utf-8'),unicode(u.last_name).encode('utf-8'),unicode(u.user.email).encode('utf-8'),(u.affiliation),'yes'.encode('utf-8'),events])
+			else:
+				writer.writerow([u.pk,unicode(u.user.username),unicode(u.first_name).encode('utf-8'),unicode(u.last_name).encode('utf-8'),unicode(u.user.email).encode('utf-8'),(u.affiliation),'no'.encode('utf-8'),events])
 		else: 
-			writer.writerow([u.pk,'',unicode(u.first_name).encode('utf-8'),unicode(u.last_name).encode('utf-8'),unicode(u.email).encode('utf-8'),(u.affiliation),events])
+			if u.newsletter:
+				writer.writerow([u.pk,'',unicode(u.first_name).encode('utf-8'),unicode(u.last_name).encode('utf-8'),unicode(u.email).encode('utf-8'),(u.affiliation),'yes'.encode('utf-8'),events])
+			else:
+				writer.writerow([u.pk,'',unicode(u.first_name).encode('utf-8'),unicode(u.last_name).encode('utf-8'),unicode(u.email).encode('utf-8'),(u.affiliation),'no'.encode('utf-8'),events])
 	return response
 
 @login_required(login_url='auth_login')
@@ -288,7 +294,7 @@ def export_user_xls(request):
 	workbook = xlwt.Workbook()
 	worksheet = workbook.add_sheet("Users")
 	row_num = 0
-	columns = ['ID','Username','First name','Last name','Email','Affiliation','Events']
+	columns = ['ID','Username','First name','Last name','Email','Affiliation','Newsletter','Events']
 	for col_num in range(len(columns)):
 		worksheet.write(row_num, col_num, columns[col_num])  
 
@@ -314,7 +320,10 @@ def export_user_xls(request):
 				aff = u.affiliation.name
 			else:
 				aff = ''
-			row=[u.pk,u.user.username,u.first_name,u.last_name,u.user.email,aff,events]
+			if u.newsletter:
+				row=[u.pk,u.user.username,u.first_name,u.last_name,u.user.email,aff,'yes'.encode('utf-8'),events]
+			else:
+				row=[u.pk,u.user.username,u.first_name,u.last_name,u.user.email,aff,'no'.encode('utf-8'),events]
 		else:
 			if u.affiliation.name and u.affiliation.country and u.affiliation.city:
 				aff = u.affiliation.name+str(', ')+u.affiliation.city+str(', ')+u.affiliation.country
@@ -326,7 +335,10 @@ def export_user_xls(request):
 				aff = u.affiliation.name
 			else:
 				aff = ''
-			row=[u.pk,'',u.first_name,u.last_name,u.email,aff,events]
+			if u.newsletter:
+				row=[u.pk,'',u.first_name,u.last_name,u.email,aff,'yes'.encode('utf-8'),events]
+			else:
+				row=[u.pk,'',u.first_name,u.last_name,u.email,aff,'no'.encode('utf-8'),events]
 		for col_num in range(len(row)):
 			worksheet.write(row_num, col_num, row[col_num])
 
@@ -428,7 +440,7 @@ def export_user_xlsx(request):
 	workbook = xlsxwriter.Workbook(output)
 	worksheet = workbook.add_worksheet('Users')
 	row_num = 0
-	columns = ['ID','Username','First name','Last name','Email','Affiliation','Events']
+	columns = ['ID','Username','First name','Last name','Email','Affiliation','Newsletter','Events']
 	for col_num in range(len(columns)):
 		worksheet.write(row_num, col_num, columns[col_num])  
 
@@ -454,7 +466,10 @@ def export_user_xlsx(request):
 				aff = u.affiliation.name
 			else:
 				aff = ''
-			row=[u.pk,u.user.username,u.first_name,u.last_name,u.user.email,aff,events]
+			if u.newsletter:
+				row=[u.pk,u.user.username,u.first_name,u.last_name,u.user.email,aff,'yes'.encode('utf-8'),events]
+			else:
+				row=[u.pk,u.user.username,u.first_name,u.last_name,u.user.email,aff,'no'.encode('utf-8'),events]
 		else:
 			if u.affiliation.name and u.affiliation.country and u.affiliation.city:
 				aff = u.affiliation.name+str(', ')+u.affiliation.city+str(', ')+u.affiliation.country
@@ -466,7 +481,10 @@ def export_user_xlsx(request):
 				aff = u.affiliation.name
 			else:
 				aff = ''
-			row=[u.pk,'',u.first_name,u.last_name,u.email,aff,events]
+			if u.newsletter:
+				row=[u.pk,'',u.first_name,u.last_name,u.email,aff,'yes'.encode('utf-8'),events]
+			else:
+				row=[u.pk,'',u.first_name,u.last_name,u.email,aff,'no'.encode('utf-8'),events]
 		for col_num in range(len(row)):
 			worksheet.write(row_num, col_num, row[col_num])
 
@@ -632,9 +650,9 @@ def profile_creation(request, id=None):
 			email = form.cleaned_data["email"]
 			new_aff = Affiliation.objects.create(name=name, country=country, city=city)
 			if form.cleaned_data["main_org"] == 'True':
-				Profile.objects.create(affiliation=new_aff, first_name=first_name, last_name=last_name, avatar=avatar, bio=bio, email=email, main_org=True)
+				Profile.objects.create(affiliation=new_aff, first_name=first_name, last_name=last_name, avatar=avatar, bio=bio, email=email, newsletter=True, main_org=True)
 			elif form.cleaned_data["main_org"] == 'False':
-				Profile.objects.create(affiliation=new_aff, first_name=first_name, last_name=last_name, avatar=avatar, bio=bio, email=email, main_org=False)
+				Profile.objects.create(affiliation=new_aff, first_name=first_name, last_name=last_name, avatar=avatar, bio=bio, email=email, newsletter=True, main_org=False)
 			if Challenge.objects.filter(id=id).count() > 0:
 				return HttpResponseRedirect(reverse('challenge_profile_select', kwargs={'id':id}))
 			elif Workshop.objects.filter(id=id).count() > 0:
@@ -727,8 +745,6 @@ def dataset_creation(request):
 		if datasetform.is_valid():
 			dataset_title = datasetform.cleaned_data['dataset_title']
 			desc = datasetform.cleaned_data['description']
-			# threshold = datasetform.cleaned_data['threshold']
-			# threshold_extra = datasetform.cleaned_data['threshold_extra']
 			evaluation_file = datasetform.cleaned_data['evaluation_file']
 			gt_file = datasetform.cleaned_data['gt_file']
 			new_dataset = Dataset.objects.create(title=dataset_title, description=desc)
@@ -1437,6 +1453,7 @@ def data_metric(request, id=None, dataset_id=None):
 	}
 	return render(request, "data/metrics.html", context, context_instance=RequestContext(request))
 
+@login_required(login_url='auth_login')
 def data_files(request, id=None, dataset_id=None):
 	dataset = Dataset.objects.filter(id=dataset_id).first()
 	data = Data.objects.filter(id=id).first()
@@ -1516,7 +1533,7 @@ def partner_list(request):
 	for p in partners:
 		if not Event_Partner.objects.filter(partner=p).exclude(event__isnull=True).count() > 0:
 			global_partners.append((p))
-	events = Event.objects.filter(is_public=True)
+	events = Event.objects.filter(is_public=True).order_by('-title')
 	for e in events:
 		if Event_Partner.objects.filter(event=e).count() > 0:
 			event_partners_aux = Event_Partner.objects.filter(event=e)
@@ -2283,7 +2300,7 @@ def challenge_unpublish(request, id=None):
 
 def challenge_desc(request, id=None):
 	challenge = Challenge.objects.filter(id=id).first()
-	tracks = Track.objects.filter(challenge__id=id).exclude(dataset=None)
+	tracks = Track.objects.filter(challenge__id=id)
 	news = News.objects.filter(event_id=id).order_by('-upload_date')
 	profile_event = check_event_permission(request, challenge)
 	sponsors = Event_Partner.objects.filter(event_id=id)
@@ -2307,7 +2324,7 @@ def challenge_desc(request, id=None):
 
 def challenge_associated_events(request, id=None):
 	challenge = Challenge.objects.filter(id=id).first()
-	tracks = Track.objects.filter(challenge__id=id).exclude(dataset=None)
+	tracks = Track.objects.filter(challenge__id=id)
 	news = News.objects.filter(event_id=id).order_by('-upload_date')
 	relations = Event_Relation.objects.filter(event_associated=challenge)
 	associated = Event_Relation.objects.filter(challenge_relation=challenge)
@@ -2679,11 +2696,16 @@ def track_edit_result(request, id=None, track_id=None):
 					return HttpResponseRedirect(reverse('result_new_table', kwargs={'id':id,'track_id':track_id}))
 				return HttpResponseRedirect(reverse('track_edit_result', kwargs={'id':id,'track_id':track_id}))
 		if grid:
-			results = Result.objects.filter(grid=grid).order_by('-rank')
-			aux_score = None
+			results = Result.objects.filter(grid=grid).order_by('rank')[:3]
+			ids = []
 			for r in results:
+				ids.append(r.id)
+				print r.user
+			results = Result.objects.filter(grid=grid).order_by('-rank')
+			results2 = Result.objects.filter(id__in=ids).order_by('-rank')
+			aux_score = None
+			for r in results2:
 				s = Score.objects.filter(result=r).first()
-				print s.score
 				if aux_score:
 					if aux_score > s.score:
 						grid.threshold = -aux_score
@@ -2711,7 +2733,7 @@ def track_remove(request, id=None, track_id=None):
 def challenge_members(request, id=None, role_id=None):
 	challenge = Challenge.objects.filter(id=id).first()
 	role = Role.objects.filter(id=role_id).first()
-	tracks = Track.objects.filter(challenge__id=id).exclude(dataset=None)
+	tracks = Track.objects.filter(challenge__id=id)
 	role = Role.objects.filter(id=role_id).first()
 	members = Profile_Event.objects.filter(event=challenge,role=role)
 	roles_aux = Role.objects.all().exclude(name='Admin')
@@ -2740,7 +2762,7 @@ def challenge_members(request, id=None, role_id=None):
 def challenge_sponsors(request, id=None):
 	challenge = Challenge.objects.filter(id=id).first()
 	sponsors = Event_Partner.objects.filter(event_id=id)
-	tracks = Track.objects.filter(challenge__id=id).exclude(dataset=None)
+	tracks = Track.objects.filter(challenge__id=id)
 	news = News.objects.filter(event_id=id).order_by('-upload_date')
 	profile_event = check_event_permission(request, challenge)
 	publications = Publication_Event.objects.filter(event=challenge)
@@ -2763,7 +2785,7 @@ def challenge_sponsors(request, id=None):
 
 def challenge_schedule(request, id=None):
 	challenge = Challenge.objects.filter(id=id).first()
-	tracks = Track.objects.filter(challenge__id=id).exclude(dataset=None)
+	tracks = Track.objects.filter(challenge__id=id)
 	news = News.objects.filter(event_id=id).order_by('-upload_date')
 	schedule = Schedule_Event.objects.filter(event_schedule=challenge,schedule_event_parent=None).order_by('date')
 	profile_event = check_event_permission(request, challenge)
@@ -2821,7 +2843,7 @@ def challenge_schedule(request, id=None):
 
 def challenge_publications(request, id=None):
 	challenge = Challenge.objects.filter(id=id).first()
-	tracks = Track.objects.filter(challenge__id=id).exclude(dataset=None)
+	tracks = Track.objects.filter(challenge__id=id)
 	news = News.objects.filter(event_id=id).order_by('-upload_date')
 	publications = Publication_Event.objects.filter(event=challenge)
 	profile_event = check_event_permission(request, challenge)
@@ -3473,7 +3495,7 @@ def special_issue_edit_desc(request, id=None):
 				issue.title = title
 				issue.description = desc
 				issue.save()
-				return HttpResponseRedirect(reverse('event_list'))
+				return HttpResponseRedirect(reverse('special_issue_desc', kwargs={'id':id}))
 		context = {
 			"eventform": eventform,
 			"issue": issue,

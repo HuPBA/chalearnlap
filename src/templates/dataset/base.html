@@ -23,7 +23,6 @@
             <div class="col-md-2" id="leftCol">
                 <ul class="nav nav-stacked" id="sidebar">
                     <li><a href='{% url 'dataset_desc' id=dataset.id %}'>Description</a></li>
-                    <li><a href='{% url 'dataset_schedule' id=dataset.id %}'>Schedule</a></li>
                     <li><a href='{% url 'dataset_associated_events' dataset_id=dataset.id %}'>Associated events</a></li>
                     {% if datas %}
                         <li><a href="#" data-toggle="collapse" data-target="#drilldown-1">Data <b class="caret"></b></a>
