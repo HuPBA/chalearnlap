@@ -1,0 +1,45 @@
+{% extends "special_issue/base.html" %}
+{% block breadcrumb %}
+    <li><a href="{% url "home" %}">Home</a></li>
+    <li>{{ issue.title }}</li>  
+    <li class="active">People</li>  
+{% endblock breadcrumb %}  
+{% block content %}
+    <div class="col-md-8"> 
+        <div class="panel panel-default"> 
+            <div class="panel-body"> 
+				<div class="top-margin">
+	                <h3 class="thin text-center">{{ role }}</h3> 
+	                <hr> 
+                    {% if members|length > 0 %}
+                        {% for m in members %} 
+                            <div class="row">
+                                <div class="vertical-margin">
+                                    <div class="col-sm-2">
+                                        {% if m.profile.avatar %}
+                                            <img class="img-responsive" src="{{ m.profile.avatar.url }}">
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-sm-10">
+                                        <p><b>{{ m.profile.first_name }} {{ m.profile.last_name }}</b></p>
+                                        <p>{{ m.profile.affiliation }}</p> 
+                                        {% if m.profile.email %}
+                                            <p>{{ m.profile.email }}</p>
+                                        {% endif %}
+                                        <p align="justify">{{ m.profile.bio }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %} 
+                    {% else %}
+                        <div class="row">
+                            <div class="col-sm-12"> 
+                                <p class="text-center">There are no members registered in {{ issue.title }}</p>
+                            </div>  
+                        </div>
+                    {% endif %}
+                </div>
+            </div>                             
+        </div>                         
+    </div>
+{% endblock content %}  

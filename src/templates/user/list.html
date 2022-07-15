@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% block container %}
+	<ol class="breadcrumb"> 
+        <li><a href="{% url "home" %}">Home</a></li>                 
+        <li class="active">Users list</li>                 
+    </ol> 
+    <div class="row"> 
+        <article class="col-xs-12 maincontent"> 
+            <header class="page-header"> 
+                <h1 class="page-title">Users</h1> 
+                <div class="dropdown">
+                    <button class="btn btn-action dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Export all users
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                        <li><a href="{% url 'export_user_csv' %}">CSV format</a></li>
+                        <li><a href="{% url 'export_user_xls' %}">Excel Binary File format (XLS)</a></li>
+                        <li><a href="{% url 'export_user_xlsx' %}">Office Open XML format (XLSX)</a></li>
+                    </ul>
+                </div>
+            </header>  
+            <div class="col-sm-4">
+                <div class="panel panel-default"> 
+                    <div class="panel-body"> 
+                        <h3 class="thin text-center">All profiles (Without users)</h3> 
+                        <hr>
+                        {% if profiles.count > 0 %}
+                            {% for p in profiles %}
+                                <p><a href='{% url 'profile_edit' member_id=p.id %}'>{{ p }}</a></p>
+                            {% endfor %}
+                        {% else %}
+                            <div class="row">
+                                <div class="col-sm-12"> 
+                                    <p class="text-center">There are no profiles registered</p>
+                                </div>  
+                            </div>
+                        {% endif %} 
+                    </div>
+                </div>    
+            </div>
+            <div class="col-sm-4">
+                <div class="panel panel-default"> 
+                    <div class="panel-body"> 
+                        <h3 class="thin text-center">All users (Without admins)</h3> 
+                        <hr>
+                        {% if users.count > 0 %}
+                            {% for u in users %}
+                                <p><a href='{% url 'user_edit' id=u.id %}'>{{ u.username }}</a></p>
+                            {% endfor %}
+                        {% else %}
+                            <div class="row">
+                                <div class="col-sm-12"> 
+                                    <p class="text-center">There are no users registered</p>
+                                </div>  
+                            </div>
+                        {% endif %} 
+                    </div>
+                </div>    
+            </div>                          
+            <div class="col-sm-4">
+                <div class="panel panel-default"> 
+                    <div class="panel-body">
+                        <h3 class="thin text-center">Admin users</h3> 
+                        <hr>
+                        {% if admins.count > 0 %}
+                            {% for admin in admins %}
+                                <p>{{ admin.username }}</p>
+                            {% endfor %} 
+                        {% else %}
+                            <div class="row">
+                                <div class="col-sm-12"> 
+                                    <p class="text-center">There are no admin users registered</p>
+                                </div>  
+                            </div>
+                        {% endif %}   
+                    </div>
+                </div>            
+            </div>
+            <!-- <div class="col-sm-4">
+                <div class="dropdown">
+                    <button class="btn btn-action dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Export all users
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                        <li><a href="{% url 'export_user_csv' %}">CSV format</a></li>
+                        <li><a href="{% url 'export_user_xls' %}">Excel Binary File format (XLS)</a></li>
+                        <li><a href="{% url 'export_user_xlsx' %}">Office Open XML format (XLSX)</a></li>
+                    </ul>
+                </div>
+            </div> -->
+        </article>
+    </div>
+       
+{% endblock container %}            

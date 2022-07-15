@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block container %}
+    <ol class="breadcrumb"> 
+        {% block breadcrumb %}
+        {% endblock breadcrumb %}            
+    </ol>            
+    <div class="row"> 
+        <article class="col-xs-12 maincontent"> 
+            <header class="page-header"> 
+                <h1 class="page-title">{{ track.title }}</h1>
+            </header> 
+            <div class="col-md-2" id="leftCol">
+                <ul id="drilldown" class="nav nav-pills nav-stacked">
+                    <li><a href='{% url 'track_edit_desc' id=challenge.id track_id=track.id %}'>Description</a></li>
+                    <li><a href='{% url 'track_edit_result' id=challenge.id track_id=track.id %}'>Results</a></li>    
+                </ul>
+            </div>
+            {% block content %}
+            {% endblock content %}
+        </article>
+    </div>
+{% endblock container %}  

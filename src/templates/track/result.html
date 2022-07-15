@@ -1,0 +1,74 @@
+{% extends "track/base.html" %}
+{% block breadcrumb %}
+    <li><a href="{% url "home" %}">Home</a></li>
+    <li><a href="{% url "challenge_desc" id=challenge.id %}">{{ challenge.title }}</a></li>  
+    <li>{{ track.title }}</li>  
+    <li class="active">Results</li>  
+{% endblock breadcrumb %} 
+{% block content %}
+    <div class="col-md-8"> 
+        <div class="panel panel-default"> 
+            <div class="panel-body"> 
+                <h3 class="thin text-center">Track results</h3> 
+                <hr> 
+                {% if headers %}
+                    <div class="table-responsive">
+                        <table class="table table-bordered display">
+                            <thead>
+                                <tr>
+                                    <th>Rank</th>
+                                    <th>User</th>
+                                    {% if scores %}
+                                        {% for n in headers %}
+                                            <th>{{ n.name }}</th>
+                                        {% endfor %}
+                                    {% else %}
+                                        {% for n in headers %}
+                                            <th>{{ n.name }}&ensp;<a href="{% url "header_edit" id=challenge.id track_id=track.id header_id=n.id %}"><i class="fa fa-pencil" aria-hidden="true"></i></a></th>
+                                        {% endfor %}
+                                    {% endif %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for r,extra in results %}
+                                    <tr>
+                                        <td>{{ r.rank }}</td>
+                                        <td>
+                                            {% if extra.count > 0 %}
+                                                <div class="btn-group">
+                                                    <a class="btn dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{ r.user }} <span class="caret"></span></a>
+                                                    <ul id="contextMenu" class="dropdown-menu" role="menu">
+                                                        {% for e in extra %}
+                                                            {% if e.paper %}
+                                                                <li><a href="{{ MEDIA_URL }}{{ e.paper }}">{{ e.name }}</a></li>
+                                                            {% else %}
+                                                                <li><a href="{% url "result_fact_sheet" id=challenge.id track_id=track.id f_sheet_id=e.id %}">{{ e.name }}</a></li>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    </ul>
+                                                </div>
+                                            {% else %}
+                                                {{ r.user }}
+                                            {% endif %}
+                                        </td>
+                                        {% for s in scores %}
+                                            {% if s.result == r %}
+                                                <td>{{ s.score }}</td>
+                                            {% endif%}
+                                        {% endfor %}
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <p class="text-center">There are no results</p>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>                             
+        </div>                         
+    </div>
+{% endblock content %}  

@@ -1,0 +1,39 @@
+{% extends "workshop/base.html" %}
+{% load thumbnail %}
+{% block breadcrumb %}
+    <li><a href="{% url "home" %}">Home</a></li>
+    <li>{{ workshop.title }}</li>  
+    <li class="active">Gallery</li>  
+{% endblock breadcrumb %}
+{% block content %}
+    <div class="col-md-7"> 
+        <div class="panel panel-default"> 
+            <div class="panel-body"> 
+                <h3 class="thin text-center">Workshop gallery</h3> 
+                <hr>
+                {% if images.count > 0 %}
+                    <div class="row">
+                        {% for i in images %} 
+                            <div class="col-sm-8 col-sm-offset-2">
+                                <div class="all-margin">
+                                    {% thumbnail i.image "250x250" crop="noop" as small %}
+                                        <a href="{{ i.image.url }}" title="zoom"><img class="img-responsive img-center" src="{{ small.url }}" width="{{ small.width }}" height="{{ small.height }}"></a>
+                                    {% endthumbnail %}
+                                    {% if i.description %}
+                                        <p>{{ i.description|safe }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="row">
+                        <div class="col-sm-12"> 
+                            <p class="text-center"> There is no pictures registered in this workshop</p>
+                        </div>  
+                    </div>
+                {% endif %}
+            </div>                             
+        </div>                         
+    </div>
+{% endblock content %}  

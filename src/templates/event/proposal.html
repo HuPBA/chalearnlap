@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% block container %}
+    {% if eventform.non_field_errors  %}
+        {% for e in eventform.non_field_errors %} 
+            <div class="row"> 
+                <div class="col-md-6 widget col-md-offset-3"> 
+                    <div class="alert alert-danger" role="alert">{{ e }}</div>
+                </div>
+            </div>
+        {% endfor %} 
+    {% endif %}
+    <ol class="breadcrumb"> 
+        <li> <a href="{% url "home" %}">Home</a> </li>
+        <li> <a href="{% url "event_list" %}">Events list</a> </li>                 
+        <li class="active"> Event proposal </li>                 
+    </ol>             
+    <div class="row"> 
+        <article class="col-xs-12 maincontent"> 
+            <header class="page-header"> 
+                <h1 class="page-title">Event proposal</h1> 
+            </header>                     
+            <div class="col-md-7"> 
+                <div class="panel panel-default"> 
+                    <div class="panel-body"> 
+                        <h3 class="thin text-center">Event</h3> 
+                        <hr>
+                        <label>Fill the following form, and an email will be sent to administrators</label> 
+                        <hr>
+                        <form method="POST" action=""> 
+                        	{% csrf_token %}
+                            <div class="top-margin"> 
+                                <label>Title 
+                                    {% if eventform.title.field.required %}
+                                    <span class="text-danger">*</span>
+                                    {% endif %}
+                                </label>  
+                                {% if eventform.errors.title %}
+                                    <div class="alert alert-danger" role="alert">{{ eventform.errors.title }}</div>
+                                {% endif %}
+                                {{ eventform.title }} 
+                            </div>                                     
+                            <div class="top-margin"> 
+                                <label>Description 
+                                    {% if eventform.description.field.required %}
+                                    <span class="text-danger">*</span>
+                                    {% endif %}
+                                </label>   
+                                {% if eventform.errors.description %}
+                                    <div class="alert alert-danger" role="alert">{{ eventform.errors.description }}</div>
+                                {% endif %}
+                                {{ eventform.description }}
+                            </div>  
+                            <div class="top-margin"> 
+                                <label>Type 
+                                    {% if eventform.event_type.field.required %}
+                                    <span class="text-danger">*</span>
+                                    {% endif %}
+                                </label>   
+                                {% if eventform.errors.event_type %}
+                                    <div class="alert alert-danger" role="alert">{{ eventform.errors.event_type }}</div>
+                                {% endif %}
+                                {{ eventform.event_type }} 
+                            </div> 
+                            <hr>
+                            <div class="row">
+                                <div class="col-lg-4 col-lg-offset-8 text-right"> 
+                                    <button class="btn btn-action" type="submit" name="signup-button">Send</button>
+                                </div>
+                            </div>                                     
+                        </form>                                 
+                    </div>                             
+                </div>                         
+            </div>
+        </article>
+    </div>
+{% endblock container %}  

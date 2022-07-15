@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block container %}
+    <ol class="breadcrumb"> 
+        {% block breadcrumb %}
+        {% endblock breadcrumb %}            
+    </ol>            
+    <div class="row"> 
+        <article class="col-xs-12 maincontent"> 
+            <header class="page-header"> 
+                <h1 class="page-title">{{ challenge.title }} 
+                    {% if challenge.is_public %}
+                        <a title="Unpublish" href="{% url "challenge_unpublish" id=challenge.id %}"><i class="fa fa-cloud-download" aria-hidden="true"></i></a>
+                    {% else %}
+                        <a title="Publish" href="{% url "challenge_publish" id=challenge.id %}"><i class="fa fa-cloud-upload" aria-hidden="true"></i></a>
+                    {% endif %}
+                    <div class="top-margin">
+                        <div class="dropdown">
+                            <button class="btn btn-action dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Export challenge members
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                <li><a href="{% url 'export_members_csv' event_id=challenge.id %}">CSV format</a></li>
+                                <li><a href="{% url 'export_members_xls' event_id=challenge.id %}">Excel Binary File format (XLS)</a></li>
+                                <li><a href="{% url 'export_members_xlsx' event_id=challenge.id %}">Office Open XML format (XLSX)</a></li>
+                            </ul>
+                        </div>
+                    </div> 
+                </h1>
+            </header> 
+            <div class="col-md-2" id="leftCol">
+                <ul id="drilldown" class="nav nav-pills nav-stacked">
+                    <li><a href='{% url 'challenge_edit_desc' id=challenge.id %}'>Description</a></li>
+                    <li><a href='{% url 'challenge_edit_schedule' id=challenge.id %}'>Schedule</a></li>
+                    <li><a href='{% url 'challenge_edit_relation' id=challenge.id %}'>Associated events</a></li>
+                    <li><a href='{% url 'challenge_edit_tracks' id=challenge.id %}'>Tracks</a></li>
+                    <li><a href='{% url 'challenge_edit_members' id=challenge.id %}'>People</a></li>
+                    <li><a href='{% url 'challenge_edit_sponsors' id=challenge.id %}'>Sponsors</a></li>
+                    <li><a href='{% url 'challenge_edit_news' id=challenge.id %}'>News</a></li>
+                    <li><a href='{% url 'challenge_edit_publications' id=challenge.id %}'>Publications</a></li>  
+                </ul>
+            </div>
+            {% block content %}
+            {% endblock content %}
+        </article>
+    </div>
+{% endblock container %}  

@@ -1,0 +1,77 @@
+<!-- {% extends "base.html" %}
+{% load staticfiles %}
+{% block container %}
+    {% if relationform.non_field_errors  %}
+        {% for e in relationform.non_field_errors %} 
+            <div class="row"> 
+                <div class="col-md-6 widget col-md-offset-3"> 
+                    <div class="alert alert-danger" role="alert">{{ e }}</div>
+                </div>
+            </div>
+        {% endfor %} 
+    {% endif %}
+    {{ relationform.media }}
+    <ol class="breadcrumb"> 
+        <li> <a href="{% url "home" %}">Home</a> </li>
+        {% if c %}
+            <li><a href="{% url "challenge_edit_relation" id=c.id%}">{{ c.title }}</a></li> 
+        {% elif w %}
+            <li><a href="{% url "workshop_edit_relations" id=w.id%}">{{ w.title }}</a></li> 
+        {% elif s %}
+            <li><a href="{% url "special_issue_edit_relations" id=s.id%}">{{ s.title }}</a></li>
+        {% elif d %}
+            <li><a href="{% url "dataset_edit_relations" id=d.id%}">{{ d.title }}</a></li>
+        {% endif %}                     
+        <li class="active">Schedule event edit</li>                   
+    </ol>           
+    <div class="row"> 
+        <article class="col-xs-12 maincontent"> 
+            <header class="page-header"> 
+                <h1 class="page-title">Add a new associated event</h1> 
+            </header> 
+            <form method="POST" action=""> {% csrf_token %}                     
+                <div class="panel panel-default"> 
+                    <div class="panel-body"> 
+                        <div class="row">
+                            <h3 class="thin text-center">Associated event</h3> 
+                            <hr> 
+                            <div class="col-md-4">
+                                <div class="top-margin"> 
+                                    <label>Associated event
+                                        {% if relationform.event.field.required %}
+                                        <span class="text-danger">*</span>
+                                        {% endif %}
+                                    </label>   
+                                    {% if relationform.errors.event %}
+                                        <div class="alert alert-danger" role="alert">{{ relationform.errors.event }}</div>
+                                    {% endif %}
+                                    {{ relationform.event }}                                      
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="top-margin"> 
+                                    <label>Short description
+                                        {% if relationform.description.field.required %}
+                                        <span class="text-danger">*</span>
+                                        {% endif %}
+                                    </label>   
+                                    {% if relationform.errors.description %}
+                                        <div class="alert alert-danger" role="alert">{{ relationform.errors.description }}</div>
+                                    {% endif %}
+                                    {{ relationform.description }}                                      
+                                </div>        
+                                <hr>
+                            </div> 
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-2 text-right"> 
+                                <button class="btn btn-action" name="save" type="submit">Save</button>
+                            </div>
+                        </div>                                     
+                    </div>                         
+                </div>
+            </form>                     
+        </article>                 
+    </div> 
+{% endblock container %}            
+ -->

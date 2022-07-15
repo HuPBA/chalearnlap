@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% block container %}
+    <div class="row"> 
+        <div class="col-sm-9"> 
+            <h3 class="thin">{{ book.name }} 
+                {% if profile %}
+                    &ensp;<a href="{% url "cimlbook_edit" id=book.id %}"><i class="fa fa-pencil" aria-hidden="true"></i></a>&ensp;<a id="{{ book.id }}" class="delete-event" value="{% url 'cimlbook_remove' id=book.id %}" href=""><i class="fa fa-minus-circle fa" aria-hidden="true"></i></a>
+                {% endif %}
+            </h3> 
+            {{ book.content | safe }} 
+        </div>  
+        <form method="POST" action=""> {% csrf_token %}                 
+            <div class="col-sm-3"> 
+                <div class="thumbnail">
+                    <h2 class="text-center top-space">News</h2>
+                    <hr> 
+                    <div class="caption">
+                        {% if news.count > 0 %}
+                            {% for n in news %}
+                                <h3>{{ n.title }}</h3> 
+                                <p>{{ n.description|safe }}</p>
+                                <hr>
+                            {% endfor %}
+                        {% else %}
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <p class="text-center"> There are no news</p>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div> 
+            </div> 
+        </form>
+    </div>    
+{% endblock container %}

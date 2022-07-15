@@ -1,0 +1,55 @@
+{% extends "track/edit/base.html" %}
+{% block breadcrumb %}
+    {% if form.non_field_errors  %}
+        {% for e in form.non_field_errors %} 
+            <div class="row"> 
+                <div class="col-md-6 widget col-md-offset-3"> 
+                    <div class="alert alert-danger" role="alert">{{ e }}</div>
+                </div>
+            </div>
+        {% endfor %} 
+    {% endif %}
+    <li> <a href="{% url "home" %}">Home</a> </li>   
+    <li><a href="{% url "challenge_edit_desc" id=challenge.id%}">{{ challenge.title }} (Edit mode)</a></li>
+    <li>{{ track.title }}</li>        
+    <li class="active">New table</li>   
+{% endblock breadcrumb %} 
+{% block content %}
+    <div class="col-md-10"> 
+        <form method="POST" action="" enctype="multipart/form-data"> {% csrf_token %}              
+            <div class="panel panel-default"> 
+                <div class="panel-body"> 
+                    <div class="row">
+                        <div class="col-sm-12"> 
+                            <h3 class="thin text-center">New table</h3>
+                            <hr> 
+                            <div class="col-sm-3 col-sm-offset-5">
+                                <div class="top-margin"> 
+                                    <label>Number of result columns
+                                        {% if form.cols.field.required %}
+                                        <span class="text-danger">*</span>
+                                        {% endif %}
+                                    </label>  
+                                    {% if form.errors.cols %}
+                                        <div class="alert alert-danger" role="alert">{{ form.errors.cols }}</div>
+                                    {% endif %}
+                                    {{ form.cols }} 
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12"> 
+                            <hr>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-2 col-lg-offset-10 text-right"> 
+                            <button class="btn btn-action" type="submit" name="signup-button">Create</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+{% endblock content %}  

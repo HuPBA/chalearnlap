@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load watson %}
+{% block container %}
+    <div class="row"> 
+        <div class="col-sm-12"> 
+            <div class="panel panel-default"> 
+                <div class="panel-body"> 
+                    <h3 class="thin text-center">Search results{% if query %} for &ldquo;{{query}}&rdquo;{% endif %}</h3>
+                    <hr>
+                    <ul>
+                        {% for result in search_results %}
+                            <li>
+                                <article>
+                                    <h1>
+                                        {% if result.url %}<a href="{{result.url}}">{% endif %}
+                                        {{result.title}}
+                                        {% if result.url %}</a>{% endif %}
+                                    </h1>
+                                    {% if result.description %}
+                                        <p>{{result.description}}</p>
+                                    {% endif %}
+                                </article>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock container %}

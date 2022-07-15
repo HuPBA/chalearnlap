@@ -1,0 +1,170 @@
+{% extends "dataset/base.html" %}
+{% block breadcrumb %}
+    <li><a href="{% url "home" %}">Home</a></li>
+    <li>{{ dataset.title }}</li>  
+    <li class="active">Results</li>  
+{% endblock breadcrumb %} 
+{% block content %}
+<form method="POST" action=""> {% csrf_token %}
+    <div class="col-md-8"> 
+        <div class="panel panel-default"> 
+            <div class="panel-body"> 
+                {% if 
+headers %}
+                    <h3 class="thin text-center">{{ grid.track.title }} competition results</h3> 
+                    <hr> 
+                    <div class="table-responsive">
+                        <table class="table table-bordered display">
+                            <thead>
+                                <tr>
+                                    <th>Rank</th>
+                                    <th>User</th>
+                                    {% if scores %}
+                                        {% for n in headers %}
+                                            <th>{{ n.name }}</th>
+                                        {% endfor %}
+                                    {% else %}
+                                        {% for n in headers %}
+                                            <th>{{ n.name }}&ensp;<a href="{% url "header_edit" id=challenge.id track_id=track.id header_id=n.id %}"><i class="fa fa-pencil" aria-hidden="true"></i></a></th>
+                                        {% endfor %}
+                                    {% endif %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for r,extra in results %}
+                                    <tr>
+                                        <td>{{ r.rank }}</td>
+                                        <td>
+                                            {% if extra.count > 0 %}
+                                                <div class="btn-group">
+                                                    <a class="btn dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{ r.user }}<span class="caret"></span></a>
+                                                    <ul id="contextMenu" class="dropdown-menu" role="menu">
+                                                        {% for e in extra %}
+                                                            {% if e.paper %}
+                                                                <li><a href="{{ MEDIA_URL }}{{ e.paper }}">{{ e.name }}</a></li>
+                                                            {% else %}
+                                                                <li><a href="{% url "dataset_result_fact_sheet" dataset_id=dataset.id f_sheet_id=e.id %}">{{ e.name }}</a></li>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    </ul>
+                                                </div>
+                                            {% else %}
+                                                {{ r.user }}
+                                            {% endif %}
+                                        </td>
+                                        {% for s in scores %}
+                                            {% if s.result == r %}
+                                                <td>{{ s.score }}</td>
+                                            {% endif%}
+                                        {% endfor %}
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <h3 class="thin text-center">State of the art results</h3> 
+                    <hr>
+                    <div class="table-responsive">
+                        <table class="table table-bordered display">
+                            <thead>
+                                <tr>
+                                    <th>Rank</th>
+                                    <th>User</th>
+                                    {% if scores %}
+                                        {% for n in headers %}
+                                            <th>{{ n.name }}</th>
+                                        {% endfor %}
+                                    {% else %}
+                                        {% for n in headers %}
+                                            <th>{{ n.name }}&ensp;<a href="{% url "header_edit" id=challenge.id track_id=track.id header_id=n.id %}"><i class="fa fa-pencil" aria-hidden="true"></i></a></th>
+                                        {% endfor %}
+                                    {% endif %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for r,extra in results %}
+                                    <tr>
+                                        <td>{{ r.sub_rank }}</td>
+                                        <td>
+                                            {% if extra.count > 0 %}
+                                                <div class="btn-group">
+                                                    <a class="btn dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{ r.user }}<span class="caret"></span></a>
+                                                    <ul id="contextMenu" class="dropdown-menu" role="menu">
+                                                        {% for e in extra %}
+                                                            {% if e.paper %}
+                                                                <li><a href="{{ MEDIA_URL }}{{ e.paper }}">{{ e.name }}</a></li>
+                                                            {% else %}
+                                                                <li><a href="{% url "dataset_result_fact_sheet" dataset_id=dataset.id f_sheet_id=e.id %}">{{ e.name }}</a></li>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    </ul>
+                                                </div>
+                                            {% else %}
+                                                {{ r.user }}
+                                            {% endif %}
+                                        </td>
+                                        {% for s in scores2 %}
+                                            {% if s.result == r %}
+                                                <td>{{ s.score }}</td>
+                                            {% endif%}
+                                        {% endfor %}
+                                    </tr>
+                                {% endfor %}
+                                {% for sub,extra in submissions %}
+                                    <tr>
+                                        <td>{{ sub.rank }}</td>
+                                        <td>
+                                            {% if extra.count > 0 %}
+                                                <div class="btn-group">
+                                                    <a class="btn dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{ sub.user.username }} <span class="caret"></span></a>
+                                                    {% if request.user.is_authenticated and request.user.username == sub.user.username %}
+                                                        &ensp;<a href="{% url "submission_resume" dataset_id=dataset.id sub_id=sub.id %}"><i class="fa fa-pencil" aria-hidden="true"></i></a>&ensp;<a id="{{ sub.id }}" class="delete-event" value="{% url 'dataset_remove_submission' id=dataset.id submission_id=sub.id %}" href=""><i class="fa fa-minus-circle fa" aria-hidden="true"></i></a>
+                                                    {% endif %}
+                                                    <ul id="contextMenu" class="dropdown-menu" role="menu">
+                                                        {% for e in extra %}
+                                                            {% if e.paper %}
+                                                                <li><a href="{{ MEDIA_URL }}{{ e.paper }}">{{ e.name }}</a></li>
+                                                            {% else %}
+                                                                <li><a href="{% url "dataset_result_fact_sheet" dataset_id=dataset.id f_sheet_id=e.id %}">{{ e.name }}</a></li>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    </ul>
+                                                </div>
+                                            {% else %}
+                                                {{ sub.user.username }}
+                                                {% if request.user.is_authenticated and request.user.username == sub.user.username %}
+                                                    &ensp;<a href="{% url "submission_resume" dataset_id=dataset.id sub_id=sub.id %}"><i class="fa fa-pencil" aria-hidden="true"></i></a>&ensp;<a id="{{ sub.id }}" class="delete-event" value="{% url 'dataset_remove_submission' id=dataset.id submission_id=sub.id %}" href=""><i class="fa fa-minus-circle fa" aria-hidden="true"></i></a>
+                                                {% endif %}
+                                            {% endif %}
+                                        </td>
+                                        {% for s in scores_submissions %}
+                                            {% if s.submission == sub %}
+                                                <td>{{ s.score }}</td>
+                                            {% endif%}
+                                        {% endfor %}
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% if grid.threshold and dataset.gt_file and dataset.evaluation_file %}
+                        <div class="row">
+                            <div class="col-sm-4 col-sm-offset-4">
+                                <div class="all-margin">
+                                    <a class="btn btn-action" href="{% url "submission_creation" dataset_id=dataset.id grid_id=grid.id %}">Make submission</a>
+                                </div> 
+                            </div>
+                        </div> 
+                    {% endif %}
+                {% else %}
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <p class="text-center">There are no results</p>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>                             
+        </div>                         
+    </div>
+</form>
+{% endblock content %}  

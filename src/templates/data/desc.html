@@ -1,0 +1,18 @@
+{% extends "data/base.html" %}
+{% block breadcrumb %}
+    <li><a href="{% url "home" %}">Home</a></li>
+    <li><a href="{% url "dataset_desc" id=dataset.id %}">{{ dataset.title }}</a></li>  
+    <li>{{ data.title }}</li>  
+    <li class="active">Description</li>  
+{% endblock breadcrumb %} 
+{% block content %}
+    <div class="col-md-8"> 
+        <div class="panel panel-default"> 
+            <div class="panel-body"> 
+                <h3 class="thin text-center">Data description</h3> 
+                <hr> 
+                {{ data.description|safe }}
+            </div>                             
+        </div>                         
+    </div>
+{% endblock content %}  

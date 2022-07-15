@@ -11,7 +11,7 @@
     border-radius: 0;
     background: rgba(0, 0, 0, .8);
     border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-    min-height: 100px;
+    min-height: 120px;
     padding-top: 25px;
     margin-bottom: 0;
 }
@@ -69,14 +69,16 @@
     font-family: "Open sans", helvetica, arial;
     font-size: 24px;
     color: white;
-    padding: 0 0 0 15px;
-    margin: 12px 0 0 0;
+    padding: 0 0 0 0;
+    margin: 0 0 0 0;
 }
 
 .navbar-inverse .navbar-brand img
 {
-    margin-top: -8px;
+    margin-top: 0px;
+    margin-bottom: -10px;
 }
+
 
 .navbar-nav .dropdown-menu
 {
@@ -178,7 +180,6 @@
     -moz-border-radius: 3px;
     border-radius: 3px;
 }
-
 
 .btn-lg
 {

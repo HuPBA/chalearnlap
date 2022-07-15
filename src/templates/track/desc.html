@@ -1,0 +1,18 @@
+{% extends "track/base.html" %}
+{% block breadcrumb %}
+    <li><a href="{% url "home" %}">Home</a></li>
+    <li><a href="{% url "challenge_desc" id=challenge.id %}">{{ challenge.title }}</a></li>  
+    <li>{{ track.title }}</li>  
+    <li class="active">Description</li>  
+{% endblock breadcrumb %}  
+{% block content %}
+    <div class="col-md-8"> 
+        <div class="panel panel-default"> 
+            <div class="panel-body"> 
+                <h3 class="thin text-center">Track description</h3> 
+                <hr> 
+                {{ track.description|safe }}
+            </div>                             
+        </div>                         
+    </div>
+{% endblock content %}  

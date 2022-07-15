@@ -1,0 +1,38 @@
+{% extends "dataset/base.html" %}
+{% block breadcrumb %}
+    <li><a href="{% url "home" %}">Home</a></li>
+    <li>{{ dataset.title }}</li>  
+    <li class="active">Submission</li>  
+{% endblock breadcrumb %} 
+{% block content %}
+    <div class="col-md-8"> 
+        <div class="panel panel-default"> 
+            <div class="panel-body"> 
+                <h3 class="thin text-center">Submission score</h3> 
+                <hr> 
+                {% for name,score in scores %}
+                    <h3 class="text-center">{{ name }}: {{ score }}</h3>
+                {% endfor %}
+                {% if passed %}
+                    <h3 class="text-center">You pass the test.</h3>
+                {% else %}
+                    <h3 class="text-center">You fail the test.</h3>
+                {% endif %}
+                <div class="row">
+                    <div class="col-sm-12"> 
+                        <hr>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-2 col-lg-offset-5 text-right"> 
+                        {% if passed %}
+                            <a class="btn btn-action" href="{% url "submission_resume" dataset_id=dataset.id sub_id=submission.id %}">Accept</a>
+                        {% else %}
+                            <a class="btn btn-action" href="{% url "dataset_results" dataset_id=dataset.id grid_id=grid_id %}">Accept</a>
+                        {% endif %}
+                    </div>
+                </div>  
+            </div>                             
+        </div>                         
+    </div>
+{% endblock content %}  
