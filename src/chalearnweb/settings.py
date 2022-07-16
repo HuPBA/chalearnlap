@@ -20,17 +20,17 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'sba*=3mn4m+)+!tr&yr#+3kh!tv#hh%qgh=ox&nnx!oto3d^^s'
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', False) in [True, 'True', 'true', '1', 1]
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '').split(',')
 
 # Application definition
 
 INSTALLED_APPS = [
+    'registration', #should be immediately above 'django.contrib.admin'
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -74,18 +74,16 @@ WSGI_APPLICATION = 'chalearnweb.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/1.9/ref/settings/#databases
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'chalearnwebdb',
-	'USER': 'oriol',
-	'PASSWORD': 'oriol',
-	'HOST': 'localhost',
-	'PORT': '',
+        'NAME': os.environ.get('DB_NAME', 'chalearn'),
+        'USER': os.environ.get('DB_USER', 'chalearn'),
+        'PASSWORD': os.environ.get('DB_PASSWORD', 'chalearn'),
+        'HOST': os.environ.get('DB_HOST', 'localhost'),
+        'PORT': os.environ.get('DB_PORT', 3306),
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/1.9/ref/settings/#auth-password-validators
