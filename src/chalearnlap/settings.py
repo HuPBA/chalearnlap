@@ -179,9 +179,9 @@ SITE_ID = 2
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
-EMAIL_HOST_USER = 'chalearnweb'
-EMAIL_HOST_PASSWORD = 'SM7#uE{9d+WG.fx)'
-DEFAULT_FROM_EMAIL = 'chalearnweb@gmail.com'
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', None),
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', None),
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', None),
 DEFAULT_TO_EMAIL = ''
 
 LOGIN_REDIRECT_URL = '/'
