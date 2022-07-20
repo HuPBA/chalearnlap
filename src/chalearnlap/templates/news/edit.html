@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% load static %}
+{% block container %}
+    {% if newsform.non_field_errors  %}
+        {% for e in newsform.non_field_errors %} 
+            <div class="row"> 
+                <div class="col-md-6 widget col-md-offset-3"> 
+                    <div class="alert alert-danger" role="alert">{{ e }}</div>
+                </div>
+            </div>
+        {% endfor %} 
+    {% endif %}
+    <ol class="breadcrumb"> 
+        <li> <a href="{% url "home" %}">Home</a> </li>     
+        {% if event %}
+            <li><a href="{% url "event_edit" id=event.id%}">{{ event.title }} (Edit mode)</a></li> 
+        {% elif dataset %}
+            <li><a href="{% url "dataset_edit_news" id=dataset.id%}">{{ dataset.title }} (Edit mode)</a></li>
+        {% endif %}           
+        <li class="active"> News edit </li>                 
+    </ol>           
+    <div class="row"> 
+        <article class="col-xs-12 maincontent"> 
+            <header class="page-header"> 
+                <h1 class="page-title">News edit</h1> 
+            </header>                     
+            <div class="col-md-8 col-md-offset-2"> 
+                <div class="panel panel-default"> 
+                    <div class="panel-body"> 
+                        <h3 class="thin text-center">News</h3> 
+                        <hr> 
+                        <form method="POST" action=""> 
+                            {% csrf_token %}
+                            <div class="top-margin"> 
+                                <label>Title 
+                                    {% if newsform.title.field.required %}
+                                    <span class="text-danger">*</span>
+                                    {% endif %}
+                                </label>  
+                                {% if newsform.errors.title %}
+                                    <div class="alert alert-danger" role="alert">{{ newsform.errors.title }}</div>
+                                {% endif %}
+                                {{ newsform.title }} 
+                            </div>                                     
+                            <div class="top-margin"> 
+                                <label>Description 
+                                    {% if newsform.description.field.required %}
+                                    <span class="text-danger">*</span>
+                                    {% endif %}
+                                </label>   
+                                {% if newsform.errors.description %}
+                                    <div class="alert alert-danger" role="alert">{{ newsform.errors.description }}</div>
+                                {% endif %}
+                                {{ newsform.description }} 
+                            </div>  
+                            <hr>
+                            <div class="row">
+                                <div class="col-lg-4 col-lg-offset-8 text-right"> 
+                                    <button class="btn btn-action" type="submit" name="signup-button">Save</button>
+                                </div>
+                            </div>                                     
+                        </form>                                 
+                    </div>                             
+                </div>                         
+            </div>
+        </article>
+    </div>
+{% endblock container %}  

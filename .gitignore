@@ -65,3 +65,5 @@ target/
 /static_cdn
 
 .env
+.env_prod
+*.sqlite3

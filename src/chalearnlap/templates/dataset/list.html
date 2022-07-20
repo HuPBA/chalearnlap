@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% load static %}
+{% block container %}
+	<ol class="breadcrumb"> 
+        <li>
+            <a href="{% url "home" %}">Home</a>
+        </li>                 
+        <li class="active">Dataset list</li>                 
+    </ol> 
+    <div class="row"> 
+        <article class="col-xs-12 maincontent"> 
+            <header class="page-header"> 
+                <h1 class="page-title">Datasets &nbsp;<a href="{% url "dataset_creation" %}"><i class="fa fa-plus-circle" aria-hidden="true"></i></a> </h1> 
+            </header>    
+            {% csrf_token %}  
+            <div class="col-sm-6">
+                {% if datasets.count > 0 %}
+                    <div class="panel panel-default"> 
+                        <div class="panel-body"> 
+                            {% for d in datasets %}
+                                <p>{{ d.title }}&ensp;<a href="{% url 'dataset_edit_desc' id=d.id%}"><i class="fa fa-pencil" aria-hidden="true"></i></a>&ensp;<a id="{{ d.id }}" class="delete-event" value="{% url "dataset_remove" id=d.id %}" href=""><i class="fa fa-minus-circle fa" aria-hidden="true"></i></a></p>
+                            {% endfor %}
+                        </div>
+                    </div>  
+                {% else %}
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <p class="text-center"> There are no datasets registered.</p>
+                        </div>
+                    </div>
+                {% endif %} 
+            </div>                
+        </article>
+    </div>                    
+{% endblock container %}    

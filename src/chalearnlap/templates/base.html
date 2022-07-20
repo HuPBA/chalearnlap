@@ -1,0 +1,204 @@
+{% load static %}
+<!DOCTYPE html> 
+<html lang="en"> 
+    <head> 
+        <meta charset="utf-8"> 
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+        <title>ChaLearn</title>         
+        <link rel="stylesheet" media="screen" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700"> 
+        <!-- <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet" type="text/css"/> -->
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.2/css/select2.min.css" rel="stylesheet" />
+        <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
+        <link href="https://cdn.datatables.net/1.10.12/css/dataTables.bootstrap.min.css" rel="stylesheet"/>
+        <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
+        <link rel="stylesheet" href="{% static "css/bootstrap.min.css" %}" media="screen"> 
+        <link rel="stylesheet" href="{% static "css/bootstrap-theme.css" %}" media="screen"> 
+        <link rel="stylesheet" href="{% static "css/main.css" %}">    
+        {% block header %} 
+        {% endblock header %}  
+    </head>     
+    <body class="home"> 
+        <div class="navbar navbar-inverse"> 
+            <div class="container-fluid cont-header"> 
+                <div class="row"> 
+                    <div class="col-sm-1 hidden-sm-down">
+                        <div class="navbar-header"> 
+                            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                                <span class="sr-only">Toggle navigation</span>
+                                <span class="icon-bar"></span>
+                                <span class="icon-bar"></span>
+                                <span class="icon-bar"></span>
+                            </button>   
+                                <a  href="{% url "home" %}">
+                                    <img class="img-responsive" src="{% static "images/icon.png" %}" alt="ChaLearn">
+                                </a>  
+                            <!-- <div class="col-sm-9">
+                                <a class="navbar-brand" href="{% url "home" %}">
+                                    <img class="img-responsive" src="{% static "images/icon2.png" %}" alt="ChaLearn">
+                                </a>  
+                            </div>  -->        
+                        </div>
+                    </div>
+                    <div class="col-sm-11 hidden-sm-down">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <!-- <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                                    <span class="sr-only">Toggle navigation</span>
+                                    <span class="icon-bar"></span>
+                                    <span class="icon-bar"></span>
+                                    <span class="icon-bar"></span>
+                                </button> -->
+                                <a class="navbar-brand" href="{% url "home" %}">
+                                    <img class="img-responsive" src="{% static "images/icon2.png" %}" alt="ChaLearn">
+                                </a>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                        <div class="row navbar-collapse collapse" id="bs-example-navbar-collapse-1"> 
+                            <ul class="nav navbar-nav pull-right navbar-header"> 
+                                <li class="dropdown"> 
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Challenges <b class="caret"></b></a> 
+                                    {% if challenges.count > 0 %}
+                                        <ul class="dropdown-menu"> 
+                                            {% for c in challenges %}
+                                                <li><a href='{% url 'challenge_desc' id=c.id %}'>{{ c.title }}</a></li>
+                                            {% endfor %}                               
+                                        </ul>   
+                                    {% endif %}                           
+                                </li>
+                                <li class="dropdown"> 
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dataset<b class="caret"></b></a> 
+                                    {% if datasets.count > 0 %}
+                                        <ul class="dropdown-menu"> 
+                                            {% for d in datasets %}
+                                                <li><a href='{% url 'dataset_desc' id=d.id %}'>{{ d.title }}</a></li>
+                                            {% endfor %}                                
+                                        </ul>        
+                                    {% endif %}                     
+                                </li> 
+                                <li class="dropdown"> 
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Workshops <b class="caret"></b></a> 
+                                    {% if workshops.count > 0 %}
+                                        <ul class="dropdown-menu"> 
+                                            {% for w in workshops %}
+                                                <li><a href='{% url 'workshop_desc' id=w.id %}'>{{ w.title }}</a></li>
+                                            {% endfor %}                                 
+                                        </ul>  
+                                    {% endif %}                            
+                                </li>
+                                <li class="dropdown"> 
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Special issues <b class="caret"></b></a> 
+                                    {% if special_issues.count > 0 %}
+                                        <ul class="dropdown-menu"> 
+                                            {% for s in special_issues %}
+                                                <li><a href='{% url 'special_issue_desc' id=s.id %}'>{{ s.title }}</a></li>
+                                            {% endfor %}                              
+                                        </ul>   
+                                    {% endif %}                           
+                                </li>
+                                <li><a href="{% url "main_organizers" %}">Main organizers</a></li>
+                                <li class="dropdown"> 
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">CIML Book series <b class="caret"></b></a> 
+                                    {% if cimlbooks.count > 0 %}
+                                        <ul class="dropdown-menu"> 
+                                            {% for c in cimlbooks %}
+                                                <li><a href='{% url 'cimlbook_detail' id=c.id %}'>{{ c.name }}</a></li>
+                                            {% endfor %}                              
+                                        </ul>   
+                                    {% endif %}                           
+                                </li>
+                                <li><a href="{% url "partners_list" %}">Sponsors</a></li>
+                                <!--<li><a href="{% url "publication_list" %}">Publications</a></li>-->
+                                {% if user.is_authenticated %}
+                                    <li>
+                                        <a class="btn" data-toggle="dropdown">{{ user.username }} <span class="caret"></span></a>
+                                        <ul class="dropdown-menu multi-level">
+                                            {% if user.is_superuser or user.is_staff %}
+                                                <li class="dropdown-submenu">
+                                                <a>Admin site</a>
+                                                    <ul class="dropdown-menu">
+                                                        <li><a href="{% url "user_list" %}">Users zone</a></li> 
+                                                        <li><a href="{% url "dataset_list" %}">Dataset zone</a></li> 
+                                                        <li><a href="{% url "event_list" %}">Event zone</a></li> 
+                                                        <li><a href="{% url "general_partner_creation" %}">Create general sponsor</a></li> 
+                                                        <li><a href="{% url "event_proposal_list" %}">Event proposals list</a></li>
+                                                        <li><a href="{% url "home_edit" %}">Edit home page</a></li> 
+                                                        <li><a href="{% url "cimlbook_creation" %}">Create new CIML book</a></li> 
+                                                    </ul>
+                                                </li>
+                                            {% endif %} 
+                                            <li><a href="{% url "event_proposal_creation" %}">Propose event</a></li> 
+                                            <li><a href="{% url "user_edit" id=user.id %}">Edit profile</a></li>
+                                            <li><a href="{% url "help" %}">Help</a></li> 
+                                            <li><a href="{% url "auth_logout" %}">Log out</a></li> 
+                                        </ul>  
+                                    </li>                       
+                                {% else %}
+                                    <li> <a class="btn" href="{% url "auth_login" %}">SIGN IN</a> </li>
+                                    <li> <a class="btn" href="{% url "register" %}">SIGN UP</a> </li>
+                                {% endif %} 
+                                <li>
+                                    <form id="search-form" action="{% url 'watson:search' %}">
+                                        <input id="search-input" type="text" class="form-control input-search" name="q" value="{{request.GET.q}}" placeholder="search">
+                                    </form>
+                                </li>
+                            </ul>
+                        </div> 
+                        </div>
+                        </div> 
+                    </div>  
+                </div>             
+            </div>             
+        </div>                
+        <div id="container-height" class="container content"> 
+            <div id="dialog" title="Confirm delete" hidden="true">Are you sure to delete?</div>
+            {% block container %} 
+            {% endblock container %}
+        </div>              
+        <footer id="footer" class="top-space"> 
+            <div class="footer1"> 
+                <div class="container"> 
+                    <div class="row"> 
+                        <div class="col-md-12 widget"> 
+                            <h3 class="widget-title">Contact</h3> 
+                            <div class="widget-body"> 
+                                <p>Sergio Escalera, Computer Vision Center and University of Barcelona, Catalonia (Spain), <a href="http://sergioescalera.com/">www.sergioescalera.com</a>, Email: sergio dot escalera dot guerrero at gmail dot com<br></p>
+                            </div>                             
+                        </div>                         
+                    </div>                     
+                </div>                 
+            </div>             
+            <div class="footer2"> 
+                <div class="container"> 
+                    <div class="row"> 
+                        <div class="col-md-6 widget"> 
+                            <div class="widget-body"> 
+                                <p class="simplenav"> <a href="{% url "home" %}">Home</a> | <a href="{% url "register" %}">Sign up</a> </p> 
+                            </div>                             
+                        </div>                         
+                        <div class="col-md-6 widget"> 
+                            <div class="widget-body"> 
+                                <p class="text-right"> 
+								Copyright © 2016-{% now 'Y' %}, Chalearn</p>
+                            </div>                             
+                        </div>                         
+                    </div>                     
+                </div>                 
+            </div>             
+        </footer>         
+        <!-- JavaScript libs are placed at the end of the document so the pages load faster -->         
+        <script src="https://cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js"></script>
+        <script src="https://cdn.datatables.net/1.10.12/js/dataTables.bootstrap.min.js"></script>
+        <script type="text/javascript" src="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script> 
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.2/js/select2.min.js"></script>  
+        <script type="text/javascript" src="{% static "js/headroom.min.js" %}"></script>         
+        <script type="text/javascript" src="{% static "js/jQuery.headroom.min.js" %}"></script>    
+        <script type="text/javascript" src="{% static "js/template.js" %}"></script>      
+        <script type="text/javascript" src="{% static "ckeditor/ckeditor/ckeditor.js" %}"></script>
+        <script type="text/javascript" src="{% static "ckeditor/ckeditor-init.js" %}"></script>   
+    </body>     
+</html>
