@@ -1,4 +1,4 @@
-from django.urls import re_path
+from django.urls import re_path, path
 from . import views
 from django.contrib.auth import views as auth_views
 from .forms import UserRegisterForm, UserLoginForm, ChangePassForm, ResetPassForm, SetPassForm, MemberCreationForm
@@ -19,11 +19,13 @@ urlpatterns = [
     re_path(r'^register/$', RegistrationView.as_view(form_class=UserRegisterForm), name='register'),
     re_path(r'^login/$', auth_views.LoginView.as_view(authentication_form=UserLoginForm), name='auth_login'),
     re_path(r'^logout/$', auth_views.LogoutView.as_view(next_page='home'), name='auth_logout'),
-    re_path(r'^password/change/$', auth_views.PasswordChangeView.as_view(), {'password_change_form': ChangePassForm}, name='auth_password_change'),
+    re_path(r'^password/change/$', auth_views.PasswordChangeView.as_view(form_class=ChangePassForm), name='auth_password_change'),
     re_path(r'^password_change/done/$', auth_views.PasswordChangeDoneView.as_view(), name='password_change_done'),
-    re_path(r'^password_reset/$', auth_views.PasswordResetView.as_view(), {'password_reset_form': ResetPassForm}, name='auth_password_reset'),
+    re_path(r'^password_reset/$', auth_views.PasswordResetView.as_view(), name='auth_password_reset'),
     re_path(r'^password_reset/done/$', auth_views.PasswordResetDoneView.as_view(), name='password_reset_done'),
-    re_path(r'^reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$', auth_views.PasswordResetConfirmView.as_view(), {'set_password_form': SetPassForm}, name='auth_password_reset_confirm'),
+    #re_path(r'^password_reset/confirm/?P<token>/$', auth_views.PasswordResetConfirmView.as_view(), name='auth_password_reset_confirm'),
+    #re_path(r'^reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$', auth_views.PasswordResetConfirmView.as_view(form_class=SetPassForm), name='auth_password_reset_confirm'),
+    path(r'^reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(), name='auth_password_reset_confirm'),
     re_path(r'^reset/done/$', auth_views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
     re_path(r'^activate/complete/$', TemplateView.as_view(template_name='registration/activation_complete.html'), name='registration_activation_complete'),
     re_path(r'^activate/(?P<activation_key>\w+)/$', ActivationView.as_view(), name='registration_activate'),

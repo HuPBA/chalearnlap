@@ -87,14 +87,14 @@
                                         {{ form.staff }}                                      
                                     </div>
                                 {% endif %}
-                                {% ifequal user.id user_edit %}
+                                {% if user.id == user_edit %}
                                     <hr> 
                                     <div class="row">
                                         <div class="col-sm-3"> 
                                             <a class="btn btn-action" href="{% url "auth_password_change" %}">Change password</a>
                                         </div>  
                                     </div>  
-                                {% endifequal %}                        
+                                {% endif %}
                                 <hr> 
                                 <div class="top-margin"> 
                                     <label>Profile picture
