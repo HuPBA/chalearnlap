@@ -2,7 +2,8 @@ django
 django-ckeditor
 django-registration-redux
 django-watson
-django-jfu
+#django-jfu
+pyforms-web
 django-datetime-widget
 django-utils-six
 django_extensions

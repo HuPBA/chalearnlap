@@ -16,9 +16,9 @@ urlpatterns = [
     re_path(r'^cimlbook/creation/$', views.cimlbook_creation, name="cimlbook_creation"),
     re_path(r'^main-organizers/$', views.main_organizers, name="main_organizers"),
     # Register, Login, edit password urls (Django auth)
-    re_path(r'^register/$', RegistrationView.as_view(form_class = UserRegisterForm), name='register'),
-    re_path(r'^login/$', auth_views.auth_login, {'authentication_form': UserLoginForm}, name='auth_login'),
-    re_path(r'^logout/$', auth_views.auth_logout, {'next_page': 'home'}, name='auth_logout'),
+    re_path(r'^register/$', RegistrationView.as_view(form_class=UserRegisterForm), name='register'),
+    re_path(r'^login/$', auth_views.LoginView.as_view(authentication_form=UserLoginForm), name='auth_login'),
+    re_path(r'^logout/$', auth_views.LogoutView.as_view(next_page='home'), name='auth_logout'),
     re_path(r'^password/change/$', auth_views.PasswordChangeView.as_view(), {'password_change_form': ChangePassForm}, name='auth_password_change'),
     re_path(r'^password_change/done/$', auth_views.PasswordChangeDoneView.as_view(), name='password_change_done'),
     re_path(r'^password_reset/$', auth_views.PasswordResetView.as_view(), {'password_reset_form': ResetPassForm}, name='auth_password_reset'),
