@@ -101,7 +101,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'chalearnlap.users.apps.UsersConfig',
+    'users',
     'ckeditor',
     'ckeditor_uploader',
     'datetimewidget',
