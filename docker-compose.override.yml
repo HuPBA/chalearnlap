@@ -1,0 +1,78 @@
+version: '3.7'
+services:
+  prometheus-gw:
+    image: prom/pushgateway
+    ports:
+      - 9091
+  prometheus:
+    image: bitnami/prometheus
+    volumes:
+      - prometheus_volume:/opt/bitnami/prometheus/data
+    configs:
+      - source: prometheus_conf
+        target: /opt/bitnami/prometheus/conf/prometheus.yml
+    ports:
+    #  — 9090:9090
+      - 9090
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.prometheus.rule=Host(`prometheus.pelp.sunai.uoc.edu`)"
+      - "traefik.http.routers.prometheus.entrypoints=http"
+      - "traefik.http.services.prometheus-service.loadBalancer.sticky.cookie=true"
+      - "traefik.http.services.prometheus-service.loadbalancer.server.port=9090"
+      - "traefik.http.routers.prometheus.service=prometheus-service"
+  grafana:
+    image: grafana/grafana-oss
+    user: root
+    depends_on:
+      - prometheus
+    #ports:
+     #— 3060:3000
+    volumes:
+      - grafana_volume:/var/lib/grafana
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.grafana.rule=Host(`grafana.pelp.sunai.uoc.edu`)"
+      - "traefik.http.routers.grafana.entrypoints=http"
+  redis-exporter:
+    image: bitnami/redis-exporter:latest
+    command: ['--redis.addr', 'redis']
+    ports:
+      - 9121
+    depends_on:
+      - redis
+
+  node-exporter:
+    image: prom/node-exporter:latest
+    restart: unless-stopped
+    expose:
+      - 9100
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor
+    restart: unless-stopped
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /var/run/docker.sock:/var/run/docker.sock:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+    expose:
+      - 8080
+
+volumes:
+  prometheus_volume:
+    driver_opts:
+      type: none
+      device: ${PWD}/_data/prometheus
+      o: bind
+  grafana_volume:
+    driver_opts:
+      type: none
+      device: ${PWD}/_data/grafana
+      o: bind
+
+configs:
+  prometheus_conf:
+    file: ${PWD}/docker/prometheus.yml

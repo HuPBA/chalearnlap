@@ -203,38 +203,66 @@ class UserRegisterForm(RegistrationForm):
 				raise forms.ValidationError('Your usrename is not unique.')
 		return self.cleaned_data
 
+
 class EditProfileForm(forms.Form):
 	def __init__(self, *args, **kwargs):
 		profile = kwargs.pop('profile', None)
 		user = kwargs.pop('user', None)
 		affiliation = kwargs.pop('affiliation', None)
 		super(EditProfileForm, self).__init__(*args, **kwargs)
-		if affiliation == None:
-			self.fields['username'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}), initial=user.username)
-			self.fields['email'] = forms.CharField(required=True, widget=forms.EmailInput(attrs={'class': "form-control"}), initial=user.email)
-			self.fields['first_name'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}))
-			self.fields['last_name'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}))
-			self.fields['avatar'] = forms.ImageField(required=False, widget=forms.FileInput(attrs={'class': "form-control"}))
-			self.fields['bio'] = forms.CharField(required=False, widget=forms.Textarea(attrs={'class': "form-control"}))
-			self.fields['name'] = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}))
-			self.fields['country'] = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}))
-			self.fields['city'] = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}))
-			self.fields['newsletter'] = forms.BooleanField(required=False, initial=True)
+
+		self._profile = profile
+		self._user = user
+		self._affiliation = affiliation
+
+		# Initialize fields
+		self.fields['username'] = forms.CharField(required=True,
+												  widget=forms.TextInput(attrs={'class': "form-control"}),
+												  initial=user.username)
+		self.fields['email'] = forms.CharField(required=True, widget=forms.EmailInput(attrs={'class': "form-control"}),
+											   initial=user.email)
+		self.fields['staff'] = forms.TypedChoiceField(required=False, choices=((False, 'False'), (True, 'True')),
+													  widget=forms.RadioSelect, initial=user.is_staff)
+		self.fields['first_name'] = forms.CharField(required=True,
+													widget=forms.TextInput(attrs={'class': "form-control"}),
+													initial=profile.first_name)
+		self.fields['last_name'] = forms.CharField(required=True,
+												   widget=forms.TextInput(attrs={'class': "form-control"}),
+												   initial=profile.last_name)
+		self.fields['avatar'] = forms.ImageField(required=False,
+												 widget=forms.FileInput(attrs={'class': "form-control"}),
+												 initial=profile.avatar)
+		self.fields['bio'] = forms.CharField(required=False, widget=forms.Textarea(attrs={'class': "form-control"}),
+											 initial=profile.bio)
+		self.fields['newsletter'] = forms.BooleanField(required=False, initial=profile.newsletter)
+
+		if affiliation is None:
+			self.fields['name'] = forms.CharField(required=False,
+												  widget=forms.TextInput(attrs={'class': "form-control"}))
+			self.fields['country'] = forms.CharField(required=False,
+													 widget=forms.TextInput(attrs={'class': "form-control"}))
+			self.fields['city'] = forms.CharField(required=False,
+												  widget=forms.TextInput(attrs={'class': "form-control"}))
 		else:
-			self.fields['username'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}), initial=user.username)
-			self.fields['email'] = forms.CharField(required=True, widget=forms.EmailInput(attrs={'class': "form-control"}), initial=user.email)
-			self.fields['first_name'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}), initial=profile.first_name)
-			self.fields['last_name'] = forms.CharField(required=True, widget=forms.TextInput(attrs={'class': "form-control"}), initial=profile.last_name)
-			self.fields['staff'] = forms.TypedChoiceField(required=False, choices=((False, 'False'), (True, 'True')), widget=forms.RadioSelect, initial=user.is_staff)
-			self.fields['avatar'] = forms.ImageField(required=False, widget=forms.FileInput(attrs={'class': "form-control"}), initial=profile.avatar)
-			self.fields['bio'] = forms.CharField(required=False, widget=forms.Textarea(attrs={'class': "form-control"}), initial=profile.bio)
-			self.fields['name'] = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}), initial=affiliation.name)
-			self.fields['country'] = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}), initial=affiliation.country)
-			self.fields['city'] = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': "form-control"}), initial=affiliation.city)
-			self.fields['newsletter'] = forms.BooleanField(required=False, initial=profile.newsletter)
+			self.fields['name'] = forms.CharField(required=False,
+												  widget=forms.TextInput(attrs={'class': "form-control"}),
+												  initial=affiliation.name)
+			self.fields['country'] = forms.CharField(required=False,
+													 widget=forms.TextInput(attrs={'class': "form-control"}),
+													 initial=affiliation.country)
+			self.fields['city'] = forms.CharField(required=False,
+												  widget=forms.TextInput(attrs={'class': "form-control"}),
+												  initial=affiliation.city)
+
+	def clean_staff(self):
+		value = self.cleaned_data['staff']
+		if value == self.fields['staff'].empty_value:
+			value = False
+		return value
 
 	def clean(self):
 		return self.cleaned_data
+
 
 class EditExtraForm(forms.Form):
 	def __init__(self, *args, **kwargs):

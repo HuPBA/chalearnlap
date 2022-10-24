@@ -1,0 +1,133 @@
+version: "3.7"
+services:
+  traefik:
+    image: "traefik"
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - traefik_volume:/letsencrypt
+    labels:
+      - "--providers.docker"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.http.address=:80"
+      - "--entrypoints.https.address=:443"
+      - "--certificatesresolvers.tesla-tlschallenge.acme.tlschallenge=true"
+      - "--certificatesresolvers.tesla-tlschallenge.acme.email=xbaro@uoc.edu"
+      - "--certificatesresolvers.tesla-tlschallenge.acme.storage=/letsencrypt/acme.json"
+      - "--certificatesresolvers.tesla-tlschallenge.acme.httpchallenge.entrypoint=http"
+  db:
+    image: mariadb
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - db_volume:/var/lib/mysql
+
+  redis:
+    image: redis:alpine
+    restart: always
+    volumes:
+      - redis_volume:/data
+
+  minio:
+    image: minio/minio
+    volumes:
+      - minio_volume:/data
+    restart: always
+    environment:
+      MINIO_REGION_NAME: ${STORAGE_REGION}
+      MINIO_ACCESS_KEY: ${STORAGE_ACCESS_KEY}
+      MINIO_SECRET_KEY: ${STORAGE_SECRET_KEY}
+      MINIO_CONSOLE_ADDRESS: 'https://data-console.chalearnlap.sunai.uoc.edu'
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9001/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.chalearnlap-data.rule=Host(`data.chalearnlap.sunai.uoc.edu`)"
+      - "traefik.http.routers.chalearnlap-data.entrypoints=http"
+      - "traefik.http.services.chalearnlap-data-service.loadBalancer.sticky.cookie=true"
+      - "traefik.http.services.chalearnlap-data-service.loadbalancer.server.port=9000"
+      - "traefik.http.routers.chalearnlap-data.service=chalearnlap-data-service"
+      - "traefik.http.routers.chalearnlap-datacons.rule=Host(`data-console.chalearnlap.sunai.uoc.edu`)"
+      - "traefik.http.routers.chalearnlap-datacons.entrypoints=http"
+      - "traefik.http.services.chalearnlap-datacons-service.loadBalancer.sticky.cookie=true"
+      - "traefik.http.services.chalearnlap-datacons-service.loadbalancer.server.port=9001"
+      - "traefik.http.routers.chalearnlap-datacons.service=chalearnlap-datacons-service"
+
+  web:
+    image: chalearnlap/web:latest
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    restart: always
+    environment:
+      DEBUG: 0
+      DJANGO_SECRET: ${DJANGO_SECRET}
+      ALLOWED_HOSTS: ${ALLOWED_HOSTS}
+      DB_ENGINE: ${DB_ENGINE}
+      DB_HOST: ${DB_HOST}
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      STORAGE_ACCESS_KEY: ${STORAGE_ACCESS_KEY}
+      STORAGE_SECRET_KEY: ${STORAGE_SECRET_KEY}
+      STORAGE_BUCKET_NAME: ${STORAGE_BUCKET_NAME}
+      STORAGE_REGION: ${STORAGE_REGION}
+      STORAGE_URL: ${STORAGE_URL}
+      STORAGE_PUBLIC_BUCKET_NAME: ${STORAGE_PUBLIC_BUCKET_NAME}
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
+      SENTRY_ENABLED: ${SENTRY_ENABLED}
+      SENTRY_DSN: ${SENTRY_DSN}
+      SENTRY_RELEASE: ${SENTRY_RELEASE}
+      SENTRY_SERVER_NAME: ${SENTRY_SERVER_NAME}
+      SENTRY_ENVIRONMENT: ${SENTRY_ENVIRONMENT}
+      EMAIL_HOST: ${EMAIL_HOST}
+      EMAIL_PORT: ${EMAIL_PORT}
+      EMAIL_HOST_USER: ${EMAIL_HOST_USER}
+      EMAIL_HOST_PASSWORD: ${EMAIL_HOST_PASSWORD}
+      EMAIL_FROM: ${EMAIL_FROM}
+      PROMETHEUS_GW: ${PROMETHEUS_GW}
+    depends_on:
+      - db
+      - redis
+      - minio
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.chalearnlap.rule=Host(`chalearnlap.sunai.uoc.edu`)"
+      - "traefik.http.routers.chalearnlap.entrypoints=http"
+      - "traefik.http.services.chalearnlap-service.loadBalancer.sticky.cookie=true"
+      - "traefik.http.services.chalearnlap-service.loadbalancer.server.port=5000"
+      - "traefik.http.routers.chalearnlap.service=chalearnlap-service"
+    
+volumes:
+  traefik_volume:
+    driver_opts:
+      type: none
+      device: ${PWD}/_data/traefik
+      o: bind
+  db_volume:
+    driver_opts:
+      type: none
+      device: ${PWD}/_data/db
+      o: bind
+  redis_volume:
+    driver_opts:
+      type: none
+      device: ${PWD}/_data/redis
+      o: bind
+  minio_volume:
+    driver_opts:
+      type: none
+      device: ${PWD}/_data/minio
+      o: bind

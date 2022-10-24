@@ -101,7 +101,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'users.apps.UsersConfig',
+    'chalearnlap.users',
     'ckeditor',
     'ckeditor_uploader',
     'datetimewidget',
@@ -225,9 +225,7 @@ REGISTRATION_EMAIL_HTML = False
 SITE_ID = os.environ.get('SITE_ID', 1)
 
 # GMAIL SMTP settings
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-
-#EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
@@ -235,6 +233,10 @@ EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', None),
 EMAIL_HOST_PASSWORD = _read_secret('EMAIL_HOST_PASSWORD', None),
 DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', None),
 DEFAULT_TO_EMAIL = ''
+
+# Use console as email backend on debug except if SMTP password is given
+if DEBUG and EMAIL_HOST_PASSWORD is None:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 LOGIN_REDIRECT_URL = '/'
 
