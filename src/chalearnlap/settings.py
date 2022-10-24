@@ -11,46 +11,95 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 """
 
 import os
+import typing
+from pathlib import Path
 import sentry_sdk
 
 from django.contrib.messages import constants as message_constants
-from django.conf import settings
 from sentry_sdk.integrations.django import DjangoIntegration
+
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = os.environ.get('DEBUG', False) in [True, 'True', 'true', '1', 1]
+
+CHALEARNLAP_VERSION = os.environ.get('CHALEARNLAP_VERSION', '2.1.0')
 
 if os.environ.get('SENTRY_DSN', None) is not None:
     sentry_sdk.init(
         dsn=os.environ.get('SENTRY_DSN'),
-        release=os.environ.get('SENTRY_RELEASE', '0.0.1'),
+        release=os.environ.get('SENTRY_RELEASE', CHALEARNLAP_VERSION),
         environment=os.environ.get('SENTRY_ENV', 'Production'),
-        integrations=[DjangoIntegration()]
+        integrations=[DjangoIntegration()],
+
+        # Set traces_sample_rate to 1.0 to capture 100%
+        # of transactions for performance monitoring.
+        # We recommend adjusting this value in production.
+        traces_sample_rate=1.0,
+
+        # If you wish to associate users to errors (assuming you are using
+        # django.contrib.auth) you may enable sending PII data.
+        send_default_pii=True,
+
+        max_breadcrumbs=50,
+        debug=DEBUG,
+        server_name=os.getenv('SENTRY_SERVER_NAME'),
+        attach_stacktrace=True,
     )
 
-
-
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR = Path(__file__).resolve().parent
+
+# GET SECRETS PATH
+SECRETS_PATH = os.environ.get('SECRETS_PATH', '/run/secrets')
+
+
+def _read_secret(key: str,
+                 default: typing.Optional[typing.Any] = None,
+                 secret_path: typing.Optional[str] = None):
+    """
+        Read configuration parameter from secrets and/or environment variable
+        :param key: Key to find for
+        :param default: Default value in case the key is not found
+        :param secret_path: Custom secrets' path
+        :return: The value for the key configuration value
+    """
+    # If secret path is not provided, use default
+    if secret_path is None:
+        secret_path = SECRETS_PATH
+
+    # Check environment variables
+    value = os.getenv(key, None)
+    if value is not None:
+        return value
+    # Check file environment variable
+    file_path = os.getenv('{}_FILE'.format(key.upper()), None)
+    if file_path is None:
+        file_path = os.path.join(secret_path, key.upper())
+    if file_path is not None and os.path.exists(file_path):
+        with open(file_path, 'r') as secret:
+            value = secret.read()
+    if value is None:
+        value = default
+    return value
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY')
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG', False) in [True, 'True', 'true', '1', 1]
+SECRET_KEY = _read_secret('SECRET_KEY')
 
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '').split(',')
 DIRECTORY = getattr(sentry_sdk, 'FILEBROWSER_DIRECTORY', '')
 
 # Application definition
 INSTALLED_APPS = [
+    'django.contrib.sites',
     'registration', #should be immediately above 'django.contrib.admin'
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.sites',
     'django.contrib.staticfiles',
     'users.apps.UsersConfig',
     'ckeditor',
@@ -108,7 +157,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.{}'.format(os.environ.get('DB_ENGINE', 'mysql')),
         'NAME': DB_NAME,
         'USER': os.environ.get('DB_USER', 'chalearn'),
-        'PASSWORD': os.environ.get('DB_PASSWORD', 'chalearn'),
+        'PASSWORD': _read_secret('DB_PASSWORD', 'chalearn'),
         'HOST': os.environ.get('DB_HOST', 'localhost'),
         'PORT': os.environ.get('DB_PORT', 3306),
     }
@@ -173,14 +222,17 @@ MESSAGE_TAGS = {
 # Registration settings
 ACCOUNT_ACTIVATION_DAYS = 7 # One-week activation window; you may, of course, use a different value.
 REGISTRATION_EMAIL_HTML = False
-SITE_ID = 2
+SITE_ID = os.environ.get('SITE_ID', 1)
 
 # GMAIL SMTP settings
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+#EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', None),
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', None),
+EMAIL_HOST_PASSWORD = _read_secret('EMAIL_HOST_PASSWORD', None),
 DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', None),
 DEFAULT_TO_EMAIL = ''
 

@@ -1,3 +1,14 @@
 DEBUG=0
+
 SECRET_KEY=my_very_secret_key
 ALLOWED_HOSTS=
+SITE_ID=1
+
+EMAIL_HOST_USER=chalearn
+EMAIL_HOST_PASSWORD=secretpassword
+
+DB_ENGINE=mysql
+DB_USER=chalearn
+DB_PASSWORD=dbsecretpassword
+DB_HOST=localhost
+DB_PORT=3306
