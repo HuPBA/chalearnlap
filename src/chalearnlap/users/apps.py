@@ -6,9 +6,7 @@ from watson import search as watson
 
 class UsersConfig(AppConfig):
     name = 'users'
-    module = 'chalearnlap.users'
-    verbose_name = 'Chalearn LAP Users'
-    default = True
+
     default_auto_field = 'django.db.models.BigAutoField'
 
     def ready(self):

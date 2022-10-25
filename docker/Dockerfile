@@ -29,7 +29,7 @@ RUN set -ex \
             python3-dev \
     && python3 -m venv /venv \
     && /venv/bin/pip install -U pip \
-    && LIBRARY_PATH=/lib:/usr/lib /bin/sh -c "/venv/bin/pip install --no-cache-dir wheel uwsgi -r requirements.txt --upgrade" \
+    && LIBRARY_PATH=/lib:/usr/lib /bin/sh -c "/venv/bin/pip install --no-cache-dir wheel uwsgi mysqlclient psycopg2 -r requirements.txt --upgrade" \
     && runDeps="$( \
             scanelf --needed --nobanner --recursive /venv \
                     | awk '{ gsub(/,/, "\nso:", $2); print "so:" $2 }' \

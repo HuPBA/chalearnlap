@@ -101,7 +101,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'chalearnlap.users',
     'ckeditor',
     'ckeditor_uploader',
     'datetimewidget',
@@ -109,6 +108,7 @@ INSTALLED_APPS = [
     'jfu',
     'sorl.thumbnail',
     'django_extensions',
+    'chalearnlap.users',
 ]
 
 MIDDLEWARE = [
@@ -235,7 +235,7 @@ DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', None),
 DEFAULT_TO_EMAIL = ''
 
 # Use console as email backend on debug except if SMTP password is given
-if DEBUG and EMAIL_HOST_PASSWORD is None:
+if DEBUG and (EMAIL_HOST_PASSWORD is None or os.environ.get('EMAIL_CONSOLE', False) in [True, 'true', 'True', '1', 1]):
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 LOGIN_REDIRECT_URL = '/'
