@@ -101,6 +101,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_prometheus',
     'ckeditor',
     'ckeditor_uploader',
     'datetimewidget',
@@ -112,6 +113,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'django_prometheus.middleware.PrometheusBeforeMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -119,6 +121,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django_prometheus.middleware.PrometheusAfterMiddleware',
 ]
 
 ROOT_URLCONF = 'chalearnlap.urls'
@@ -135,7 +138,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'users.context_processors.base_context',
+                'chalearnlap.users.context_processors.base_context',
                 'django.template.context_processors.static',
             ],
         },
@@ -154,7 +157,7 @@ if os.environ.get('DB_ENGINE', 'mysql') == 'sqlite3':
     DB_NAME = os.path.join(os.path.dirname(os.path.dirname(BASE_DIR)), DB_NAME + '.sqlite3')
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.{}'.format(os.environ.get('DB_ENGINE', 'mysql')),
+        'ENGINE': 'django_prometheus.db.backends.{}'.format(os.environ.get('DB_ENGINE', 'mysql')),
         'NAME': DB_NAME,
         'USER': os.environ.get('DB_USER', 'chalearn'),
         'PASSWORD': _read_secret('DB_PASSWORD', 'chalearn'),
@@ -254,3 +257,5 @@ CKEDITOR_UPLOAD_PATH = "ck_uploads"
 
 # Account Verification (none or optional)
 ACCOUNT_EMAIL_VERIFICATION = 'optional'
+
+PROMETHEUS_METRICS_GW = os.getenv('PROMETHEUS_GW')

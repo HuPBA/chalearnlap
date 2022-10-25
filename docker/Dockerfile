@@ -29,7 +29,7 @@ RUN set -ex \
             python3-dev \
     && python3 -m venv /venv \
     && /venv/bin/pip install -U pip \
-    && LIBRARY_PATH=/lib:/usr/lib /bin/sh -c "/venv/bin/pip install --no-cache-dir wheel uwsgi mysqlclient psycopg2 -r requirements.txt --upgrade" \
+    && LIBRARY_PATH=/lib:/usr/lib /bin/sh -c "/venv/bin/pip install --no-cache-dir wheel uwsgi daphne mysqlclient psycopg2 -r requirements.txt --upgrade" \
     && runDeps="$( \
             scanelf --needed --nobanner --recursive /venv \
                     | awk '{ gsub(/,/, "\nso:", $2); print "so:" $2 }' \
@@ -81,7 +81,7 @@ RUN addgroup -g 2000 -S web_group && \
 RUN chown -R web_user:web_group /code
 
 # Call collectstatic (customize the following line with the minimal environment variables needed for manage.py to run):
-RUN DEBUG=1 /venv/bin/python manage.py collectstatic --noinput
+RUN DB_ENGINE=sqlite3 /venv/bin/python manage.py collectstatic --noinput
 
 # Copy the Nginx global conf
 COPY docker/nginx.conf /etc/nginx/

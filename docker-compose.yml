@@ -19,7 +19,7 @@ services:
       - "--certificatesresolvers.tesla-tlschallenge.acme.storage=/letsencrypt/acme.json"
       - "--certificatesresolvers.tesla-tlschallenge.acme.httpchallenge.entrypoint=http"
   db:
-    image: mariadb
+    image: mariadb:10.7
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
@@ -72,7 +72,7 @@ services:
     restart: always
     environment:
       DEBUG:
-      DJANGO_SECRET: ${DJANGO_SECRET}
+      SECRET_KEY: ${DJANGO_SECRET}
       ALLOWED_HOSTS:
       SITE_ID:
       DB_ENGINE:

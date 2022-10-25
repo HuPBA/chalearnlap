@@ -1,4 +1,4 @@
-from users.models import Event, Track
+from chalearnlap.users.models import Event, Track
 
 
 def replace_data():
