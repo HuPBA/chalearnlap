@@ -17,11 +17,11 @@ from django.urls import include, re_path
 from django.contrib import admin
 from django.conf.urls.static import static
 from django.conf import settings
-from users import views
+from .users import views
 
 urlpatterns = [
     re_path(r'^admin/', admin.site.urls),
-    re_path(r'^', include("users.urls")),
+    re_path(r'^', include("chalearnlap.users.urls")),
     re_path(r'^ckeditor/', include('ckeditor_uploader.urls')),
     re_path(r'file/upload/', views.file_upload, name = 'jfu_file_upload' ),
     re_path(r'image/upload/', views.image_upload, name = 'jfu_image_upload' ),
@@ -29,7 +29,7 @@ urlpatterns = [
     re_path(r'^$', views.home, name="home"),
 ]
 
-handler404 = 'users.views.handler404'
+handler404 = 'chalearnlap.users.views.handler404'
 
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

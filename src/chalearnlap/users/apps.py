@@ -5,7 +5,7 @@ from watson import search as watson
 
 
 class UsersConfig(AppConfig):
-    name = 'users'
+    name = 'chalearnlap.users'
 
     default_auto_field = 'django.db.models.BigAutoField'
 
