@@ -1,11 +1,11 @@
 version: "3.7"
 services:
   traefik:
-    image: "traefik"
+    image: "traefik:2-7"
     restart: always
     ports:
-      - "80:80"
-      - "443:443"
+      - "8080:80"
+      - "8443:443"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - traefik_volume:/letsencrypt
@@ -44,7 +44,7 @@ services:
       MINIO_REGION_NAME: ${STORAGE_REGION}
       MINIO_ACCESS_KEY: ${STORAGE_ACCESS_KEY}
       MINIO_SECRET_KEY: ${STORAGE_SECRET_KEY}
-      MINIO_CONSOLE_ADDRESS: 'https://data-console.${BASE_DOMAIN:-chalearnlap.aiwell.uoc.edu}'
+      MINIO_BROWSER_REDIRECT_URL: 'https://data-console.${BASE_DOMAIN:-chalearnlap.aiwell.uoc.edu}'
     command: server /data --console-address ":9001"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9001/minio/health/live"]
@@ -54,12 +54,12 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.chalearnlap-data.rule=Host(`data.${BASE_DOMAIN:-chalearnlap.aiwell.uoc.edu}`)"
-      - "traefik.http.routers.chalearnlap-data.entrypoints=http"
+      - "traefik.http.routers.chalearnlap-data.entrypoints=${EXPOSE_ENTRYPOINT:-http}"
       - "traefik.http.services.chalearnlap-data-service.loadBalancer.sticky.cookie=true"
       - "traefik.http.services.chalearnlap-data-service.loadbalancer.server.port=9000"
       - "traefik.http.routers.chalearnlap-data.service=chalearnlap-data-service"
       - "traefik.http.routers.chalearnlap-datacons.rule=Host(`data-console.${BASE_DOMAIN:-chalearnlap.aiwell.uoc.edu}`)"
-      - "traefik.http.routers.chalearnlap-datacons.entrypoints=http"
+      - "traefik.http.routers.chalearnlap-datacons.entrypoints=${EXPOSE_ENTRYPOINT:-http}"
       - "traefik.http.services.chalearnlap-datacons-service.loadBalancer.sticky.cookie=true"
       - "traefik.http.services.chalearnlap-datacons-service.loadbalancer.server.port=9001"
       - "traefik.http.routers.chalearnlap-datacons.service=chalearnlap-datacons-service"
@@ -106,7 +106,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.chalearnlap.rule=Host(`${BASE_DOMAIN:-chalearnlap.aiwell.uoc.edu}`)"
-      - "traefik.http.routers.chalearnlap.entrypoints=http"
+      - "traefik.http.routers.chalearnlap.entrypoints=${EXPOSE_ENTRYPOINT:-http}"
       - "traefik.http.services.chalearnlap-service.loadBalancer.sticky.cookie=true"
       - "traefik.http.services.chalearnlap-service.loadbalancer.server.port=5000"
       - "traefik.http.routers.chalearnlap.service=chalearnlap-service"
