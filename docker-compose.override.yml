@@ -16,7 +16,7 @@ services:
       - 9090
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.prometheus.rule=Host(`prometheus.chalearnlap.sunai.uoc.edu`)"
+      - "traefik.http.routers.prometheus.rule=Host(`prometheus.chalearnlap.aiwell.uoc.edu`)"
       - "traefik.http.routers.prometheus.entrypoints=http"
       - "traefik.http.services.prometheus-service.loadBalancer.sticky.cookie=true"
       - "traefik.http.services.prometheus-service.loadbalancer.server.port=9090"
@@ -32,7 +32,7 @@ services:
       - grafana_volume:/var/lib/grafana
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.grafana.rule=Host(`grafana.chalearnlap.sunai.uoc.edu`)"
+      - "traefik.http.routers.grafana.rule=Host(`grafana.chalearnlap.aiwell.uoc.edu`)"
       - "traefik.http.routers.grafana.entrypoints=http"
   redis-exporter:
     image: bitnami/redis-exporter:latest
