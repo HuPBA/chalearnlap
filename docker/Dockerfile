@@ -81,7 +81,7 @@ RUN addgroup -g 2000 -S web_group && \
 RUN chown -R web_user:web_group /code
 
 # Call collectstatic (customize the following line with the minimal environment variables needed for manage.py to run):
-RUN DEBUG=1 /venv/bin/python manage.py collectstatic --noinput
+# RUN DEBUG=1 /venv/bin/python manage.py collectstatic --noinput
 
 # Copy the Nginx global conf
 COPY docker/nginx.conf /etc/nginx/
