@@ -222,7 +222,7 @@ MESSAGE_TAGS = {
 # Registration settings
 ACCOUNT_ACTIVATION_DAYS = 7 # One-week activation window; you may, of course, use a different value.
 REGISTRATION_EMAIL_HTML = False
-SITE_ID = os.environ.get('SITE_ID', 1)
+SITE_ID = int(os.environ.get('SITE_ID', 1))
 
 # GMAIL SMTP settings
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
