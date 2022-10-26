@@ -97,7 +97,7 @@ def home_edit(request):
 def help(request):
 	help = Help.objects.all().first()
 	profile = None
-	if request.user and (not request.user.is_anonymous()):
+	if request.user and (not request.user.is_anonymous):
 		if request.user.is_superuser or request.user.is_staff:
 			profile = Profile.objects.filter(user=request.user)
 	return render(request, "help.html", {"help": help, "profile": profile})
@@ -117,7 +117,7 @@ def cimlbook_detail(request, id=None):
 	book = CIMLBook.objects.filter(id=id).first()
 	news = News.objects.order_by('-upload_date')[:5]
 	profile = None
-	if request.user and (not request.user.is_anonymous()):
+	if request.user and (not request.user.is_anonymous):
 		if request.user.is_superuser or request.user.is_staff:
 			profile = Profile.objects.filter(user=request.user)
 	return render(request, "cimlbook-detail.html", {"book": book, "news": news, "profile": profile})
@@ -173,10 +173,10 @@ def user_list(request):
 @login_required(login_url='auth_login')
 def user_edit(request, id=None):
 	profile = Profile.objects.filter(user__id=id).first()
+	if profile is None:
+		profile = Profile.objects.create(user=request.user)
 	user = profile.user
 	affiliation = profile.affiliation
-	if affiliation==None:
-		form = EditProfileForm(user=user)
 	form = EditProfileForm(profile=profile, user=user, affiliation=affiliation)
 	if request.method == 'POST':
 		form = EditProfileForm(request.POST, request.FILES, profile=profile, user=user, affiliation=affiliation)
@@ -4300,7 +4300,7 @@ def event_edit(request, id=None):
 
 def check_event_permission(request, event):
 	profile_event = None
-	if request.user and (not request.user.is_anonymous()):
+	if request.user and (not request.user.is_anonymous):
 		if request.user.is_superuser or request.user.is_staff:
 			profile_event = Profile.objects.filter(user=request.user)
 		else:
@@ -4327,7 +4327,7 @@ def check_edit_event_permission(request, event):
 
 def check_dataset_permission(request, dataset):
 	profile_dataset = None
-	if request.user and (not request.user.is_anonymous()):
+	if request.user and (not request.user.is_anonymous):
 		if request.user.is_superuser or request.user.is_staff:
 			profile_dataset = Profile.objects.filter(user=request.user)
 		else:
