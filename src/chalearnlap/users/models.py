@@ -51,7 +51,7 @@ class Affiliation(BaseModel):
 			out = str(self.name)
 		else:
 			out = str('')
-		return out.encode('utf-8')
+		return out
 
 class Event(BaseModel):
 	title = models.CharField(max_length=100)
@@ -59,7 +59,7 @@ class Event(BaseModel):
 	is_public = models.BooleanField(default=False)
 
 	def __str__(self):
-		return str(self.title).encode('utf-8')
+		return str(self.title)
 
 	def get_absolute_url(self):
 		if Challenge.objects.filter(id=self.id).count() > 0:
@@ -89,7 +89,7 @@ class Profile(BaseModel):
 
 	def __str__(self):
 		out = str(self.first_name) + str(' ') + str(self.last_name)
-		return out.encode('utf-8')
+		return out
 
 	def get_absolute_url(self):
 		return reverse("profile_edit", kwargs={"id": self.id})
@@ -107,14 +107,14 @@ class Proposal(BaseModel):
 	description = RichTextField()
 
 	def __str__(self):
-		return str(self.title).encode('utf-8')
+		return str(self.title)
 
 
 class Role(BaseModel):
 	name = models.CharField(max_length=50)
 
 	def __str__(self):
-		return str(self.name).encode('utf-8')
+		return str(self.name)
 
 
 class Profile_Event(BaseModel):
@@ -132,7 +132,7 @@ class Profile_Event(BaseModel):
 class Challenge(Event):
 
 	def __str__(self):
-		return str(self.title).encode('utf-8')
+		return str(self.title)
 
 	def get_absolute_url(self):
 		return reverse("challenge_desc", kwargs={"id": self.id})
@@ -151,7 +151,7 @@ class Dataset(BaseModel):
 	gt_file = models.FileField(upload_to=dataset_path, null=True)
 
 	def __str__(self):
-		return str(self.title).encode('utf-8')
+		return str(self.title)
 
 	def get_absolute_url(self):
 		return reverse("dataset_desc", kwargs={"id": self.id})
@@ -169,7 +169,7 @@ class Contact(BaseModel):
 	email = models.CharField(max_length=100, null=True)
 
 	def __str__(self):
-		return str(self.first_name).encode('utf-8')
+		return str(self.first_name)
 
 
 def partner_avatar_path(instance, filename):
@@ -184,7 +184,7 @@ class Partner(BaseModel):
 	contact = models.ForeignKey(Contact, on_delete=models.CASCADE, null=True)
 
 	def __str__(self):
-		return str(self.name).encode('utf-8')
+		return str(self.name)
 
 @receiver(post_delete, sender=Partner)
 def auto_delete_Profile(sender, instance, **kwargs):
@@ -199,7 +199,7 @@ class Event_Partner(BaseModel):
 
 class Special_Issue(Event):
 	def __str__(self):
-		return str(self.title).encode('utf-8')
+		return str(self.title)
 
 	def get_absolute_url(self):
 		return reverse("special_issue_desc", kwargs={"id": self.id})
@@ -207,7 +207,7 @@ class Special_Issue(Event):
 
 class Workshop(Event):
 	def __str__(self):
-		return str(self.title).encode('utf-8')
+		return str(self.title)
 
 	def get_absolute_url(self):
 		return reverse("workshop_desc", kwargs={"id": self.id})
@@ -223,7 +223,7 @@ class Gallery_Image(BaseModel):
 	workshop = models.ForeignKey(Workshop, on_delete=models.CASCADE, null=True)
 
 	def __str__(self):
-		return str(self.id).encode('utf-8')
+		return str(self.id)
 
 
 class News(BaseModel):
@@ -239,7 +239,7 @@ class News(BaseModel):
 		return super(News, self).save(*args, **kwargs)
 
 	def __str__(self):
-		return str(self.title).encode('utf-8')
+		return str(self.title)
 
 	# def get_absolute_url(self):
 	# 	if self.event:
@@ -260,7 +260,7 @@ class Schedule_Event(BaseModel):
 	dataset_schedule = models.ForeignKey(Dataset, on_delete=models.CASCADE, null=True)
 
 	def __str__(self):
-		return str(self.title).encode('utf-8')
+		return str(self.title)
 
 
 class Event_Relation(BaseModel):
@@ -273,7 +273,7 @@ class Event_Relation(BaseModel):
 	description = RichTextField(null=True)
 
 	def __str__(self):
-		return str(self.id).encode('utf-8')
+		return str(self.id)
 
 class Track(BaseModel):
 	title = models.CharField(max_length=100)
@@ -300,7 +300,7 @@ class Result(BaseModel):
 	sub_rank = models.IntegerField(null=True)
 
 	def __str__(self):
-		return str(self.user).encode('utf-8')
+		return str(self.user)
 
 def submission_path(instance, filename):
 	return 'submissions/%s/input/res/%s' % (instance.pk, filename)
@@ -326,7 +326,7 @@ class Submission(BaseModel):
 	rank = models.IntegerField(null=True)
 
 	def __str__(self):
-		return str(self.user.username).encode('utf-8')
+		return str(self.user.username)
 
 def paper_path(instance, filename):
 	return 'results/%s/%s' % (instance.pk, filename)
@@ -339,7 +339,7 @@ class Result_User(BaseModel):
 	submission = models.ForeignKey(Submission, on_delete=models.CASCADE, null=True)
 
 	def __str__(self):
-		return str(self.name).encode('utf-8')
+		return str(self.name)
 
 class Score(BaseModel):
 	name = models.CharField(null=True, max_length=100)
@@ -348,7 +348,7 @@ class Score(BaseModel):
 	submission = models.ForeignKey(Submission, on_delete=models.CASCADE, null=True)
 
 	def __str__(self):
-		return str(self.name).encode('utf-8')
+		return str(self.name)
 
 class Data(BaseModel):
 	title = models.CharField(max_length=100)
@@ -359,7 +359,7 @@ class Data(BaseModel):
 	is_public = models.BooleanField(default=False)
 
 	def __str__(self):
-		return str(self.title).encode('utf-8')
+		return str(self.title)
 
 	def get_absolute_url(self):
 		return reverse("data_detail", kwargs={"id": self.id, "dataset_id": self.dataset.id})
@@ -374,7 +374,7 @@ class File(BaseModel):
 	data = models.ForeignKey(Data, on_delete=models.CASCADE, null=True)
 
 	def __str__(self):
-		return str(self.name).encode('utf-8')
+		return str(self.name)
 
 	def filename(self):
 		basename, extension = os.path.splitext(os.path.basename(self.file.name))
@@ -457,17 +457,17 @@ class Chalearn(BaseModel):
 	home_text = RichTextField(null=True)
 
 	def __str__(self):
-		return str(self.id).encode('utf-8')
+		return str(self.id)
 
 class CIMLBook(BaseModel):
 	name = models.CharField(null=True, max_length=100)
 	content = RichTextField(null=True)
 
 	def __str__(self):
-		return str(self.id).encode('utf-8')
+		return str(self.id)
 
 class Help(BaseModel):
 	help_text = RichTextField(null=True)
 
 	def __str__(self):
-		return str(self.id).encode('utf-8')
+		return str(self.id)
