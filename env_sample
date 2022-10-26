@@ -1,7 +1,6 @@
 DEBUG=0
 # Proxy settings
 BASE_DOMAIN=chalearnlap.aiwell.uoc.edu
-#EXPOSE_ENTRYPOINT=https
 
 # DJango configuration
 DJANGO_SECRET=my_very_secret_key

@@ -1,7 +1,7 @@
 version: "3.7"
 services:
   traefik:
-    image: "traefik:2-7"
+    image: "traefik"
     restart: always
     ports:
       - "8080:80"
@@ -9,15 +9,15 @@ services:
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - traefik_volume:/letsencrypt
-    labels:
+    command:
       - "--providers.docker"
       - "--providers.docker.exposedbydefault=false"
       - "--entrypoints.http.address=:80"
       - "--entrypoints.https.address=:443"
-      - "--certificatesresolvers.tesla-tlschallenge.acme.tlschallenge=true"
-      - "--certificatesresolvers.tesla-tlschallenge.acme.email=xbaro@uoc.edu"
-      - "--certificatesresolvers.tesla-tlschallenge.acme.storage=/letsencrypt/acme.json"
-      - "--certificatesresolvers.tesla-tlschallenge.acme.httpchallenge.entrypoint=http"
+      - "--certificatesresolvers.chalearnlap-tlschallenge.acme.tlschallenge=true"
+      - "--certificatesresolvers.chalearnlap-tlschallenge.acme.email=xbaro@uoc.edu"
+      - "--certificatesresolvers.chalearnlap-tlschallenge.acme.storage=/letsencrypt/acme.json"
+      - "--certificatesresolvers.chalearnlap-tlschallenge.acme.httpchallenge.entrypoint=http"
   db:
     image: mariadb:10.7
     restart: always
@@ -54,12 +54,16 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.chalearnlap-data.rule=Host(`data.${BASE_DOMAIN:-chalearnlap.aiwell.uoc.edu}`)"
-      - "traefik.http.routers.chalearnlap-data.entrypoints=${EXPOSE_ENTRYPOINT:-http}"
+      - "traefik.http.routers.chalearnlap-data.entrypoints=https"
+      - "traefik.http.routers.chalearnlap-data.tls=true"
+      - "traefik.http.routers.chalearnlap-data.tls.certresolver=chalearnlap-tlschallenge"
       - "traefik.http.services.chalearnlap-data-service.loadBalancer.sticky.cookie=true"
       - "traefik.http.services.chalearnlap-data-service.loadbalancer.server.port=9000"
       - "traefik.http.routers.chalearnlap-data.service=chalearnlap-data-service"
       - "traefik.http.routers.chalearnlap-datacons.rule=Host(`data-console.${BASE_DOMAIN:-chalearnlap.aiwell.uoc.edu}`)"
-      - "traefik.http.routers.chalearnlap-datacons.entrypoints=${EXPOSE_ENTRYPOINT:-http}"
+      - "traefik.http.routers.chalearnlap-datacons.entrypoints=https"
+      - "traefik.http.routers.chalearnlap-datacons.tls=true"
+      - "traefik.http.routers.chalearnlap-datacons.tls.certresolver=chalearnlap-tlschallenge"
       - "traefik.http.services.chalearnlap-datacons-service.loadBalancer.sticky.cookie=true"
       - "traefik.http.services.chalearnlap-datacons-service.loadbalancer.server.port=9001"
       - "traefik.http.routers.chalearnlap-datacons.service=chalearnlap-datacons-service"
@@ -106,7 +110,9 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.chalearnlap.rule=Host(`${BASE_DOMAIN:-chalearnlap.aiwell.uoc.edu}`)"
-      - "traefik.http.routers.chalearnlap.entrypoints=${EXPOSE_ENTRYPOINT:-http}"
+      - "traefik.http.routers.chalearnlap.entrypoints=https"
+      - "traefik.http.routers.chalearnlap.tls=true"
+      - "traefik.http.routers.chalearnlap.tls.certresolver=chalearnlap-tlschallenge"
       - "traefik.http.services.chalearnlap-service.loadBalancer.sticky.cookie=true"
       - "traefik.http.services.chalearnlap-service.loadbalancer.server.port=5000"
       - "traefik.http.routers.chalearnlap.service=chalearnlap-service"

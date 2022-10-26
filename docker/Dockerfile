@@ -80,6 +80,14 @@ RUN addgroup -g 2000 -S web_group && \
 # Give permisions to root folder for this user
 RUN chown -R web_user:web_group /code
 
+# Define default static folder
+ENV STATIC_ROOT=/code/static
+
+# Create the media folder
+RUN mkdir /code/media
+RUN chown -R web_user:web_group /code/media
+ENV MEDIA_ROOT=/code/media
+
 # Call collectstatic (customize the following line with the minimal environment variables needed for manage.py to run):
 RUN DB_ENGINE=sqlite3 /venv/bin/python manage.py collectstatic --noinput
 
