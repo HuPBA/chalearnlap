@@ -116,7 +116,8 @@ services:
       - "traefik.http.services.chalearnlap-service.loadBalancer.sticky.cookie=true"
       - "traefik.http.services.chalearnlap-service.loadbalancer.server.port=5000"
       - "traefik.http.routers.chalearnlap.service=chalearnlap-service"
-    
+    volumes:
+      - web_media_volume:/code/media_cdn
 volumes:
   traefik_volume:
     driver_opts:
@@ -137,4 +138,9 @@ volumes:
     driver_opts:
       type: none
       device: ${PWD}/_data/minio
+      o: bind
+  web_media_volume:
+    driver_opts:
+      type: none
+      device: ${PWD}/_data/web_media
       o: bind
