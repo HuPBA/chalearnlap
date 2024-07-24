@@ -5,6 +5,7 @@ BASE_DOMAIN=chalearnlap.aiwell.uoc.edu
 # DJango configuration
 DJANGO_SECRET=my_very_secret_key
 ALLOWED_HOSTS=
+CSRF_TRUSTED_ORIGINS=
 SITE_ID=1
 
 # Database configuration

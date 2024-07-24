@@ -232,9 +232,9 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', None),
-EMAIL_HOST_PASSWORD = _read_secret('EMAIL_HOST_PASSWORD', None),
-DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', None),
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', None)
+EMAIL_HOST_PASSWORD = _read_secret('EMAIL_HOST_PASSWORD', None)
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', None)
 DEFAULT_TO_EMAIL = ''
 
 # Use console as email backend on debug except if SMTP password is given
@@ -259,3 +259,14 @@ CKEDITOR_UPLOAD_PATH = "ck_uploads"
 ACCOUNT_EMAIL_VERIFICATION = 'optional'
 
 PROMETHEUS_METRICS_GW = os.getenv('PROMETHEUS_GW')
+
+# If your Django app is behind a proxy that sets a header to specify secure
+# connections, AND that proxy ensures that user-submitted headers with the
+# same name are ignored (so that people can't spoof it), set this value to
+# a tuple of (header_name, header_value). For any requests that come in with
+# that header/value, request.is_secure() will return True.
+# WARNING! Only set this if you fully understand what you're doing. Otherwise,
+# you may be opening yourself up to a security risk.
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+CSRF_TRUSTED_ORIGINS = os.environ.get('CSRF_TRUSTED_ORIGINS', '').split(',')

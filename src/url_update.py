@@ -1,4 +1,4 @@
-from chalearnlap.users.models import Event, Track
+from chalearnlap.users.models import Event, Track, File
 
 
 def replace_data():
@@ -6,31 +6,35 @@ def replace_data():
 		event.description = event.description.replace('http://158.109.8.102', 'https://data.chalearnlap.cvc.uab.cat')
 		event.save()	
 
+def replace_file_url():
+	for data_file in File.objects.filter(url__startswith='http://158.109.8.102').all():
+		data_file.url = data_file.url.replace('http://158.109.8.102', 'https://data.chalearnlap.cvc.uab.cat')
+		data_file.save()
 
 def replace_local():
-        for event in Event.objects.filter(description__contains='http://chalearnlap.cvc.uab').all():
-                event.description = event.description.replace('http://chalearnlap.cvc.uab', 'https://chalearnlap.cvc.uab')
-                event.save()
+	for event in Event.objects.filter(description__contains='http://chalearnlap.cvc.uab').all():
+		event.description = event.description.replace('http://chalearnlap.cvc.uab', 'https://chalearnlap.cvc.uab')
+		event.save()
 
 
 def replace_track():
-        for track in Track.objects.filter(description__contains='http://chalearnlap.cvc.uab').all():
-                track.description = track.description.replace('http://chalearnlap.cvc.uab', 'https://chalearnlap.cvc.uab')
-                track.description = track.description.replace('http://158.109.8.102', 'https://data.chalearnlap.cvc.uab.cat')
-                track.save()
+	for track in Track.objects.filter(description__contains='http://chalearnlap.cvc.uab').all():
+		track.description = track.description.replace('http://chalearnlap.cvc.uab', 'https://chalearnlap.cvc.uab')
+		track.description = track.description.replace('http://158.109.8.102', 'https://data.chalearnlap.cvc.uab.cat')
+		track.save()
 
 
 
 def replace_event_data(source, destination):
-        for event in Event.objects.filter(description__contains=source).all():
-                event.description = event.description.replace(source, destination)
-                event.save()
+	for event in Event.objects.filter(description__contains=source).all():
+		event.description = event.description.replace(source, destination)
+		event.save()
 
 
 def replace_track_data(source, destination):
-        for track in Track.objects.filter(description__contains=source).all():
-                track.description = track.description.replace(source, destination)                
-                track.save()
+	for track in Track.objects.filter(description__contains=source).all():
+		track.description = track.description.replace(source, destination)
+		track.save()
 
 
 def update_data():
@@ -45,6 +49,18 @@ def update_data():
 		('http://icmi.acm.org', 'https://icmi.acm.org'),
 		('http://www.youtube.com', 'https://www.youtube.com'),
 		('http://competitions.codalab.org', 'https://competitions.codalab.org'),
+		('http://cvpr2017.thecvf.com', 'https://cvpr2017.thecvf.com'),
+		('http://cvpr2021.thecvf.com', 'https://cvpr2021.thecvf.com'),
+		('http://eccv2014.org', 'https://eccv2014.org'),
+		('http://image-net.org', 'https://image-net.org'),
+		('http://pamitc.org', 'https://pamitc.org'),
+		('http://sunai.uoc.edu', 'https://sunai.uoc.edu'),
+		('http://doi.org', 'https://doi.org'),
+		('http://link.springer.com', 'https://link.springer.com'),
+
+		('http://pamitc.org', 'https://pamitc.org'),
+
+
 	]
 
 	for rep_src, rep_dst in replacements:
@@ -62,16 +78,15 @@ def get_event_type(event):
 	except Exception:
 		pass
 	try:
-                event.workshop.id
-                return 'workshop'
-        except Exception:
-                pass
+		event.workshop.id
+		return 'workshop'
+	except Exception:
+		pass
 	try:
-                event.challenge.id
-                return 'challenge'
-        except Exception:
-                pass
-	
+		event.challenge.id
+		return 'challenge'
+	except Exception:
+		pass
 
 	return 'unknown'
 
@@ -85,10 +100,10 @@ def list_pending():
 		except Exception as exc:
 			print('Event {} (https://chalearnlap.cvc.uab.cat/{}/{}/description/) => {}'.format(event.id, get_event_type(event), event.id, str(exc)))
 
-        for track in Track.objects.filter(description__contains='http://').all():
+	for track in Track.objects.filter(description__contains='http://').all():
 		url_start = track.description.find('http://')
 		url_end = min(len(track.description) - 1, url_start + 50)
 		try:
-	                print('Track {} => {}'.format(track.id, track.description[url_start:url_end]))
+			print('Track {} => {}'.format(track.id, track.description[url_start:url_end]))
 		except Exception as exc:
 			print('Track {} => {}'.format(track.id, track.description[url_start:url_end], str(exc)))
