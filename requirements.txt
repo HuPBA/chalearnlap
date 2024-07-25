@@ -6,8 +6,8 @@ django-watson
 pyforms-web
 django-datetime-widget
 django-utils-six
-django_extensions
-django_prometheus
+django-extensions
+django-prometheus
 xlwt
 sentry-sdk
 XlsxWriter
