@@ -133,10 +133,10 @@
                                             {% endif %} 
                                             <li><a href="{% url "event_proposal_creation" %}">Propose event</a></li> 
                                             <li><a href="{% url "user_edit" id=user.id %}">Edit profile</a></li>
-                                            <li><a href="{% url "help" %}">Help</a></li> 
-                                            <li><a href="{% url "auth_logout" %}">Log out</a></li> 
-                                        </ul>  
-                                    </li>                       
+                                            <li><a href="{% url "help" %}">Help</a></li>
+                                            <li><a href="#" onclick="document.getElementById('logout_post_form').submit();">Log out</a></li>
+                                        </ul>
+                                    </li>
                                 {% else %}
                                     <li> <a class="btn" href="{% url "auth_login" %}">SIGN IN</a> </li>
                                     <li> <a class="btn" href="{% url "register" %}">SIGN UP</a> </li>
@@ -153,7 +153,10 @@
                     </div>  
                 </div>             
             </div>             
-        </div>                
+        </div>
+        <form id="logout_post_form" action="{% url 'auth_logout' %}" method="post">
+            {% csrf_token %}
+        </form>
         <div id="container-height" class="container content"> 
             <div id="dialog" title="Confirm delete" hidden="true">Are you sure to delete?</div>
             {% block container %} 
