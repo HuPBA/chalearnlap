@@ -4332,9 +4332,9 @@ def check_dataset_permission(request, dataset):
 			profile_dataset = Profile.objects.filter(user=request.user)
 		else:
 			profile = Profile.objects.filter(user=request.user)
-			profile_dataset = Profile_Dataset.objects.filter(dataset=dataset, profile=profile)
+			profile_dataset = Profile_Dataset.objects.filter(dataset=dataset, profile__in=profile)
 			if len(profile_dataset) > 0:
-				profile_dataset = Profile_Dataset.objects.filter(dataset=dataset, profile=profile).first()
+				profile_dataset = Profile_Dataset.objects.filter(dataset=dataset, profile__in=profile).first()
 				if not profile_dataset.is_admin():
 					profile_dataset = None
 			else:
@@ -4344,9 +4344,9 @@ def check_dataset_permission(request, dataset):
 def check_edit_dataset_permission(request, dataset):
 	if not request.user.is_staff:
 		profile = Profile.objects.filter(user=request.user)
-		profile_dataset = Profile_Dataset.objects.filter(dataset=dataset, profile=profile)
+		profile_dataset = Profile_Dataset.objects.filter(dataset=dataset, profile__in=profile)
 		if len(profile_dataset) > 0:
-			profile_dataset = Profile_Dataset.objects.filter(dataset=dataset, profile=profile).first()
+			profile_dataset = Profile_Dataset.objects.filter(dataset=dataset, profile__in=profile).first()
 			if not profile_dataset.is_admin():
 				return False
 		else:
