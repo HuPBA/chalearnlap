@@ -4305,9 +4305,9 @@ def check_event_permission(request, event):
 			profile_event = Profile.objects.filter(user=request.user)
 		else:
 			profile = Profile.objects.filter(user=request.user)
-			profile_event = Profile_Event.objects.filter(event=event, profile=profile)
+			profile_event = Profile_Event.objects.filter(event=event, profile__in=profile)
 			if len(profile_event) > 0:
-				profile_event = Profile_Event.objects.filter(event=event, profile=profile).first()
+				profile_event = Profile_Event.objects.filter(event=event, profile__in=profile).first()
 				if not profile_event.is_admin():
 					profile_event = None
 			else:
@@ -4317,9 +4317,9 @@ def check_event_permission(request, event):
 def check_edit_event_permission(request, event):
 	if not request.user.is_staff:
 		profile = Profile.objects.filter(user=request.user)
-		profile_event = Profile_Event.objects.filter(event=event, profile=profile)
+		profile_event = Profile_Event.objects.filter(event=event, profile__in=profile)
 		if len(profile_event) > 0:
-			profile_event = Profile_Event.objects.filter(event=event, profile=profile).first()
+			profile_event = Profile_Event.objects.filter(event=event, profile__in=profile).first()
 			if not profile_event.is_admin():
 				return False
 		else:
