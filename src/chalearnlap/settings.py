@@ -225,6 +225,7 @@ MESSAGE_TAGS = {
 # Registration settings
 ACCOUNT_ACTIVATION_DAYS = 7 # One-week activation window; you may, of course, use a different value.
 REGISTRATION_EMAIL_HTML = False
+REGISTRATION_OPEN = False # Site deprecated: new user registration is closed
 SITE_ID = int(os.environ.get('SITE_ID', 1))
 
 # GMAIL SMTP settings
