@@ -29,6 +29,7 @@ RUN set -ex \
             python3-dev \
     && python3 -m venv /venv \
     && /venv/bin/pip install -U pip \
+    && /venv/bin/pip install --upgrade pip setuptools wheel \
     && LIBRARY_PATH=/lib:/usr/lib /bin/sh -c "/venv/bin/pip install --no-cache-dir wheel uwsgi daphne mysqlclient psycopg2 -r requirements.txt --upgrade" \
     && runDeps="$( \
             scanelf --needed --nobanner --recursive /venv \

@@ -1,0 +1,11 @@
+FROM chalearn_lap-web:v2.1.0
+
+# Copy the code
+ADD src/chalearnlap /code/chalearnlap
+RUN cp /code/chalearnlap/manage.py /code/manage.py
+
+# Give permisions to root folder for this user
+RUN chown -R web_user:web_group /code
+
+# Call collectstatic (customize the following line with the minimal environment variables needed for manage.py to run):
+RUN DB_ENGINE=sqlite3 /venv/bin/python manage.py collectstatic --noinput
